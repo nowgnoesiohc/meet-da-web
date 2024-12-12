@@ -3,30 +3,24 @@ import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
 
+// import eslintPluginJsxA11y from "eslint-plugin-jsx-a11y";
+// import eslintPluginPrettier from "eslint-plugin-prettier";
+import eslintPluginReactHooks from "eslint-plugin-react-hooks";
+import eslintPluginJsxA11y from "eslint-plugin-jsx-a11y";
+
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
+  // pluginReact.configs.flat.recommended,
   {
-    env: {
-      browser: true,
-      es2021: true,
+    files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+    languageOptions: { globals: globals.browser },
+    plugins: {
+      react: pluginReact,
+      "react-hooks": eslintPluginReactHooks,
+      "jsx-a11y": eslintPluginJsxA11y,
     },
-    extends: [
-      "eslint:recommended",
-      "plugin:react/recommended",
-      "plugin:jsx-ally/recommended",
-      "plugin:prettier/recommended",
-      "plugin:react-hooks/recommended",
-    ],
-    parserOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-    },
-    plugins: ["react"],
-    rules: {},
   },
+  // eslintPluginJsxA11y.flatConfigs.recommended,
 ];
