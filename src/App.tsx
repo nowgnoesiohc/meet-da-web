@@ -1,16 +1,17 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Page1/Page1";
-import "./App.css";
+import { Outlet } from "react-router-dom";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import GlobalStyles from "./styles/GlobalStyle";
 
-const App: React.FC = () => {
+function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </Router>
+    <>
+      <GlobalStyles />
+      <Header />
+      <Outlet />
+      <Footer />
+    </>
   );
-};
+}
 
 export default App;
