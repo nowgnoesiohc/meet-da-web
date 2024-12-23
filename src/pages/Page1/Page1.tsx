@@ -1,4 +1,4 @@
-import GlobalStyle from "/Users/noey/Desktop/meet-so-sa/meet-da-web/src/styles/GlobalStyle.ts";
+import GlobalStyle from "@/styles/GlobalStyle";
 
 export function Page1() {
   return (
