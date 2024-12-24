@@ -20,8 +20,8 @@ jobs:
 
       - name: Setup remote for forked repo
         run: |
-          git remote add forked-repo https://${{ secrets.GITHUB_ID }}:${{ secrets.ACTIONS_TOKEN }}@github.com/${{ secrets.GITHUB_ID }}/meet-da-web
-          git config user.name ${{ secrets.GITHUB_ID }}
+          git remote add forked-repo https://${{ secrets.ID_GITHUB }}:${{ secrets.ACTIONS_TOKEN }}@github.com/${{ secrets.ID_GITHUB }}/meet-da-web
+          git config user.name ${{ secrets.ID_GITHUB }}
           git config user.email ${{ secrets.EMAIL }}
 
       - name: Force push to forked-repo
