@@ -1,4 +1,4 @@
-import GlobalStyle from "/Users/noey/Desktop/meet-so-sa/meet-da-web/src/styles/GlobalStyle.ts";
+import GlobalStyle from "@/styles/GlobalStyle";
 import {
   FriendButton,
   PointConfirmButton,
@@ -12,7 +12,7 @@ import {
   MypageButton,
   OrangeLineButton,
   FriendTabButton,
-} from "/Users/noey/Desktop/meet-so-sa/meet-da-web/src/components/ui/Button";
+} from "@/components/ui/Button";
 import { useState } from "react";
 
 export function Page1() {

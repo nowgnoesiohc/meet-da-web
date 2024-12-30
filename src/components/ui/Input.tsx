@@ -1,3 +1,3 @@
-export default function Input(params) {
+export default function Input() {
   return <input />;
 }
