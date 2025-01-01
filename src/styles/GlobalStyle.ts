@@ -8,50 +8,89 @@ const GlobalStyles = createGlobalStyle`
     --white: #FFFFFF;
 
     /* Background Colors */
-    --bg-01: #FFF9F5; /* 캘린더 및 모달 배경색 */
-    --bg-02: #F8F4E7; /* 버튼 및 답글창 배경색 */
+    --bg-01: #FFFCF5; /* 캘린더 및 모달 배경색 */
+    --bg-02: #F5F1E7; /* 버튼 및 답글창 배경색 */
     --bg-mood: #E2EBC1; /* 무드 클릭 시 배경색 */
   
     /* Line Colors */
-    --line-green: #99C1C9; /* 피드 검색창 라인 색상 */
+    --line-green: #99C1B9; /* 피드 검색창 라인 색상 */
     --line-diary: #968786; /* 피드 게시글 라인 색 */
     --line-basic: #B1AB99; /* 일부 버튼 및 기본선 등 색상 */
 
     /* Button & Hover Colors */
-    --submit-button: #FFC096; /* 등록 버튼 색 */
-    --comment-button: #A1B982; /* 댓글 및 답글 버튼 색 */
+    --submit-button: #FFC99C; /* 등록 버튼 색 */
+    --comment-button: #A1AB82; /* 댓글 및 답글 버튼 색 */
     --disable-button: #E6E6E6; /* 비활성 버튼 색 */
-    --orange-button: #F9A950; /* 일부 버튼 및 라인 색 */
-    --hover-orange: #F4F2E3; /* 헤어지기 버튼 호버 배경색 */
-    --hover-green: #D0EAE4; /* 만나기 버튼 호버 색 */
+    --orange-button: #F69250; /* 일부 버튼 및 라인 색 */
+    --hover-orange: #FFF2E2; /* 헤어지기 버튼 호버 배경색 */
+    --hover-green: #DCF2E2; /* 만나기 버튼 호버 색 */
     
     /* Green Colors */
-    --feed-searchbar: #C2E2A2; /* 피드 검색창 색 */
+    --feed-searchbar: #D3E9E4; /* 피드 검색창 색 */
     --past-track: #B8D7D1; /* 지난 날짜 무드 기록 화면 색 */
     
     /* Orange Colors */
-    --main-orange: #F37352; /* 메인 테마 색상 */
+    --main-orange: #F3752E; /* 메인 테마 색상 */
     
     /* Red Colors */
-    --error-01: #F174A4; /* 비밀번호 변경 입력 오류 인풋 라인 및 안내 문구 색상 */
-    --error-02: #E01B00; /* 회원가입 입력 오류 인풋 라인 및 안내 문구 색상 */
+    --error-01: #F1474A; /* 비밀번호 변경 입력 오류 인풋 라인 및 안내 문구 색상 */
+    --error-02: #EB1D20; /* 회원가입 입력 오류 인풋 라인 및 안내 문구 색상 */
 
     /* Text Colors */
-    --main-text: #54533A; /* 메인 텍스트 색상 */
+    --main-text: #54433A; /* 메인 텍스트 색상 */
     --sub-text: #635E4E; /* 서브 텍스트 색상 */
     --diary-text: #4B4B4B; /* 피드 내용, 댓글 등 텍스트 색상 */
-    --unfollow-text: #C46242; /* 헤어지기 버튼 텍스트 색상 */
+    --unfollow-text: #C66224; /* 헤어지기 버튼 텍스트 색상 */
     --search-placeholder: #645E4E; /* 마이페이지 검색창 placeholder 색 */
     --text-01: #868686; /* 비활성 버튼 텍스트 색상 */
-    --text-02: #B5B5B5; /* 로그인 및 회원가입, 일부 모달 텍스트 색상 */
+    --text-02: #958B85; /* 로그인 및 회원가입, 일부 모달 텍스트 색상 */
     --text-03: #C9C9C9; /* 작성 전 및 보조 텍스트 색상 */
 
     /* Point Colors */
-    --point-blue: #1F87FF; /* 마이페이지 적립 포인트 표시 색 */
+    --point-blue: #1F88FF; /* 마이페이지 적립 포인트 표시 색 */
     --point-red: #F43333; /* 마이페이지 사용 포인트 표시 색 */
+
+    /* Font Weight */
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
   }
   *{
     box-sizing: border-box;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+         url('/fonts/Pretendard-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Medium.woff2') format('woff2'),
+         url('/fonts/Pretendard-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2'),
+         url('/fonts/Pretendard-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Bold.woff2') format('woff2'),
+         url('/fonts/Pretendard-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
   }
   
  html {
@@ -91,6 +130,8 @@ const GlobalStyles = createGlobalStyle`
     cursor: pointer;
     background: none;
     border: none;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: var(--font-regular);
   }
 
   input {
@@ -100,7 +141,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   /* Responsive styles */
-  @media (max-width: var(--mobile)) {
+  @media (max-width: 360px) {
     html {
       font-size: 14px;
     }
@@ -109,7 +150,7 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  @media (max-width: var(--tablet)) and (min-width: var(--mobile)) {
+  @media (max-width: 781px) and (min-width: 360px) {
     html {
       font-size: 16px;
     }
@@ -118,9 +159,12 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  @media (min-width: var(--desktop)) {
+  @media (min-width: 1920px) {
     html {
       font-size: 18px;
+    }
+    body {
+      background-color: var(--white);
     }
   }
 `;
