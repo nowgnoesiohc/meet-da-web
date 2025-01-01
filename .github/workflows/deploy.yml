@@ -1,0 +1,33 @@
+name: Synchronize to forked repo
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    if: github.repository_owner == 'SeSAC-meet-so-sa' # org 이름
+    name: Sync forked repo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONS_TOKEN }}
+          fetch-depth: 0
+          ref: dev
+
+      - name: Setup remote for forked repo
+        run: |
+          git remote add forked-repo https://${{ secrets.ID_GITHUB }}:${{ secrets.ACTIONS_TOKEN }}@github.com/${{ secrets.ID_GITHUB }}/meet-da-web
+          git config user.name ${{ secrets.ID_GITHUB }}
+          git config user.email ${{ secrets.EMAIL }}
+
+      - name: Force push to forked-repo
+        run: |
+          git push -f forked-repo dev
+
+      - name: Clean up
+        run: |
+          git remote remove forked-repo

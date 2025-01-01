@@ -392,7 +392,6 @@ const OrangeButtonStyle = {
       width: "8.25rem",
       height: "3rem",
       borderRadius: "0.625rem",
-      fontSize: "1rem",
     },
   },
   confirm: {
@@ -498,7 +497,6 @@ export const ReplyButton = styled.button<{
 }>`
   display: flex;
   align-items: center;
-  justify-content: center;
   width: 5.875rem;
   height: 2.625rem;
   border-radius: 0.5rem;

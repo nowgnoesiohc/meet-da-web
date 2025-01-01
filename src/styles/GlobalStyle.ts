@@ -144,15 +144,18 @@ const GlobalStyles = createGlobalStyle`
   @media (max-width: 390px) {
     html {
       font-size: 0.875rem;
+
     }
     body {
       background-color: var(--white);
     }
   }
 
+
   @media (max-width: 781px) and (min-width: 390px) {
     html {
       font-size: 1rem;
+
     }
     body {
       background-color: var(--white);
@@ -162,6 +165,7 @@ const GlobalStyles = createGlobalStyle`
   @media (min-width: 1920px) {
     html {
       font-size: 1.125rem;
+
     }
     body {
       background-color: var(--white);

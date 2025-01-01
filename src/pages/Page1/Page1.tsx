@@ -1,3 +1,4 @@
+
 import styled from "styled-components";
 import Navigation from "../../components/layout/navigation/Navigation";
 import MypageNavigation from "../../components/layout/navigation/MypageNavigation";
@@ -26,3 +27,5 @@ export default function Page1() {
     </>
   );
 }
+
+export default Page1;
