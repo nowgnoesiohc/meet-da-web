@@ -3,93 +3,170 @@ import { createGlobalStyle } from "styled-components";
 const GlobalStyles = createGlobalStyle`
 
   :root {
-    background-color: #fffdee;
-    /* color */
-    --color-main: #5A8900;
-    --color-black: #222;
-    --color-white: #fff;
-    --color-warning: #ff9191;
-    --color-grey: #d9d9d9;
-    --color-sub: #CD7522;
+    /* Basic Colors */
+    --black: #000000; /* 강조 및 내용 작성 텍스트 색상 */
+    --white: #FFFFFF;
+
+    /* Background Colors */
+    --bg-01: #FFFCF5; /* 캘린더 및 모달 배경색 */
+    --bg-02: #F5F1E7; /* 버튼 및 답글창 배경색 */
+    --bg-mood: #E2EBC1; /* 무드 클릭 시 배경색 */
+  
+    /* Line Colors */
+    --line-green: #99C1B9; /* 피드 검색창 라인 색상 */
+    --line-diary: #968786; /* 피드 게시글 라인 색 */
+    --line-basic: #B1AB99; /* 일부 버튼 및 기본선 등 색상 */
+
+    /* Button & Hover Colors */
+    --submit-button: #FFC99C; /* 등록 버튼 색 */
+    --comment-button: #A1AB82; /* 댓글 및 답글 버튼 색 */
+    --disable-button: #E6E6E6; /* 비활성 버튼 색 */
+    --orange-button: #F69250; /* 일부 버튼 및 라인 색 */
+    --hover-orange: #FFF2E2; /* 헤어지기 버튼 호버 배경색 */
+    --hover-green: #DCF2E2; /* 만나기 버튼 호버 색 */
+    
+    /* Green Colors */
+    --feed-searchbar: #D3E9E4; /* 피드 검색창 색 */
+    --past-track: #B8D7D1; /* 지난 날짜 무드 기록 화면 색 */
+    
+    /* Orange Colors */
+    --main-orange: #F3752E; /* 메인 테마 색상 */
+    
+    /* Red Colors */
+    --error-01: #F1474A; /* 비밀번호 변경 입력 오류 인풋 라인 및 안내 문구 색상 */
+    --error-02: #EB1D20; /* 회원가입 입력 오류 인풋 라인 및 안내 문구 색상 */
+
+    /* Text Colors */
+    --main-text: #54433A; /* 메인 텍스트 색상 */
+    --sub-text: #635E4E; /* 서브 텍스트 색상 */
+    --diary-text: #4B4B4B; /* 피드 내용, 댓글 등 텍스트 색상 */
+    --unfollow-text: #C66224; /* 헤어지기 버튼 텍스트 색상 */
+    --search-placeholder: #645E4E; /* 마이페이지 검색창 placeholder 색 */
+    --text-01: #868686; /* 비활성 버튼 텍스트 색상 */
+    --text-02: #958B85; /* 로그인 및 회원가입, 일부 모달 텍스트 색상 */
+    --text-03: #C9C9C9; /* 작성 전 및 보조 텍스트 색상 */
+
+    /* Point Colors */
+    --point-blue: #1F88FF; /* 마이페이지 적립 포인트 표시 색 */
+    --point-red: #F43333; /* 마이페이지 사용 포인트 표시 색 */
+
+    /* Font Weight */
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
   }
   *{
     box-sizing: border-box;
   }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+         url('/fonts/Pretendard-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Medium.woff2') format('woff2'),
+         url('/fonts/Pretendard-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2'),
+         url('/fonts/Pretendard-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/Pretendard-Bold.woff2') format('woff2'),
+         url('/fonts/Pretendard-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
   
-  html, body, div, span, applet, object, iframe,
-  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-  a, abbr, acronym, address, big, cite, code,
-  del, dfn, em, img, ins, kbd, q, s, samp,
-  small, strike, strong, sub, sup, tt, var,
-  b, u, i, center,
-  dl, dt, dd, ol, ul, li,
-  fieldset, form, label, legend,
-  table, caption, tbody, tfoot, thead, tr, th, td,
-  article, aside, canvas, details, embed, 
-  figure, figcaption, footer, header, hgroup, 
-  menu, nav, output, ruby, section, summary,
-  time, mark, audio, video {
+ html {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: var(--font-regular);
+  }
+
+  /* Font weight utility classes */
+  .font-regular {
+    font-weight: var(--font-regular);
+  }
+  .font-medium {
+    font-weight: var(--font-medium);
+  }
+  .font-semibold {
+    font-weight: var(--font-semibold);
+  }
+  .font-bold {
+    font-weight: var(--font-bold);
+  }
+
+  body {
     margin: 0;
     padding: 0;
-    border: 0;
-    font-size: 100%;
-   font-family: 'Pretendard Regular';
-    vertical-align: baseline;
+    background-color: var(--white);
+    color: var(--main-text);
+    height: 100%;
+    line-height: 1.5;
   }
-  /* HTML5 display-role reset for older browsers */
-  article, aside, details, figcaption, figure, 
-  footer, header, hgroup, menu, nav, section {
-    display: block;
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
-  body {
-    line-height: 1;
-  }
-  ol, ul {
-    list-style: none;
-  }
-  blockquote, q {
-    quotes: none;
-  }
-  blockquote:before, blockquote:after,
-  q:before, q:after {
-    content: '';
-    content: none;
-  }
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
+
   button {
     cursor: pointer;
     background: none;
     border: none;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: var(--font-regular);
   }
+
   input {
     background: none;
-    border: 0;
-  }
-  input:focus {
+    border: none;
     outline: none;
   }
-  input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-a {
-  color: inherit;
-  text-decoration: none;
-}
 
-  body {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-text-size-adjust: none; /* Chrome, Safari, Opera */
-  -ms-text-size-adjust: none; /* IE */
-  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
-  height: 100%; /* Prevent vertical bounce and set height to full view */
-  margin: 0;
-  padding: 0;
-}
+  /* Responsive styles */
+  @media (max-width: 390px) {
+    html {
+      font-size: 0.875rem;
+    }
+    body {
+      background-color: var(--white);
+    }
+  }
+
+  @media (max-width: 781px) and (min-width: 390px) {
+    html {
+      font-size: 1rem;
+    }
+    body {
+      background-color: var(--white);
+    }
+  }
+
+  @media (min-width: 1920px) {
+    html {
+      font-size: 1.125rem;
+    }
+    body {
+      background-color: var(--white);
+    }
+  }
 `;
 
 export default GlobalStyles;
