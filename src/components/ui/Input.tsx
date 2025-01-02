@@ -1,53 +1,73 @@
-// CommonStyles.ts
 import styled, { css } from "styled-components";
 import React, { useState, ChangeEvent } from "react";
 
+// 글자 수 초과 여부
 interface CommonProps {
-  exceeded?: boolean; // 글자수 초과 여부
+  exceeded?: boolean;
 }
+interface BaseProps {
+  maxLength?: number;
+  showCount?: boolean;
+}
+interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement>,
+    BaseProps {}
+interface TextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    BaseProps {}
 
-// 공통 인풋 스타일 믹스인
+// 공통 스타일
 export const commonStyle = css<CommonProps>`
   box-sizing: border-box;
   width: 100%;
   padding: 20px;
-  border: 2px solid ${({ exceeded }) => (exceeded ? "#FF0000" : "#635E4E")};
+  border: 2px solid
+    ${({ exceeded }) => (exceeded ? "var(--error-02)" : "var(--text-02)")};
   border-radius: 12px;
   font-size: 16px;
   outline: none;
   color: #000;
   ::placeholder {
-    color: ${({ exceeded }) => (exceeded ? "#FF0000" : "#aaa")};
+    color: ${({ exceeded }) =>
+      exceeded ? "var(--error-02)" : "var(--text-02)"};
   }
 
   &:focus {
-    border-color: ${({ exceeded }) => (exceeded ? "#FF0000" : "#F3752E")};
+    border-color: ${({ exceeded }) =>
+      exceeded ? "var(--error-02)" : "var(--orange-button)"};
   }
 `;
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  maxLength?: number;
-  showCount?: boolean;
-}
-
-const StyledInput = styled.input<{ exceeded: boolean }>`
+const StyledInput = styled.input<CommonProps>`
   ${commonStyle}
 `;
+const StyledTextarea = styled.textarea<CommonProps>`
+  ${commonStyle}
+  resize:none;
+  min-height: 100px;
+`;
+const CountIndicator = styled.span<{ exceeded: boolean }>`
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  font-size: 12px;
+  color: ${({ exceeded }) => (exceeded ? "var(--error-02)" : "var(--text-02)")};
+`;
 
-export const Input: React.FC<InputProps> = ({
-  maxLength,
-  showCount,
-  ...props
-}) => {
+const Wrapper = styled.div`
+  position: relative;
+`;
+
+export const Input: React.FC<InputProps> = ({ maxLength, ...props }) => {
   const [value, setValue] = useState(props.value?.toString() || "");
   const exceeded = maxLength ? value.length > maxLength : false;
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-    props.onChange && props.onChange(e);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
+    props.onChange?.(event);
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <Wrapper>
       <StyledInput
         {...props}
         value={value}
@@ -55,42 +75,26 @@ export const Input: React.FC<InputProps> = ({
         exceeded={exceeded}
         placeholder={exceeded ? "글자 수 초과!" : props.placeholder}
       />
-      {showCount && maxLength !== undefined && (
+      {maxLength && (
         <CountIndicator exceeded={exceeded}>
           {value.length}/{maxLength}
         </CountIndicator>
       )}
-    </div>
+    </Wrapper>
   );
 };
 
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  maxLength?: number;
-  showCount?: boolean;
-}
-
-const StyledTextarea = styled.textarea<{ exceeded: boolean }>`
-  ${commonStyle}
-  resize: none;
-  min-height: 100px;
-`;
-
-export const Textarea: React.FC<TextareaProps> = ({
-  maxLength,
-  showCount,
-  ...props
-}) => {
+export const Textarea: React.FC<TextareaProps> = ({ maxLength, ...props }) => {
   const [value, setValue] = useState(props.value?.toString() || "");
   const exceeded = maxLength ? value.length > maxLength : false;
 
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value);
-    props.onChange && props.onChange(e);
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(event.target.value);
+    props.onChange?.(event);
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <Wrapper>
       <StyledTextarea
         {...props}
         value={value}
@@ -98,19 +102,11 @@ export const Textarea: React.FC<TextareaProps> = ({
         exceeded={exceeded}
         placeholder={exceeded ? "글자 수 초과!" : props.placeholder}
       />
-      {showCount && maxLength !== undefined && (
+      {maxLength && (
         <CountIndicator exceeded={exceeded}>
           {value.length}/{maxLength}
         </CountIndicator>
       )}
-    </div>
+    </Wrapper>
   );
 };
-
-const CountIndicator = styled.span<{ exceeded: boolean }>`
-  position: absolute;
-  bottom: 5px;
-  right: 10px;
-  font-size: 12px;
-  color: ${({ exceeded }) => (exceeded ? "#FF0000" : "#000")};
-`;
