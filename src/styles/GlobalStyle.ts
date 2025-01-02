@@ -115,7 +115,7 @@ const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-01);
+    background-color: var(--white);
     color: var(--main-text);
     height: 100%;
     line-height: 1.5;
@@ -141,18 +141,21 @@ const GlobalStyles = createGlobalStyle`
   }
 
   /* Responsive styles */
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     html {
-      font-size: 14px;
+      font-size: 0.875rem;
+
     }
     body {
       background-color: var(--white);
     }
   }
 
-  @media (max-width: 781px) and (min-width: 360px) {
+
+  @media (max-width: 781px) and (min-width: 390px) {
     html {
-      font-size: 16px;
+      font-size: 1rem;
+
     }
     body {
       background-color: var(--white);
@@ -161,7 +164,8 @@ const GlobalStyles = createGlobalStyle`
 
   @media (min-width: 1920px) {
     html {
-      font-size: 18px;
+      font-size: 1.125rem;
+
     }
     body {
       background-color: var(--white);

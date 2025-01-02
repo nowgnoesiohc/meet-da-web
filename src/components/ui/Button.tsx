@@ -3,158 +3,158 @@ import styled from "styled-components";
 const FriendButtonStyle = {
   follow: {
     default: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "16px",
+      borderRadius: "1rem",
       color: "var(--search-placeholder)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     tablet: {
-      width: "114px",
-      height: "56px",
+      width: "7.125rem",
+      height: "3.5rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "16px",
+      borderRadius: "1rem",
       color: "var(--search-placeholder)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "72px",
-      height: "40px",
+      width: "4.5rem",
+      height: "2.5rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--search-placeholder)",
-      fontSize: "14px",
+      fontSize: "0.875rem",
     },
   },
   unfollow: {
     default: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "16px",
+      borderRadius: "1rem",
       color: "var(--unfollow-text)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     tablet: {
-      width: "114px",
-      height: "56px",
+      width: "7.125rem",
+      height: "3.5rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "16px",
+      borderRadius: "1rem",
       color: "var(--unfollow-text)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "72px",
-      height: "40px",
+      width: "4.5rem",
+      height: "2.5rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--unfollow-text)",
-      fontSize: "14px",
+      fontSize: "0.875rem",
     },
   },
   diaryFollow: {
     default: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--search-placeholder)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     tablet: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--search-placeholder)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "86px",
-      height: "44px",
+      width: "5.375rem",
+      height: "2.75rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--search-placeholder)",
-      fontSize: "14px",
+      fontSize: "0.875rem",
     },
   },
   diaryUnfollow: {
     default: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--unfollow-text)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     tablet: {
-      width: "128px",
-      height: "56px",
+      width: "8rem",
+      height: "3.5rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--unfollow-text)",
-      fontSize: "20px",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "86px",
-      height: "44px",
+      width: "5.375rem",
+      height: "2.75rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--unfollow-text)",
-      fontSize: "14px",
+      fontSize: "0.875rem",
     },
   },
   modalFollow: {
     default: {
-      width: "100px",
-      height: "52px",
+      width: "6.25rem",
+      height: "3.25rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--search-placeholder)",
-      fontSize: "18px",
+      fontSize: "1.125rem",
     },
     tablet: {
-      width: "100px",
-      height: "52px",
+      width: "6.25rem",
+      height: "3.25rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--search-placeholder)",
-      fontSize: "18px",
+      fontSize: "1.125rem",
     },
     mobile: {
-      width: "98px",
-      height: "44px",
+      width: "6.125rem",
+      height: "2.75rem",
       border: "1px solid var(--main-text)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--search-placeholder)",
-      fontSize: "16px",
+      fontSize: "1rem",
     },
   },
   modalUnfollow: {
     default: {
-      width: "100px",
-      height: "52px",
+      width: "6.25rem",
+      height: "3.25rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--unfollow-text)",
-      fontSize: "18px",
+      fontSize: "1.125rem",
     },
     tablet: {
-      width: "100px",
-      height: "52px",
+      width: "6.25rem",
+      height: "3.25rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "12px",
+      borderRadius: "0.75rem",
       color: "var(--unfollow-text)",
-      fontSize: "18px",
+      fontSize: "1.125rem",
     },
     mobile: {
-      width: "98px",
-      height: "44px",
+      width: "6.125rem",
+      height: "2.75rem",
       border: "1px solid var(--main-orange)",
-      borderRadius: "10px",
+      borderRadius: "0.625rem",
       color: "var(--unfollow-text)",
-      fontSize: "16px",
+      fontSize: "1rem",
     },
   },
 };
@@ -209,7 +209,7 @@ export const FriendButton = styled.button<{
     font-size: ${(props) => FriendButtonStyle[props.variant].tablet.fontSize};
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     width: ${(props) => FriendButtonStyle[props.variant].mobile.width};
     height: ${(props) => FriendButtonStyle[props.variant].mobile.height};
     border-radius: ${(props) =>
@@ -222,112 +222,112 @@ export const PointConfirmButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 128px;
-  height: 56px;
-  border-radius: 16px;
+  width: 8rem;
+  height: 3.5rem;
+  border-radius: 1rem;
   background-color: var(--orange-button);
   color: var(--white);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-semibold);
 
   @media (max-width: 781px) {
-    width: 110px;
-    height: 48px;
-    border-radius: 16px;
-    font-size: 20px;
+    width: 6.875rem;
+    height: 3rem;
+    border-radius: 1rem;
+    font-size: 1.25rem;
   }
 
-  @media (max-width: 360px) {
-    width: 98px;
-    height: 44px;
-    border-radius: 12px;
-    font-size: 16px;
+  @media (max-width: 390px) {
+    width: 6.125rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
   }
 `;
 
 const RecordButtonStyle = {
   moodCancel: {
     default: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
       backgroundColor: "var(--line-basic)",
     },
     tablet: {
-      width: "110px",
-      height: "52px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "6.875rem",
+      height: "3.25rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "80px",
-      height: "44px",
-      borderRadius: "12px",
-      fontSize: "16px",
+      width: "5rem",
+      height: "2.75rem",
+      borderRadius: "0.75rem",
+      fontSize: "1rem",
     },
   },
   moodSubmit: {
     default: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
       backgroundColor: "var(--submit-button)",
     },
     tablet: {
-      width: "110px",
-      height: "52px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "6.875rem",
+      height: "3.25rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "80px",
-      height: "44px",
-      borderRadius: "12px",
-      fontSize: "16px",
+      width: "5rem",
+      height: "2.75rem",
+      borderRadius: "0.75rem",
+      fontSize: "1rem",
     },
   },
   diaryCancel: {
     default: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
       backgroundColor: "var(--line-basic)",
     },
     tablet: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "112px",
-      height: "48px",
-      borderRadius: "14px",
-      fontSize: "16px",
+      width: "7rem",
+      height: "3rem",
+      borderRadius: "0.875rem",
+      fontSize: "1rem",
     },
   },
   diarySubmit: {
     default: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
       backgroundColor: "var(--submit-button)",
     },
     tablet: {
-      width: "128px",
-      height: "56px",
-      borderRadius: "16px",
-      fontSize: "20px",
+      width: "8rem",
+      height: "3.5rem",
+      borderRadius: "1rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "112px",
-      height: "48px",
-      borderRadius: "14px",
-      fontSize: "16px",
+      width: "7rem",
+      height: "3rem",
+      borderRadius: "0.875rem",
+      fontSize: "1rem",
     },
   },
 };
@@ -357,7 +357,7 @@ export const RecordButton = styled.button<{
     font-size: ${(props) => RecordButtonStyle[props.variant].tablet.fontSize};
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     width: ${(props) => RecordButtonStyle[props.variant].mobile.width};
     height: ${(props) => RecordButtonStyle[props.variant].mobile.height};
     border-radius: ${(props) =>
@@ -369,58 +369,57 @@ export const RecordButton = styled.button<{
 const OrangeButtonStyle = {
   membership: {
     default: {
-      width: "442px",
-      height: "68px",
-      borderRadius: "12px",
-      fontSize: "24px",
+      width: "27.625rem",
+      height: "4.25rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.5rem",
     },
     mobile: {
-      width: "280px",
-      height: "56px",
-      borderRadius: "12px",
-      fontSize: "18px",
+      width: "17.5rem",
+      height: "3.5rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.125rem",
     },
   },
   mailSend: {
     default: {
-      width: "174px",
-      height: "56px",
-      borderRadius: "12px",
-      fontSize: "24px",
+      width: "10.875rem",
+      height: "3.5rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.5rem",
     },
     mobile: {
-      width: "132px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "16px",
+      width: "8.25rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
     },
   },
   confirm: {
     default: {
-      width: "122px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "20px",
+      width: "7.625rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "100px",
-      height: "44px",
-      borderRadius: "10px",
-      fontSize: "18px",
+      width: "6.25rem",
+      height: "2.75rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.125rem",
     },
   },
   signupToLogin: {
     default: {
-      width: "162px",
-      height: "68px",
-      borderRadius: "12px",
-      fontSize: "24px",
+      width: "10.125rem",
+      height: "4.25rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.5rem",
     },
     mobile: {
-      width: "120px",
-      height: "56px",
-      borderRadius: "12px",
-      fontSize: "18px",
+      width: "7.5rem",
+      height: "3.5rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.125rem",
     },
   },
 };
@@ -441,7 +440,7 @@ export const OrangeButton = styled.button<{
   font-size: ${(props) => OrangeButtonStyle[props.variant].default.fontSize};
   font-weight: var(--font-semibold);
 
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     width: ${(props) => OrangeButtonStyle[props.variant].mobile.width};
     height: ${(props) => OrangeButtonStyle[props.variant].mobile.height};
     border-radius: ${(props) =>
@@ -454,21 +453,21 @@ export const DiaryButton = styled.button<{ variant: "delete" | "modify" }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 116px;
-  height: 52px;
-  border-radius: 10px;
+  width: 7.25rem;
+  height: 3.25rem;
+  border-radius: 0.625rem;
   background-color: ${(props) =>
     props.variant === "delete" ? "var(--line-basic)" : "var(--orange-button)"};
   color: var(--white);
   text-align: center;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: var(--font-semibold);
 
-  @media (max-width: 360px) {
-    width: 104px;
-    height: 48px;
-    border-radius: 10px;
-    font-size: 16px;
+  @media (max-width: 390px) {
+    width: 6.5rem;
+    height: 3rem;
+    border-radius: 0.625rem;
+    font-size: 1rem;
   }
 `;
 
@@ -476,20 +475,20 @@ export const CommentButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 116px;
-  height: 52px;
-  border-radius: 10px;
+  width: 7.25rem;
+  height: 3.25rem;
+  border-radius: 0.625rem;
   background-color: var(--comment-button);
   color: var(--white);
   text-align: center;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: var(--font-semibold);
 
-  @media (max-width: 360px) {
-    width: 86px;
-    height: 42px;
-    border-radius: 8px;
-    font-size: 14px;
+  @media (max-width: 390px) {
+    width: 5.375rem;
+    height: 2.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
   }
 `;
 
@@ -498,22 +497,21 @@ export const ReplyButton = styled.button<{
 }>`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 94px;
-  height: 42px;
-  border-radius: 8px;
+  width: 5.875rem;
+  height: 2.625rem;
+  border-radius: 0.5rem;
   background-color: ${(props) =>
     props.variant === "cancel" ? "none" : "var(--comment-button)"};
   color: ${(props) =>
     props.variant === "cancel" ? "var(--comment-button)" : "var(--white)"};
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: var(--font-semibold);
 
-  @media (max-width: 360px) {
-    width: 86px;
-    height: 42px;
-    border-radius: 8px;
-    font-size: 14px;
+  @media (max-width: 390px) {
+    width: 5.375rem;
+    height: 2.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
   }
 `;
 
@@ -523,70 +521,70 @@ export const DiarySettingButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => (props.variant === "delete" ? "124px" : "150px")};
-  height: 60px;
-  border-radius: 10px;
+  width: ${(props) => (props.variant === "delete" ? "7.75rem" : "9.375rem")};
+  height: 3.75rem;
+  border-radius: 0.625rem;
   background-color: var(--orange-button);
   color: var(--white);
   text-align: center;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: var(--font-semibold);
 
   @media (max-width: 781px) {
-    width: 124px;
-    height: 60px;
-    font-size: 20px;
+    width: 7.75rem;
+    height: 3.75rem;
+    font-size: 1.25rem;
   }
 
-  @media (max-width: 360px) {
-    width: 96px;
-    height: 44px;
-    font-size: 16px;
+  @media (max-width: 390px) {
+    width: 6rem;
+    height: 2.75rem;
+    font-size: 1rem;
   }
 `;
 
 const ProfileButtonStyle = {
   friend: {
     default: {
-      width: "140px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "20px",
+      width: "8.75rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "64px",
-      height: "30px",
-      borderRadius: "6px",
-      fontSize: "10px",
+      width: "4rem",
+      height: "1.875rem",
+      borderRadius: "0.375rem",
+      fontSize: "0.625rem",
     },
   },
   diary: {
     default: {
-      width: "174px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "20px",
+      width: "10.875rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.25rem",
     },
 
     mobile: {
-      width: "84px",
-      height: "30px",
-      borderRadius: "6px",
-      fontSize: "10px",
+      width: "5.25rem",
+      height: "1.875rem",
+      borderRadius: "0.375rem",
+      fontSize: "0.625rem",
     },
   },
   mood: {
     default: {
-      width: "138px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "20px",
+      width: "8.625rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.25rem",
     },
     mobile: {
-      width: "64px",
-      height: "30px",
-      borderRadius: "6px",
-      fontSize: "10px",
+      width: "4rem",
+      height: "1.875rem",
+      borderRadius: "0.375rem",
+      fontSize: "0.625rem",
     },
   },
 };
@@ -610,7 +608,7 @@ export const ProfileButton = styled.button<{
     background-color: var(--hover-orange);
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     width: ${(props) => ProfileButtonStyle[props.variant].mobile.width};
     height: ${(props) => ProfileButtonStyle[props.variant].mobile.height};
     border-radius: ${(props) =>
@@ -626,17 +624,17 @@ export const MypageButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 40px;
+  width: 5rem;
+  height: 2.5rem;
   border: ${(props) =>
     props.disabled
       ? "none"
       : `1px solid ${props.variant === "active" ? "var(--main-text)" : "none"}`};
-  border-radius: 8px;
+  border-radius: 0.5rem;
   background-color: ${(props) =>
     props.disabled ? "var(--disable-button)" : "var(--white)"};
   color: ${(props) => (props.disabled ? "var(--text-01)" : "var(--main-text)")};
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: var(--font-medium);
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 
@@ -651,57 +649,57 @@ export const MypageButton = styled.button<{
     }};
   }
 
-  @media (max-width: 360px) {
-    font-size: 16px;
+  @media (max-width: 390px) {
+    font-size: 1rem;
   }
 `;
 
 const OrangeLineButtonStyle = {
   theme: {
     default: {
-      width: "114px",
-      height: "44px",
-      borderRadius: "8px",
-      fontSize: "20px",
+      width: "7.125rem",
+      height: "2.75rem",
+      borderRadius: "0.5rem",
+      fontSize: "1.25rem",
       fontWeight: "var(--font-medium)",
     },
     mobile: {
-      width: "98px",
-      height: "44px",
-      borderRadius: "8px",
-      fontSize: "18px",
+      width: "6.125rem",
+      height: "2.75rem",
+      borderRadius: "0.5rem",
+      fontSize: "1.125rem",
       fontWeight: "var(--font-medium)",
     },
   },
   moveToHome: {
     default: {
-      width: "162px",
-      height: "68px",
-      borderRadius: "12px",
-      fontSize: "24px",
+      width: "10.125rem",
+      height: "4.25rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.5rem",
       fontWeight: "var(--font-semibold)",
     },
     mobile: {
-      width: "120px",
-      height: "56px",
-      borderRadius: "12px",
-      fontSize: "24px",
+      width: "7.5rem",
+      height: "3.5rem",
+      borderRadius: "0.75rem",
+      fontSize: "1.5rem",
       fontWeight: "var(--font-semibold)",
     },
   },
   modal: {
     default: {
-      width: "122px",
-      height: "48px",
-      borderRadius: "10px",
-      fontSize: "20px",
+      width: "7.625rem",
+      height: "3rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.25rem",
       fontWeight: "var(--font-semibold)",
     },
     mobile: {
-      width: "100px",
-      height: "44px",
-      borderRadius: "10px",
-      fontSize: "18px",
+      width: "6.25rem",
+      height: "2.75rem",
+      borderRadius: "0.625rem",
+      fontSize: "1.125rem",
       fontWeight: "var(--font-semibold)",
     },
   },
@@ -729,7 +727,7 @@ export const OrangeLineButton = styled.button<{
     background-color: var(--hover-orange);
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 390px) {
     width: ${(props) => OrangeLineButtonStyle[props.variant].mobile.width};
     height: ${(props) => OrangeLineButtonStyle[props.variant].mobile.height};
     border-radius: ${(props) =>
@@ -759,10 +757,10 @@ export const FriendTabButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 112px;
-  height: 48px;
+  width: 7rem;
+  height: 3rem;
   border: 1px solid var(--main-text);
-  border-radius: 10px;
+  border-radius: 0.625rem;
   background-color: ${(props) =>
     props.isClicked
       ? FriendTabButtonStyle.unclicked.backgroundColor
@@ -771,10 +769,10 @@ export const FriendTabButton = styled.button<{
     props.isClicked
       ? FriendTabButtonStyle.unclicked.color
       : FriendTabButtonStyle.clicked.color};
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-semibold);
 
-  @media (max-width: 360px) {
-    font-size: 18px;
+  @media (max-width: 390px) {
+    font-size: 1.125rem;
   }
 `;

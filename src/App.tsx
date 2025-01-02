@@ -1,7 +1,8 @@
 import { Outlet } from "react-router-dom";
 import Header from "./components/layout/Header";
-import Footer from "./components/layout/Footer";
 import GlobalStyles from "./styles/GlobalStyle";
+// import Navigation from "./components/layout/navigation/Navigation";
+// import MypageNavigation from "./components/layout/navigation/MypageNavigation";
 
 function App() {
   return (
@@ -9,7 +10,8 @@ function App() {
       <GlobalStyles />
       <Header />
       <Outlet />
-      <Footer />
+      {/* <Navigation />
+      <MypageNavigation /> */}
     </>
   );
 }
