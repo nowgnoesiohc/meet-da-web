@@ -8,7 +8,7 @@ import { useIsModalStore } from "../../store/ModalStore"
 import { RecordButton } from "../ui/Button"
 import { Textarea } from "@/components/ui/Input"
 
-const MoodTrackerWrap = styled.div`
+const Wrap = styled.div`
     width:62.125rem;
     background-color:var(--bg-01);
     border-radius:7.5rem;
@@ -120,12 +120,16 @@ const Ul = styled.ul`
 
 const TextAreaWrap = styled.div`
     width:40.5rem;
-    height:10rem;
     position:relative;
     margin:0 auto;
 
+    textarea {
+        height:160px;
+    }
+
     @media (max-width:781px){
         width:26.125rem;
+
     }
     
     @media (max-width:390px){
@@ -140,6 +144,10 @@ const ButtonWrap = styled.div`
     align-items:center;
     gap:2rem;
     padding-bottom:3.75rem;
+
+    @media (max-width:390px){
+        margin-top:2.5rem;
+    }
 `
 
 export default function MoodTrackerModal(){
@@ -151,7 +159,7 @@ export default function MoodTrackerModal(){
 
     return(
         <>
-            <MoodTrackerWrap>
+            <Wrap>
                 <Title>
                     <h2>오늘의 무드를 기록하세요!</h2>
                     <p>Track Your Mood</p>
@@ -173,7 +181,7 @@ export default function MoodTrackerModal(){
                     <RecordButton variant="moodCancel" onClick={CloseButton}>취소</RecordButton>
                     <RecordButton variant="moodSubmit">등록</RecordButton>
                 </ButtonWrap>
-            </MoodTrackerWrap>
+            </Wrap>
         </>
     )
 }

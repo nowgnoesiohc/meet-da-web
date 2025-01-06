@@ -47,22 +47,16 @@ export function Page1() {
       </div>
 
       <Button>
-          <button onClick={() => FindPassword('popularDiaryModal')}>인기다이어리</button>
+          <button onClick={() => FindPassword('pointModal')}>포인트적립모달</button>
           <button onClick={() => FindPassword('findPasswordModal')}>비밀번호 찾기</button>
           <button onClick={() => FindPassword('moodTrackerModal')}> 무드트래커</button>
           <button onClick={() => FindPassword('noticeModal')}>알림모달</button>
           <button onClick={() => FindPassword('signUpModal')}>회원가입</button>          
-          <button onClick={() => FindPassword('boardWriteModal')}>게시글작성</button>
-          <button onClick={() => FindPassword('commentWriteModal')}>댓글작성</button>
-          <button onClick={() => FindPassword('themaBuyModal')}>테마구매</button>
           <button onClick={() => FindPassword('themaCompleteModal')}>테마구매완료</button>
           <button onClick={() => FindPassword('changePasswordModal')}>비밀번호변경</button>
-          <button onClick={() => FindPassword('deleteIdModal')}>회원탈퇴</button>
-          <button onClick={() => FindPassword('deleteIdCompleteModal')}>회원탈퇴완료모달</button>
-          <button onClick={() => FindPassword('deleteThemaModal')}>테마삭제</button>
-          <button onClick={() => FindPassword('deleteThemaCompleteModal')}>테마삭제완료</button>
+          <button onClick={() => FindPassword('deleteCompleteModal')}>삭제 / 탈퇴완료모달</button>
+          <button onClick={() => FindPassword('deleteModal')}>탈퇴 / 삭제 / 구매모달</button>
           <button onClick={() => FindPassword('friendModal')}>친구모달</button>
-          <button onClick={() => FindPassword('todayMoodModal')}>무드기록 포인트적립</button>
       </Button>
     </>
   );
