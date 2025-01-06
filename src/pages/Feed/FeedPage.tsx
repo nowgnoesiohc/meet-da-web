@@ -295,11 +295,12 @@ const SwiperImage = styled.img`
 `;
 
 export default function FeedPage() {
-  const [Latest, setLatest] = useState(true);
-  const [Popular, setPopular] = useState(true);
+  const [activeTab, setActiveTab] = useState("Latest");
 
-  const LatestClick = () => setLatest(!Latest);
-  const PopularClick = () => setPopular(!Popular);
+  const TabItems = [
+    { key: "Latest", label: "최신" },
+    { key: "Popular", label: "인기" },
+  ];
 
   return (
     <>
@@ -315,12 +316,15 @@ export default function FeedPage() {
         </SearchBarWrap>
         <PostWrap>
           <ButtonWrap>
-            <FeedButton isClicked={Latest} onClick={LatestClick}>
-              최신
-            </FeedButton>
-            <FeedButton isClicked={Popular} onClick={PopularClick}>
-              인기
-            </FeedButton>
+            {TabItems.map((menu) => (
+              <FeedButton
+                key={menu.key}
+                isClicked={activeTab !== menu.key}
+                onClick={() => setActiveTab(menu.key)}
+              >
+                {menu.label}
+              </FeedButton>
+            ))}
           </ButtonWrap>
           <PostContainer>
             <PostItem to="/Page1">
