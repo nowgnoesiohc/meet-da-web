@@ -7,7 +7,7 @@ import test from "/src/assets/testImage.png";
 import happy from "/src/assets/happy.svg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import "/Users/noey/Desktop/meet-so-sa/meet-da-web/node_modules/swiper/swiper.css";
+// import "/Users/noey/Desktop/meet-so-sa/meet-da-web/node_modules/swiper/swiper.css";
 import { Link } from "react-router-dom";
 
 const Layout = styled.div`
