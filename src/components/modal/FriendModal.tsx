@@ -4,7 +4,7 @@ import SearchImg from "../../assets/images/search.svg"
 import { FriendButton, FriendTabButton } from "../ui/Button"
 import { useState } from "react"
 
-const FriendWrap = styled.div`
+const Wrap = styled.div`
     width:40.375rem;
     background-color:var(--bg-01);
     border-radius:1.25rem;
@@ -203,7 +203,7 @@ export default function FriendModal(){
 
     return(
         <>
-            <FriendWrap>
+            <Wrap>
                 <CloseButton />
                 <SearchBar>
                     <Input type="text" placeholder="믿다에서 새로운 친구를 만나보세요!" />
@@ -240,7 +240,7 @@ export default function FriendModal(){
                         <FriendButton variant="diaryFollow">만나기</FriendButton>
                     </FriendList>
                 </Content>
-            </FriendWrap>
+            </Wrap>
         </>
     )
 }

@@ -3,7 +3,7 @@ import CloseButton from "./CloseButton"
 import Lock from "../../assets/images/lock.svg"
 import { OrangeButton } from "../ui/Button"
 
-const FindPasswordWrap = styled.div`
+const Wrap = styled.div`
     width:36.5625rem;
     display:flex;
     flex-direction:column;
@@ -83,7 +83,7 @@ export default function FindPasswordModal(){
     
     return(
         <>
-            <FindPasswordWrap>
+            <Wrap>
                 <CloseButton />
                 <Image src={Lock} alt="자물쇠이미지" />
                 <Title>
@@ -93,7 +93,7 @@ export default function FindPasswordModal(){
                 </Title>
                 <Input type="text" placeholder="example@meetda.com"/>
                 <OrangeButton variant="mailSend">메일 전송하기</OrangeButton>
-            </FindPasswordWrap>
+            </Wrap>
         </>
     )
 }
