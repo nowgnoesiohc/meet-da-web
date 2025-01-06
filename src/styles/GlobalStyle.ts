@@ -140,6 +140,15 @@ const GlobalStyles = createGlobalStyle`
     outline: none;
   }
 
+  swiper-wrapper {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    transition-property: transform;
+    transition-timing-function: var(--swiper-wrapper-transition-timing-function, initial);
+    box-sizing: content-box;
+  }
+
   /* Responsive styles */
   @media (max-width: 390px) {
     html {

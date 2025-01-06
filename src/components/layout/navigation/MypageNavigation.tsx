@@ -4,16 +4,39 @@ import test from "/src/assets/testImage.png";
 import { ProfileButton } from "../../ui/Button";
 import { useState } from "react";
 import { HiPencil } from "react-icons/hi2";
+import { Outlet, Link } from "react-router-dom";
 
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
+  margin: 5.25rem 5rem 0rem;
+  align-items: center;
+
+  @media (max-width: 781px) {
+    margin: 5.25rem auto;
+  }
+
+  @media (max-width: 390px) {
+    margin: 1.875rem 1.25rem;
+  }
 `;
 
-// const Content = styled.div`
-//   flex: 1;
-//   padding: 130px;
-// `;
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+
+  @media (max-width: 390px) {
+    flex-direction: column;
+  }
+`;
+
+const Content = styled.div`
+  flex: 1;
+
+  @media (max-width: 390px) {
+    border-top: 1px solid var(--line-basic);
+  }
+`;
 
 const NavigationWrapper = styled.div`
   display: flex;
@@ -55,10 +78,9 @@ const SideMenuWrapper = styled.div`
     width: calc(100vw - 1.25rem); // (100vw - 20px)
     flex-direction: row;
     align-items: center;
-    height: 8rem;
+    height: auto;
     padding: 1.5rem 0rem;
     border-right: none;
-    border-bottom: 1px solid var(--line-basic);
   }
 `;
 
@@ -81,16 +103,20 @@ const SideMenuTextStyle = {
 };
 
 const SideMenuText = styled.button<{
-  variant: "unclicked" | "clicked";
+  variant: "clicked" | "unclicked";
   isClicked: boolean;
 }>`
   display: flex;
   color: ${(props) =>
     props.isClicked
-      ? SideMenuTextStyle.unclicked.color
-      : SideMenuTextStyle.clicked.color};
+      ? SideMenuTextStyle.clicked.color
+      : SideMenuTextStyle.unclicked.color};
   font-size: 1.25rem;
   font-weight: var(--font-medium);
+
+  @media (max-width: 781px) {
+    font-size: 1rem; /* 중간 화면에서 크기 축소 */
+  }
 
   @media (max-width: 390px) {
     font-size: 0.875rem;
@@ -107,7 +133,7 @@ const SideMenuPointStyle = {
 };
 
 const SideMenuPoint = styled.button<{
-  variant: "unclicked" | "clicked";
+  variant: "clicked" | "unclicked";
   isClicked: boolean;
 }>`
   display: flex;
@@ -117,8 +143,8 @@ const SideMenuPoint = styled.button<{
   border-radius: 50%; /* 완벽한 원 */
   background-color: ${(props) =>
     props.isClicked
-      ? SideMenuPointStyle.unclicked.backgroundColor
-      : SideMenuPointStyle.clicked.backgroundColor};
+      ? SideMenuPointStyle.clicked.backgroundColor
+      : SideMenuPointStyle.unclicked.backgroundColor};
 `;
 
 const ProfileContainer = styled.div`
@@ -243,31 +269,17 @@ const UserState = styled.div`
 `;
 
 export default function MypageNavigation() {
-  const [MoodReport, setMoodReport] = useState(true);
-  const [Diary, setDiary] = useState(true);
-  const [Point, setPoint] = useState(true);
-  const [Theme, setTheme] = useState(true);
-  const [Setting, setSetting] = useState(true);
+  // 메뉴 상태를 배열로 관리
+  const [activeMenu, setActiveMenu] = useState("MoodReport");
 
-  const MoodReportClick = () => {
-    setMoodReport(!MoodReport); // 클릭 상태 토글
-  };
-
-  const DiaryClick = () => {
-    setDiary(!Diary); // 클릭 상태 토글
-  };
-
-  const PointClick = () => {
-    setPoint(!Point); // 클릭 상태 토글
-  };
-
-  const ThemeClick = () => {
-    setTheme(!Theme); // 클릭 상태 토글
-  };
-
-  const SettingClick = () => {
-    setSetting(!Setting); // 클릭 상태 토글
-  };
+  // 메뉴 데이터 정의
+  const menuItems = [
+    { key: "MoodReport", path: "mood-report", label: "무드 리포트" },
+    { key: "Diary", path: "diary-management", label: "다이어리 관리" },
+    { key: "Point", path: "point-management", label: "포인트 관리" },
+    { key: "Theme", path: "theme", label: "테마" },
+    { key: "Setting", path: "settings", label: "설정" },
+  ];
 
   return (
     <Layout>
@@ -291,78 +303,31 @@ export default function MypageNavigation() {
           </ButtonWrapper>
         </UserInfo>
       </NavigationWrapper>
-      <SideMenuWrapper>
-        <SideMenu>
-          <SideMenuPoint
-            isClicked={MoodReport}
-            onClick={MoodReportClick}
-            variant="unclicked"
-          />
-          <SideMenuText
-            isClicked={MoodReport}
-            onClick={MoodReportClick}
-            variant="unclicked"
-          >
-            무드 리포트
-          </SideMenuText>
-        </SideMenu>
-        <SideMenu>
-          <SideMenuPoint
-            isClicked={Diary}
-            onClick={DiaryClick}
-            variant="unclicked"
-          />
-          <SideMenuText
-            isClicked={Diary}
-            onClick={DiaryClick}
-            variant="unclicked"
-          >
-            다이어리 관리
-          </SideMenuText>
-        </SideMenu>
-        <SideMenu>
-          <SideMenuPoint
-            isClicked={Point}
-            onClick={PointClick}
-            variant="unclicked"
-          />
-          <SideMenuText
-            isClicked={Point}
-            onClick={PointClick}
-            variant="unclicked"
-          >
-            포인트 관리
-          </SideMenuText>
-        </SideMenu>
-        <SideMenu>
-          <SideMenuPoint
-            isClicked={Theme}
-            onClick={ThemeClick}
-            variant="unclicked"
-          />
-          <SideMenuText
-            isClicked={Theme}
-            onClick={ThemeClick}
-            variant="unclicked"
-          >
-            테마
-          </SideMenuText>
-        </SideMenu>
-        <SideMenu>
-          <SideMenuPoint
-            isClicked={Setting}
-            onClick={SettingClick}
-            variant="unclicked"
-          />
-          <SideMenuText
-            isClicked={Setting}
-            onClick={SettingClick}
-            variant="unclicked"
-          >
-            설정
-          </SideMenuText>
-        </SideMenu>
-      </SideMenuWrapper>
+      <ContentWrapper>
+        <SideMenuWrapper>
+          {menuItems.map((menu) => (
+            <SideMenu key={menu.key}>
+              <SideMenuPoint
+                isClicked={activeMenu === menu.key}
+                variant="clicked"
+              />
+              <Link to={menu.path}>
+                <SideMenuText
+                  isClicked={activeMenu === menu.key}
+                  variant="clicked"
+                  onClick={() => setActiveMenu(menu.key)}
+                >
+                  {menu.label}
+                </SideMenuText>
+              </Link>
+            </SideMenu>
+          ))}
+        </SideMenuWrapper>
+        {/* Outlet으로 동적 콘텐츠 삽입 */}
+        <Content>
+          <Outlet />
+        </Content>
+      </ContentWrapper>
     </Layout>
   );
 }

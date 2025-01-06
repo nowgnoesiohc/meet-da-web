@@ -1,6 +1,4 @@
-
 import styled from "styled-components";
-import Navigation from "../../components/layout/navigation/Navigation";
 import MypageNavigation from "../../components/layout/navigation/MypageNavigation";
 
 const Layout = styled.div`
@@ -20,12 +18,9 @@ const Layout = styled.div`
 export default function Page1() {
   return (
     <>
-      <Navigation />
       <Layout>
         <MypageNavigation />
       </Layout>
     </>
   );
 }
-
-export default Page1;

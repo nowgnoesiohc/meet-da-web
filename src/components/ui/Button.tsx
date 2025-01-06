@@ -392,6 +392,7 @@ const OrangeButtonStyle = {
       width: "8.25rem",
       height: "3rem",
       borderRadius: "0.625rem",
+      fontSize: "1rem",
     },
   },
   confirm: {
@@ -774,5 +775,28 @@ export const FriendTabButton = styled.button<{
 
   @media (max-width: 390px) {
     font-size: 1.125rem;
+  }
+`;
+
+export const FeedButton = styled.button<{
+  isClicked: boolean;
+}>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.875rem;
+  height: 2.875rem;
+  border: 1px solid var(--main-text);
+  border-radius: 1rem;
+  color: var(--main-text);
+  font-size: 1.125rem;
+  font-weight: var(--font-medium);
+  background-color: ${(props) => (props.isClicked ? "" : "var(--bg-02)")};
+
+  @media (max-width: 390px) {
+    width: 3.5rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
   }
 `;
