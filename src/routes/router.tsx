@@ -9,6 +9,8 @@ import DiaryManagement from "@/pages/Mypage/DiaryManagement";
 import PointManagement from "@/pages/Mypage/PointManagement";
 import Theme from "@/pages/Mypage/Theme";
 import Settings from "@/pages/Mypage/Settings";
+import Join from "@/pages/join/Join";
+import Login from "@/pages/login/Login";
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +28,14 @@ export const router = createBrowserRouter([
       {
         path: "/feed",
         element: <FeedPage />,
+      },
+      {
+        path: "/login",
+        element: <Login />
+      },
+      {
+        path: "/join",
+        element: <Join />
       },
       {
         path: "/mypage",
