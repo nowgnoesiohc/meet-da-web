@@ -3,7 +3,7 @@ import CloseButton from "./CloseButton"
 import signUpImg from "../../assets/images/signUp.svg"
 import { OrangeButton, OrangeLineButton } from "../ui/Button"
 
-const SignUpModalWrap = styled.div`
+const Wrap = styled.div`
     width:36.5rem;
     // height:38.75rem;
     background-color:#fff;
@@ -63,7 +63,7 @@ export default function SignUpModal(){
 
     return(
         <>
-            <SignUpModalWrap>
+            <Wrap>
                 <CloseButton />
                 <Title>
                     <img src={signUpImg} alt="회원가입 이미지" />
@@ -75,7 +75,7 @@ export default function SignUpModal(){
                     <OrangeLineButton variant="moveToHome">🏠</OrangeLineButton>
                     <OrangeButton variant="signupToLogin">로그인</OrangeButton>
                 </Button>
-            </SignUpModalWrap>
+            </Wrap>
         </>
     )
 }

@@ -3,7 +3,7 @@ import CheckImg from "../../assets/images/signUp.svg"
 import { useIsModalStore } from "../../store/ModalStore";
 import { PointConfirmButton } from "../ui/Button";
 
-const BuyCompleteWrap = styled.div`
+const Wrap = styled.div`
     width:36.5rem;
     background-color:#fff;
     border-radius:2.5rem;
@@ -77,7 +77,7 @@ export default function ThemaBuyCompleteModal(){
 
     return(
         <>
-            <BuyCompleteWrap>
+            <Wrap>
                 <Title>
                     <img src={CheckImg} alt="구매완료 체크 이미지" />
                     <p>파스텔 팝콘 세트</p>
@@ -87,7 +87,7 @@ export default function ThemaBuyCompleteModal(){
                 <Button>
                     <PointConfirmButton onClick={onClickCheck}>확인</PointConfirmButton>
                 </Button>
-            </BuyCompleteWrap>
+            </Wrap>
         </>
     )
 }

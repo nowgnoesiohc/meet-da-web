@@ -2,10 +2,11 @@ import styled from "styled-components"
 import CloseButton from "./CloseButton"
 import { OrangeButton } from "../ui/Button"
 
-const NoticeModalWrap = styled.div`
+const Wrap = styled.div`
     width:30.25rem;
     background-color:#fff;
     border-radius:1.875rem;
+    padding-top:4.125rem;
     padding-bottom:2.75rem;
 
     @media (max-width:781px){
@@ -19,9 +20,6 @@ const NoticeModalWrap = styled.div`
 `
 
 const NoticeText = styled.div`
-    padding-top:4.125rem;
-    margin-bottom:2.75rem;
-
     > h2{
         margin:0;
         font-size:1.625rem;
@@ -30,7 +28,7 @@ const NoticeText = styled.div`
         margin-bottom:0.75rem;
     }
 
-    >p{
+    > p{
         margin:0;
         color:var(--main-text);
         font-weight:var(--font-medium);
@@ -51,15 +49,29 @@ const NoticeText = styled.div`
 const Button = styled.button`
     color:#fff;
     border-radius:0.625rem;
-    font-size:1.25rem;
-    font-weight:var(--font-semibold);
+    font-weight:var(--font-medium);
+    padding:0;
+    margin-top:2.875rem;
+
+    > button{
+        width:7.625rem;
+        height:3rem;
+        font-size:1.25rem;    
+    }
+
+    @media (max-width:390px){
+        > button{
+            width:6.25rem;
+            font-size:1.125rem;
+        }
+    }
 `
 
 export default function NoticeModal(){
 
     return(
         <>
-            <NoticeModalWrap>
+            <Wrap>
                 <CloseButton />
                 <NoticeText>
                     <h2>알림</h2>
@@ -69,7 +81,7 @@ export default function NoticeModal(){
                 <Button>
                     <OrangeButton variant="signupToLogin">로그인</OrangeButton>
                 </Button>
-            </NoticeModalWrap>
+            </Wrap>
         </>
     )
 }
