@@ -13,11 +13,11 @@ const Layout = styled.div`
   align-items: center;
 
   @media (max-width: 781px) {
-    margin: 5.25rem auto;
+    margin: 5.25rem 1.8rem 0rem;
   }
 
   @media (max-width: 390px) {
-    margin: 1.875rem 1.25rem;
+    margin: 1.875rem 1.25rem 0rem;
   }
 `;
 
@@ -32,9 +32,11 @@ const ContentWrapper = styled.div`
 
 const Content = styled.div`
   flex: 1;
+  border-left: 1px solid var(--line-basic);
 
   @media (max-width: 390px) {
     border-top: 1px solid var(--line-basic);
+    border-left: none;
   }
 `;
 
@@ -53,7 +55,6 @@ const NavigationWrapper = styled.div`
   }
 
   @media (max-width: 390px) {
-    width: calc(100vw - 1.25rem); // (100vw - 20px)
     gap: 0.75rem;
     padding-bottom: 2.25rem;
   }
@@ -65,8 +66,8 @@ const SideMenuWrapper = styled.div`
   width: 16.375rem;
   height: 100vh;
   gap: 1.5rem;
-  border-right: 1px solid var(--line-basic);
-  padding: 3.75rem 4.875rem 0rem 1.5rem;
+  // border-right: 1px solid var(--line-basic);
+  padding: 60px 48px 0px 24px;
   flex-wrap: wrap;
 
   @media (max-width: 781px) {
@@ -87,8 +88,10 @@ const SideMenuWrapper = styled.div`
 const SideMenu = styled.div`
   display: flex;
   gap: 0.75rem;
+  width: 12.5rem;
 
   @media (max-width: 390px) {
+    width: 7rem;
     gap: 0.5rem;
   }
 `;
@@ -284,7 +287,6 @@ export default function MypageNavigation() {
   return (
     <Layout>
       <NavigationWrapper>
-        {/* <ProfileImage src={test} alt="test" /> */}
         <ProfileContainer>
           <ProfileImage src={test} alt="Profile" />
           <EditButton>
