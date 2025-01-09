@@ -4,28 +4,27 @@ import { useIsModalStore } from "@/store/ModalStore";
 import styled from "styled-components";
 
 const Button = styled.div`
-  width:300px;
-  > button{
-    width:100%;
-    font-size:30px;
-    padding:20px;
-    border:10px solid var(--main-orange);
-    margin:10px 0;
+  width: 300px;
+  > button {
+    width: 100%;
+    font-size: 30px;
+    padding: 20px;
+    border: 10px solid var(--main-orange);
+    margin: 10px 0;
   }
-`
+`;
 
-export function Page1() {
+export function Page2() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-    
+
   const FindPassword = (type?: string) => {
-      console.log(type);
+    console.log(type);
 
-      if(type){
-          setIsModalClick(type);
-      } else{
-          setIsModalClick();
-      }
-
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
   };
 
   return (
@@ -47,19 +46,34 @@ export function Page1() {
       </div>
 
       <Button>
-          <button onClick={() => FindPassword('pointModal')}>포인트적립모달</button>
-          <button onClick={() => FindPassword('findPasswordModal')}>비밀번호 찾기</button>
-          <button onClick={() => FindPassword('moodTrackerModal')}> 무드트래커</button>
-          <button onClick={() => FindPassword('noticeModal')}>알림모달</button>
-          <button onClick={() => FindPassword('signUpModal')}>회원가입</button>          
-          <button onClick={() => FindPassword('themaCompleteModal')}>테마구매완료</button>
-          <button onClick={() => FindPassword('changePasswordModal')}>비밀번호변경</button>
-          <button onClick={() => FindPassword('deleteCompleteModal')}>삭제 / 탈퇴완료모달</button>
-          <button onClick={() => FindPassword('deleteModal')}>탈퇴 / 삭제 / 구매모달</button>
-          <button onClick={() => FindPassword('friendModal')}>친구모달</button>
+        <button onClick={() => FindPassword("pointModal")}>
+          포인트적립모달
+        </button>
+        <button onClick={() => FindPassword("findPasswordModal")}>
+          비밀번호 찾기
+        </button>
+        <button onClick={() => FindPassword("moodTrackerModal")}>
+          {" "}
+          무드트래커
+        </button>
+        <button onClick={() => FindPassword("noticeModal")}>알림모달</button>
+        <button onClick={() => FindPassword("signUpModal")}>회원가입</button>
+        <button onClick={() => FindPassword("themaCompleteModal")}>
+          테마구매완료
+        </button>
+        <button onClick={() => FindPassword("changePasswordModal")}>
+          비밀번호변경
+        </button>
+        <button onClick={() => FindPassword("deleteCompleteModal")}>
+          삭제 / 탈퇴완료모달
+        </button>
+        <button onClick={() => FindPassword("deleteModal")}>
+          탈퇴 / 삭제 / 구매모달
+        </button>
+        <button onClick={() => FindPassword("friendModal")}>친구모달</button>
       </Button>
     </>
   );
 }
 
-export default Page1;
+export default Page2;

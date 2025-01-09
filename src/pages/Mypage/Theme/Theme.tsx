@@ -1,3 +1,5 @@
+import { DiarySettingButton } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -5,42 +7,63 @@ import styled from "styled-components";
 const Layout = styled.div`
   display: flex;
   gap: 30px;
-  padding: 40px 80px 32px;
+  padding: 40px 20px 0px 80px;
+  margin-bottom: 32px;
 
   @media (max-width: 781px) {
-    padding: 40px 50px 32px;
+    flex-direction: column;
+    padding: 40px 20px 0px 50px;
+    margin-bottom: 32px;
   }
 
   @media (max-width: 390px) {
-    gap: 12px;
-    padding: 40px 0px 32px;
+    gap: 20px;
+    padding: 40px 20px 20px 0px;
+    margin: unset;
   }
 `;
 
-const TabWrapper = styled.button<{
-  isClicked: boolean;
-}>`
+const TabWrap = styled.div`
+  display: flex;
+  gap: 30px;
+`;
+
+const TabWrapper = styled.button`
   display: flex;
   height: 48px;
-  border-bottom: ${(props) =>
-    props.isClicked ? "2px solid var(--orange-button)" : ""};
+  align-items: flex-start;
 
   @media (max-width: 781px) {
     height: 34px;
   }
 `;
 
-const TabMenu = styled.button`
+const TabMenu = styled.button<{
+  isClicked: boolean;
+}>`
   display: flex;
   width: 100%;
-  height: 26px;
   padding-bottom: 16px;
   color: var(--black);
   font-size: 24px;
   font-weight: var(--font-semibold);
+  border-bottom: ${(props) =>
+    props.isClicked ? "2px solid var(--orange-button)" : ""};
 
   @media (max-width: 781px) {
     font-size: 16px;
+  }
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  margin-left: auto;
+  width: 124px;
+
+  @media (max-width: 781px) {
+    justify-content: center;
+    margin: unset;
+    width: 100%;
   }
 `;
 
@@ -85,18 +108,47 @@ export default function Theme() {
     }
   }, [location.pathname]);
 
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
+  const isModalOpen = (type?: string) => {
+    console.log(type);
+
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
+  };
+
   return (
     <>
       <Layout>
-        {TabItems.map((menu) => (
-          <TabWrapper key={menu.key} isClicked={activeTab === menu.key}>
-            <Link to={menu.path}>
-              <TabMenu onClick={() => setActiveTab(menu.key)}>
-                {menu.label}
-              </TabMenu>
-            </Link>
-          </TabWrapper>
-        ))}
+        <TabWrap>
+          {TabItems.map((menu) => (
+            <TabWrapper key={menu.key}>
+              <Link to={menu.path}>
+                <TabMenu
+                  isClicked={activeTab === menu.key}
+                  onClick={() => setActiveTab(menu.key)}
+                >
+                  {menu.label}
+                </TabMenu>
+              </Link>
+            </TabWrapper>
+          ))}
+        </TabWrap>
+        {/* Own 탭일 때만 삭제하기 버튼 표시 */}
+        {activeTab === "Own" && (
+          <ButtonWrapper>
+            <DiarySettingButton
+              variant="delete"
+              style={{ width: "100%" }}
+              onClick={() => isModalOpen("deleteModal")}
+            >
+              삭제하기
+            </DiarySettingButton>
+          </ButtonWrapper>
+        )}
       </Layout>
       <ContentWrapper>
         <Content>

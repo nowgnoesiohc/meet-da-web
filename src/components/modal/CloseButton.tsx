@@ -9,7 +9,7 @@ const CloseButtonWrap = styled.div`
 
   @media (max-width: 390px) {
     top: 1.35rem;
-    left: 18rem;
+    left: 17rem;
 
     > button > img {
       width: 1.125rem;

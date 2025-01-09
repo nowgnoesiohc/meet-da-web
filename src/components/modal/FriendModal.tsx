@@ -196,22 +196,23 @@ const UserText = styled.p`
 `;
 
 export default function FriendModal() {
-  const [isClicked, setIsClicked] = useState(true);
+  // const [isClicked, setIsClicked] = useState(true);
 
-  const handleClick = () => {
-    setIsClicked(!isClicked); // 클릭 상태 토글
-  };
+  // const handleClick = () => {
+  //   setIsClicked(!isClicked); // 클릭 상태 토글
+  // };
+
+  const [activeTab, setActiveTab] = useState("");
+
+  const TabItems = [
+    { key: "following", label: "서로 믿음" },
+    { key: "follower", label: "믿으미" },
+  ];
 
   return (
     <>
       <Wrap>
         <CloseButton />
-        {/* <SearchBar>
-          <Input type="text" placeholder="믿다에서 새로운 친구를 만나보세요!" />
-          <button>
-            <SearchIcon />
-          </button>
-        </SearchBar> */}
         <SearchBarContainer>
           <SearchInput
             type="text"
@@ -226,33 +227,40 @@ export default function FriendModal() {
             포뇨소스케스키<span>님의</span>
           </p>
           <Button>
-            <FriendTabButton
-              isClicked={isClicked}
-              onClick={handleClick}
-              variant="unclicked"
-            >
-              서로 믿음
-            </FriendTabButton>
-            <FriendTabButton
-              isClicked={isClicked}
-              onClick={handleClick}
-              variant="unclicked"
-            >
-              믿으미
-            </FriendTabButton>
+            {TabItems.map((menu) => (
+              <FriendTabButton
+                key={menu.key}
+                isClicked={activeTab !== menu.key}
+                onClick={() =>
+                  setActiveTab(activeTab === menu.key ? "" : menu.key)
+                }
+                variant={activeTab === menu.key ? "clicked" : "unclicked"}
+              >
+                {menu.label}
+              </FriendTabButton>
+            ))}
           </Button>
         </Profile>
         <Content>
-          <FriendList>
-            <FriendProfile>
-              <UserWrap>
-                <UserImage></UserImage>
-                <UserName>믿음소망사과</UserName>
-              </UserWrap>
-              <UserText>믿음소망사랑 아니고 사과</UserText>
-            </FriendProfile>
-            <FriendButton variant="diaryFollow">만나기</FriendButton>
-          </FriendList>
+          {/* activeTab이 ""일 때는 아무것도 표시되지 않음 */}
+          {activeTab && (
+            <FriendList>
+              <FriendProfile>
+                <UserWrap>
+                  <UserImage></UserImage>
+                  <UserName>믿음소망사과</UserName>
+                </UserWrap>
+                <UserText>믿음소망사랑 아니고 사과</UserText>
+              </FriendProfile>
+              <FriendButton
+                variant={
+                  activeTab === "following" ? "diaryUnfollow" : "diaryFollow"
+                }
+              >
+                {activeTab === "following" ? "헤어지기" : "만나기"}
+              </FriendButton>
+            </FriendList>
+          )}
         </Content>
       </Wrap>
     </>

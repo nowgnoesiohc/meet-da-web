@@ -2,9 +2,10 @@ import styled from "styled-components";
 import test from "/src/assets/testImage.png";
 // import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiPencil } from "react-icons/hi2";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
   display: flex;
@@ -44,13 +45,13 @@ const NavigationWrapper = styled.div`
   display: flex;
   justify-content: start;
   align-items: center;
-  width: calc(100vw - 12.1875rem); // (100vw - 195px)
+  width: 100%;
   gap: 1.875rem;
   padding-bottom: 3.125rem;
   border-bottom: 1px solid var(--line-basic);
 
   @media (max-width: 781px) {
-    width: calc(100vw - 3.125rem); // (100vw - 50px)
+    width: 100%;
     padding-bottom: 3.25rem;
   }
 
@@ -223,6 +224,7 @@ const UserInfo = styled.div`
   }
 
   @media (max-width: 390px) {
+    width: 100%;
     gap: 0.5rem;
   }
 `;
@@ -274,6 +276,29 @@ const UserState = styled.div`
 export default function MypageNavigation() {
   // 메뉴 상태를 배열로 관리
   const [activeMenu, setActiveMenu] = useState("MoodReport");
+  const location = useLocation(); // 현재 경로를 가져옴
+
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
+  const isModalOpen = (type?: string) => {
+    console.log(type);
+
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
+  };
+
+  // 메뉴 상태를 URL 경로에 맞게 설정
+  useEffect(() => {
+    // 경로에서 마지막 부분을 가져와서 activeMenu에 설정
+    const path = location.pathname.split("/").pop();
+    const matchedMenu = menuItems.find((menu) => menu.path === path);
+    if (matchedMenu) {
+      setActiveMenu(matchedMenu.key);
+    }
+  }, [location]);
 
   // 메뉴 데이터 정의
   const menuItems = [
@@ -299,7 +324,12 @@ export default function MypageNavigation() {
             <UserState>믿음 소망 사랑보다 강력한 사과</UserState>
           </UserTextWrapper>
           <ButtonWrapper>
-            <ProfileButton variant="friend">17명의 친구</ProfileButton>
+            <ProfileButton
+              variant="friend"
+              onClick={() => isModalOpen("friendModal")}
+            >
+              17명의 친구
+            </ProfileButton>
             <ProfileButton variant="diary">38개의 다이어리</ProfileButton>
             <ProfileButton variant="mood">97개의 무드</ProfileButton>
           </ButtonWrapper>

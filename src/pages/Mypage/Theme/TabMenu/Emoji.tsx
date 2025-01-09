@@ -4,6 +4,7 @@ import { FaCheck } from "react-icons/fa6";
 import themeSet from "/src/assets/themeset.svg";
 import { useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
   display: flex;
@@ -247,6 +248,18 @@ export default function Emoji() {
     setIsClicked(!isClicked); // 클릭 시 상태 변경
   };
 
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
+  const isModalOpen = (type?: string) => {
+    console.log(type);
+
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
+  };
+
   // 백엔드 연결 시 코드 미리 작성
   // const [themes, setThemes] = useState([]); // 테마 데이터를 저장할 상태
   // const [clickedStates, setClickedStates] = useState<boolean[]>([]); // 각 ThemeSet의 클릭 상태
@@ -307,7 +320,12 @@ export default function Emoji() {
                   가격
                   <PriceText>300P</PriceText>
                 </PriceBox>
-                <OrangeLineButton variant="theme">구매하기</OrangeLineButton>
+                <OrangeLineButton
+                  variant="theme"
+                  onClick={() => isModalOpen("deleteModal")}
+                >
+                  구매하기
+                </OrangeLineButton>
               </PurchaseBox>
             </ThemeSet>
             <ThemeSet>

@@ -5,6 +5,7 @@ import retrosans from "/src/assets/retrosans.svg";
 import cabinet from "/src/assets/cabinet.svg";
 import { useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
   display: flex;
@@ -247,6 +248,18 @@ export default function Font() {
     setIsClicked(!isClicked); // 클릭 시 상태 변경
   };
 
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
+  const isModalOpen = (type?: string) => {
+    console.log(type);
+
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
+  };
+
   return (
     <>
       <Layout>
@@ -275,7 +288,12 @@ export default function Font() {
                   가격
                   <PriceText>300P</PriceText>
                 </PriceBox>
-                <OrangeLineButton variant="theme">구매하기</OrangeLineButton>
+                <OrangeLineButton
+                  variant="theme"
+                  onClick={() => isModalOpen("deleteModal")}
+                >
+                  구매하기
+                </OrangeLineButton>
               </PurchaseBox>
             </FontSet>
             <FontSet>
