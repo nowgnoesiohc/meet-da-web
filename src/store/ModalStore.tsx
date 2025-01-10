@@ -1,6 +1,5 @@
 import { create } from "zustand";
 
-
 interface UseIsModalStoreType {
   isModal: boolean | string;
   setIsModalClick: (modalType?: string) => void;

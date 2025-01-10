@@ -2,78 +2,59 @@ import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
 import { OrangeButton } from "../ui/Button";
 
-const ChangePasswordWrap = styled.div`
+const DeleteThmeaWrap = styled.div`
   width: 30.25rem;
   background-color: var(--white);
   border-radius: 1.875rem;
-  padding-top: 2.875rem;
-  padding-bottom: 2.125rem;
-
-  > button {
-    width: 8rem;
-    height: 3.25rem;
-    background-color: var(--main-orange);
-    border-radius: 0.625rem;
-    color: var(--white);
-    font-size: 1.25rem;
-    font-weight: var(--font-semibold);
-    margin-top: 3.125rem;
-  }
+  padding-top: 4rem;
+  padding-bottom: 2.875rem;
 
   @media (max-width: 390px) {
     width: 20rem;
     margin: 0 auto;
-    padding-top: 2.375rem;
+    padding-top: 2.625rem;
+    padding-bottom: 1.75rem;
   }
 `;
 
 const Title = styled.div`
   > h2 {
-    margin: 0;
     font-size: 1.625rem;
     font-weight: var(--font-semibold);
     color: var(--main-orange);
-    padding-bottom: 1.875rem;
+    margin: 0;
+    padding-bottom: 1.5rem;
   }
 
   > p {
     margin: 0;
     font-size: 1.25rem;
     font-weight: var(--font-medium);
-  }
-  > p:last-child {
-    font-size: 1.125rem;
-    font-weight: var(--font-regular);
-    color: var(--text-03);
-    padding-top: 0.5rem;
+    color: var(--main-text);
+    padding-bottom: 3.75rem;
   }
 
   @media (max-width: 390px) {
     > h2 {
       font-size: 1.5rem;
-      padding-bottom: 1.75rem;
     }
     > p {
       font-size: 1.125rem;
-    }
-    > p:last-child {
-      font-size: 1rem;
-      padding-bottom: 1.5rem;
+      padding-bottom: 3rem;
     }
   }
 `;
 
 const Button = styled.div`
-  margin-top: 3.125rem;
+  width: 16.75rem;
+  height: 3rem;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
-
-  @media (max-width: 390px) {
-    margin: 0;
-  }
+  gap: 1.5rem;
 `;
 
-export default function ChangePasswordModal() {
+export default function DeleteThemeCompleteModal() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const onClickCheck = () => {
     setIsModalClick();
@@ -81,18 +62,17 @@ export default function ChangePasswordModal() {
 
   return (
     <>
-      <ChangePasswordWrap>
+      <DeleteThmeaWrap>
         <Title>
-          <h2>비밀번호 변경 완료</h2>
-          <p>비밀번호가 정상적으로 변경되었습니다.</p>
-          <p>새로 로그인 해주세요.</p>
+          <h2>테마 삭제 완료</h2>
+          <p>테마 삭제가 정상적으로 처리되었습니다.</p>
         </Title>
         <Button>
           <OrangeButton variant="confirm" onClick={onClickCheck}>
             확인
           </OrangeButton>
         </Button>
-      </ChangePasswordWrap>
+      </DeleteThmeaWrap>
     </>
   );
 }

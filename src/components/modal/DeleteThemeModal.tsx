@@ -1,38 +1,28 @@
 import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
-import { OrangeButton } from "../ui/Button";
+import { OrangeButton, OrangeLineButton } from "../ui/Button";
 
-const ChangePasswordWrap = styled.div`
+const DeleteThemaWrap = styled.div`
   width: 30.25rem;
   background-color: var(--white);
   border-radius: 1.875rem;
-  padding-top: 2.875rem;
-  padding-bottom: 2.125rem;
-
-  > button {
-    width: 8rem;
-    height: 3.25rem;
-    background-color: var(--main-orange);
-    border-radius: 0.625rem;
-    color: var(--white);
-    font-size: 1.25rem;
-    font-weight: var(--font-semibold);
-    margin-top: 3.125rem;
-  }
+  padding-bottom: 2.875rem;
+  padding-top: 3.625rem;
 
   @media (max-width: 390px) {
     width: 20rem;
     margin: 0 auto;
     padding-top: 2.375rem;
+    padding-bottom: 1.75rem;
   }
 `;
 
 const Title = styled.div`
   > h2 {
-    margin: 0;
     font-size: 1.625rem;
     font-weight: var(--font-semibold);
     color: var(--main-orange);
+    margin: 0;
     padding-bottom: 1.875rem;
   }
 
@@ -40,59 +30,65 @@ const Title = styled.div`
     margin: 0;
     font-size: 1.25rem;
     font-weight: var(--font-medium);
+    color: var(--main-text);
   }
   > p:last-child {
-    font-size: 1.125rem;
+    padding-top: 0.5rem;
+    padding-bottom: 3.125rem;
+    font-size: 1rem;
     font-weight: var(--font-regular);
     color: var(--text-03);
-    padding-top: 0.5rem;
   }
 
   @media (max-width: 390px) {
     > h2 {
       font-size: 1.5rem;
-      padding-bottom: 1.75rem;
     }
     > p {
       font-size: 1.125rem;
     }
     > p:last-child {
-      font-size: 1rem;
+      font-size: 0.875rem;
       padding-bottom: 1.5rem;
     }
   }
 `;
 
 const Button = styled.div`
-  margin-top: 3.125rem;
+  width: 16.75rem;
+  height: 3rem;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
+  gap: 1.5rem;
 
-  @media (max-width: 390px) {
-    margin: 0;
+  > button {
+    width: 7.625rem;
+    height: 3rem;
   }
 `;
 
-export default function ChangePasswordModal() {
+export default function DeleteThemeModal() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const onClickCheck = () => {
+  const onClickCancel = () => {
     setIsModalClick();
   };
 
   return (
     <>
-      <ChangePasswordWrap>
+      <DeleteThemaWrap>
         <Title>
-          <h2>비밀번호 변경 완료</h2>
-          <p>비밀번호가 정상적으로 변경되었습니다.</p>
-          <p>새로 로그인 해주세요.</p>
+          <h2>테마 삭제</h2>
+          <p>정말로 삭제 하시겠습니까?</p>
+          <p>삭제한 테마와 사용된 포인트는 복구되지 않습니다.</p>
         </Title>
         <Button>
-          <OrangeButton variant="confirm" onClick={onClickCheck}>
-            확인
-          </OrangeButton>
+          <OrangeLineButton variant="modal" onClick={onClickCancel}>
+            취소
+          </OrangeLineButton>
+          <OrangeButton variant="confirm">확인</OrangeButton>
         </Button>
-      </ChangePasswordWrap>
+      </DeleteThemaWrap>
     </>
   );
 }

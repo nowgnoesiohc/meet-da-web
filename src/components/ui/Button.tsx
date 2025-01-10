@@ -55,7 +55,7 @@ const FriendButtonStyle = {
   },
   diaryFollow: {
     default: {
-      width: "8rem",
+      width: "6.25rem",
       height: "3.5rem",
       border: "1px solid var(--main-text)",
       borderRadius: "0.625rem",
@@ -63,7 +63,7 @@ const FriendButtonStyle = {
       fontSize: "1.25rem",
     },
     tablet: {
-      width: "8rem",
+      width: "6.25rem",
       height: "3.5rem",
       border: "1px solid var(--main-text)",
       borderRadius: "0.625rem",
@@ -71,17 +71,17 @@ const FriendButtonStyle = {
       fontSize: "1.25rem",
     },
     mobile: {
-      width: "5.375rem",
+      width: "6.125rem",
       height: "2.75rem",
       border: "1px solid var(--main-text)",
       borderRadius: "0.625rem",
       color: "var(--search-placeholder)",
-      fontSize: "0.875rem",
+      fontSize: "1rem",
     },
   },
   diaryUnfollow: {
     default: {
-      width: "8rem",
+      width: "6.25rem",
       height: "3.5rem",
       border: "1px solid var(--main-orange)",
       borderRadius: "0.625rem",
@@ -89,7 +89,7 @@ const FriendButtonStyle = {
       fontSize: "1.25rem",
     },
     tablet: {
-      width: "8rem",
+      width: "6.25rem",
       height: "3.5rem",
       border: "1px solid var(--main-orange)",
       borderRadius: "0.625rem",
@@ -97,12 +97,12 @@ const FriendButtonStyle = {
       fontSize: "1.25rem",
     },
     mobile: {
-      width: "5.375rem",
+      width: "6.125rem",
       height: "2.75rem",
       border: "1px solid var(--main-orange)",
       borderRadius: "0.625rem",
       color: "var(--unfollow-text)",
-      fontSize: "0.875rem",
+      fontSize: "1rem",
     },
   },
   modalFollow: {
