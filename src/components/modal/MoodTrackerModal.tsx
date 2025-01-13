@@ -67,24 +67,55 @@ const Title = styled.div`
 const MoodWrap = styled.div`
   display: flex;
   justify-content: center;
-  gap: 46px;
-  margin: 60px 0px;
+  gap: 2.875rem;
+  margin: 3.75rem 0rem;
+
+  @media (max-width: 781px) {
+    gap: 1.75rem;
+  }
+
+  @media (max-width: 390px) {
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: center;
+    padding: 0rem 2.25rem;
+  }
 `;
 
 const MoodClick = styled.button<{ isClicked: boolean }>`
   display: flex;
-  width: 80px;
-  height: 80px;
+  width: 5rem;
+  height: 5rem;
   justify-content: center;
   background-color: ${(props) =>
     props.isClicked ? "var(--bg-mood)" : "transparent"};
-  border-radius: 10px;
+  border-radius: 0.625rem;
+
+  @media (max-width: 781px) {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 3.125rem;
+    height: 3.125rem;
+  }
 `;
 
 const MoodImage = styled.img`
-  width: 80px;
-  height: 80px;
+  width: 5rem;
+  height: 5rem;
   object-fit: cover;
+
+  @media (max-width: 781px) {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 3.125rem;
+    height: 3.125rem;
+  }
 `;
 
 const TextAreaWrap = styled.div`
