@@ -6,35 +6,35 @@ import styled from "styled-components";
 
 const Layout = styled.div`
   display: flex;
-  gap: 30px;
-  padding: 40px 20px 0px 80px;
-  margin-bottom: 32px;
+  gap: 1.875rem;
+  padding: 2.5rem 1.25rem 0rem 5rem;
+  margin-bottom: 2rem;
 
   @media (max-width: 781px) {
     flex-direction: column;
-    padding: 40px 20px 0px 50px;
-    margin-bottom: 32px;
+    padding: 2.5rem 1.25rem 0rem 3.125rem;
+    margin-bottom: 2rem;
   }
 
   @media (max-width: 390px) {
-    gap: 20px;
-    padding: 40px 20px 20px 0px;
+    gap: 1.25rem;
+    padding: 2.5rem 1.25rem 1.25rem 0rem;
     margin: unset;
   }
 `;
 
 const TabWrap = styled.div`
   display: flex;
-  gap: 30px;
+  gap: 1.875rem;
 `;
 
 const TabWrapper = styled.button`
   display: flex;
-  height: 48px;
+  height: 3rem;
   align-items: flex-start;
 
   @media (max-width: 781px) {
-    height: 34px;
+    height: 2.125rem;
   }
 `;
 
@@ -43,22 +43,22 @@ const TabMenu = styled.button<{
 }>`
   display: flex;
   width: 100%;
-  padding-bottom: 16px;
+  padding-bottom: 1rem;
   color: var(--black);
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: var(--font-semibold);
   border-bottom: ${(props) =>
     props.isClicked ? "2px solid var(--orange-button)" : ""};
 
   @media (max-width: 781px) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
   margin-left: auto;
-  width: 124px;
+  width: 7.75rem;
 
   @media (max-width: 781px) {
     justify-content: center;

@@ -67,8 +67,7 @@ const SideMenuWrapper = styled.div`
   width: 16.375rem;
   height: 100vh;
   gap: 1.5rem;
-  // border-right: 1px solid var(--line-basic);
-  padding: 60px 48px 0px 24px;
+  padding: 3.75rem 3rem 0rem 1.5rem;
   flex-wrap: wrap;
 
   @media (max-width: 781px) {

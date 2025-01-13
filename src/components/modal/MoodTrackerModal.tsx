@@ -7,6 +7,7 @@ import 화남 from "../../assets/images/화남.svg";
 import { useIsModalStore } from "../../store/ModalStore";
 import { RecordButton } from "../ui/Button";
 import { Textarea } from "@/components/ui/Input";
+import { useState } from "react";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -63,59 +64,27 @@ const Title = styled.div`
   }
 `;
 
-const Ul = styled.ul`
+const MoodWrap = styled.div`
   display: flex;
   justify-content: center;
-  width: 62.125rem;
-  margin: 3.75rem 0;
+  gap: 46px;
+  margin: 60px 0px;
+`;
 
-  > li {
-    list-style: none;
-    margin-right: 2.875rem;
-  }
+const MoodClick = styled.button<{ isClicked: boolean }>`
+  display: flex;
+  width: 80px;
+  height: 80px;
+  justify-content: center;
+  background-color: ${(props) =>
+    props.isClicked ? "var(--bg-mood)" : "transparent"};
+  border-radius: 10px;
+`;
 
-  > li > img {
-    width: 5rem;
-    height: 5rem;
-  }
-
-  @media (max-width: 781px) {
-    width: 26.125rem;
-    margin: 3.75rem auto;
-    padding: 0;
-
-    > li {
-      width: 100%;
-      margin: 0;
-    }
-    > li > img {
-      width: 3.75rem;
-      height: 3.75rem;
-    }
-  }
-
-  @media (max-width: 390px) {
-    width: 13rem;
-    height: 7.125rem;
-    margin: 2.5rem auto;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-content: center;
-    gap: 20px;
-
-    > li {
-      width: 3.125rem;
-      height: 3.125rem;
-    }
-
-    > li > img {
-      width: 3.125rem;
-      height: 3.125rem;
-      object-fit: cover;
-    }
-  }
+const MoodImage = styled.img`
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
 `;
 
 const TextAreaWrap = styled.div`
@@ -151,8 +120,33 @@ const ButtonWrap = styled.div`
 
 export default function MoodTrackerModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+
+  const moods = [
+    { id: "기쁨", src: 기쁨 },
+    { id: "슬픔", src: 슬픔 },
+    { id: "평범", src: 평범 },
+    { id: "피곤", src: 피곤 },
+    { id: "화남", src: 화남 },
+  ];
+
+  const handleMoodClick = (id: string) => {
+    setSelectedMood((prev) => (prev === id ? null : id)); // 같은 버튼 클릭 시 취소
+  };
+
   const CloseButton = () => {
     useSetIsModalClick();
+  };
+
+  const savePoint = (type?: string) => {
+    console.log(type);
+
+    if (type) {
+      setIsModalClick(type);
+    } else {
+      setIsModalClick();
+    }
   };
 
   return (
@@ -162,23 +156,17 @@ export default function MoodTrackerModal() {
           <h2>오늘의 무드를 기록하세요!</h2>
           <p>Track Your Mood</p>
         </Title>
-        <Ul>
-          <li>
-            <img src={기쁨} alt="기쁨" />
-          </li>
-          <li>
-            <img src={슬픔} alt="기쁨" />
-          </li>
-          <li>
-            <img src={평범} alt="평범" />
-          </li>
-          <li>
-            <img src={피곤} alt="피곤" />
-          </li>
-          <li>
-            <img src={화남} alt="화남" />
-          </li>
-        </Ul>
+        <MoodWrap>
+          {moods.map((mood) => (
+            <MoodClick
+              key={mood.id}
+              isClicked={selectedMood === mood.id}
+              onClick={() => handleMoodClick(mood.id)}
+            >
+              <MoodImage src={mood.src} alt={mood.id} />
+            </MoodClick>
+          ))}
+        </MoodWrap>
         <TextAreaWrap>
           <Textarea maxLength={100} showCount />
         </TextAreaWrap>
@@ -186,7 +174,12 @@ export default function MoodTrackerModal() {
           <RecordButton variant="moodCancel" onClick={CloseButton}>
             취소
           </RecordButton>
-          <RecordButton variant="moodSubmit">등록</RecordButton>
+          <RecordButton
+            variant="moodSubmit"
+            onClick={() => savePoint("pointModal")}
+          >
+            등록
+          </RecordButton>
         </ButtonWrap>
       </Wrap>
     </>
