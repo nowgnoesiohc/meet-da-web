@@ -9,8 +9,8 @@ import DiaryManagement from "@/pages/Mypage/DiaryManagement";
 import PointManagement from "@/pages/Mypage/PointManagement";
 import Theme from "@/pages/Mypage/Theme";
 import Settings from "@/pages/Mypage/Settings";
-import Join from "@/pages/join/Join";
 import Login from "@/pages/login/Login";
+import Join from "@/pages/auth/Join";
 
 export const router = createBrowserRouter([
   {
@@ -34,7 +34,7 @@ export const router = createBrowserRouter([
         element: <Login />
       },
       {
-        path: "/join",
+        path: "auth/join",
         element: <Join />
       },
       {
