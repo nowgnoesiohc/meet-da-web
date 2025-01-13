@@ -28,6 +28,7 @@ const SearchBarContainer = styled.div`
   border: 0.0625rem solid var(--main-text);
   background-color: var(--white);
   margin: 0 auto;
+  box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.25);
 
   @media (max-width: 390px) {
     width: 100%;

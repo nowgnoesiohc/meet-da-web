@@ -9,20 +9,20 @@ import { useIsModalStore } from "@/store/ModalStore";
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  padding: 0px 20px 0px 80px;
+  gap: 1.875rem;
+  padding: 0rem 1.25rem 0rem 5rem;
   align-items: center;
   height: 100vh;
 
   @media (max-width: 781px) {
-    padding: 0px 20px 0px 50px;
+    padding: 0rem 1.25rem 0rem 3.125rem;
     height: 100%;
   }
 
   @media (max-width: 390px) {
-    gap: 26px;
+    gap: 1.625rem;
     height: 100%;
-    padding-left: 0px;
+    padding-left: 0rem;
   }
 `;
 
@@ -31,19 +31,19 @@ const SearchBarContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 60px;
-  padding: 12px 40px;
-  border-radius: 10px;
+  height: 3.75rem;
+  padding: 0.75rem 2.5rem;
+  border-radius: 0.625rem;
   border: 1px solid var(--main-text);
 
   @media (max-width: 781px) {
-    padding: 10px 30px;
-    height: 50px;
+    padding: 0.625rem 1.875rem;
+    height: 3.125rem;
   }
 
   @media (max-width: 390px) {
-    padding: 8px 20px;
-    height: 40px;
+    padding: 0.5rem 1.25rem;
+    height: 2.5rem;
   }
 `;
 
@@ -52,7 +52,7 @@ const SearchInput = styled.input`
   background: transparent;
   outline: none;
   flex: 1;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-regular);
 
   &::placeholder {
@@ -61,11 +61,11 @@ const SearchInput = styled.input`
   }
 
   @media (max-width: 781px) {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   @media (max-width: 390px) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
@@ -82,21 +82,21 @@ const ThemeSet = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 12px;
+  gap: 0.75rem;
 `;
 
 const CheckIcon = styled(FaCheck)`
   color: var(--main-orange);
-  font-size: 22px;
+  font-size: 1.375rem;
 `;
 
 const CheckBox = styled.button<{ isClicked: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.375rem;
   border: ${(props) =>
     props.isClicked ? "none" : "1px solid var(--main-text)"};
   background-color: ${(props) =>
@@ -104,13 +104,13 @@ const CheckBox = styled.button<{ isClicked: boolean }>`
   cursor: pointer;
 
   @media (max-width: 781px) {
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   @media (max-width: 390px) {
-    width: 30px;
-    height: 30px;
+    width: 1.875rem;
+    height: 1.875rem;
   }
 `;
 
@@ -118,7 +118,7 @@ const ImageBox = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
 `;
 
 const PurchaseBox = styled.div`
@@ -130,77 +130,77 @@ const PurchaseBox = styled.div`
 const ThemeContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 60px 68px 40px;
-  margin-bottom: 60px;
+  padding: 3.75rem 4.25rem 2.5rem;
+  margin-bottom: 3.75rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 60px;
-  border-radius: 10px;
+  gap: 3.75rem;
+  border-radius: 0.625rem;
   background: var(--white);
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
 
   @media (max-width: 781px) {
-    padding: 40px 50px 30px;
-    gap: 40px;
+    padding: 2.5rem 3.125rem 1.875rem;
+    gap: 2.5rem;
   }
 
   @media (max-width: 390px) {
-    padding: 20px 20px 20px;
-    gap: 20px;
+    padding: 1.25rem 1.25rem 1.25rem;
+    gap: 1.25rem;
   }
 `;
 
 const ThemeWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 기본 1줄에 2개 */
-  row-gap: 40px;
-  column-gap: 60px;
+  row-gap: 2.5rem;
+  column-gap: 3.75rem;
   width: 100%;
 
   @media (max-width: 781px) {
     grid-template-columns: 1fr; /* 1줄에 1개 */
-    row-gap: 30px;
+    row-gap: 1.875rem;
     width: auto;
   }
 
   @media (max-width: 390px) {
-    row-gap: 20px;
+    row-gap: 1.25rem;
     width: auto;
   }
 `;
 
 const ThemeTitle = styled.div`
   display: flex;
-  gap: 20px;
+  gap: 1.25rem;
   color: var(--black);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-medium);
   align-items: center;
 
   @media (max-width: 781px) {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   @media (max-width: 390px) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
 const ThemeBox = styled.div`
   display: inline-flex;
-  padding: 20px 26px;
+  padding: 1.25rem 1.625rem;
   flex-direction: column;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 0.625rem;
   border: 1px solid var(--main-text);
 
   @media (max-width: 781px) {
-    padding: 16px 20px;
+    padding: 1rem 1.25rem;
   }
 
   @media (max-width: 390px) {
-    padding: 12px 16px;
+    padding: 0.75rem 1rem;
   }
 `;
 
@@ -212,32 +212,32 @@ const ThemeImage = styled.img`
 
 const PriceBox = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   color: var(--main-orange);
   text-align: center;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-medium);
 
   @media (max-width: 781px) {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   @media (max-width: 390px) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
 const PriceText = styled.div`
   color: var(--black);
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: var(--font-regular);
 
   @media (max-width: 781px) {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   @media (max-width: 390px) {
-    font-size: 16px;
+    font-size: 1rem;
   }
 `;
 
