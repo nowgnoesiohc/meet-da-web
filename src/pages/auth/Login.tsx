@@ -6,10 +6,17 @@ import kakao from "../../assets/kakao.png"
 import naverHover from "../../assets/naver-hover.png"
 import googleHover from "../../assets/google-hover.png"
 import kakaoHover from "../../assets/kakao-hover.png"
+import error from "../../assets/error.png"
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { useIsModalStore } from "@/store/ModalStore";
 // import { useIsModalStore } from "../../store/ModalStore";
+
+    interface StyledProps {
+        $isError?: boolean;
+    }
 
     const LoginWrap = styled.div`
         width: 34.5rem; /* 552px */
@@ -38,7 +45,7 @@ import { useForm } from "react-hook-form";
         }
     `
 
-    const Input = styled.input`
+    const Input = styled.input<StyledProps>`
         width: 27.625rem; /* 442px */
         height: 4.25rem; /* 68px */
         border: 0.0625rem solid;
@@ -132,35 +139,42 @@ import { useForm } from "react-hook-form";
         }
     `
 
-    const Error = styled.div`
+    const Error = styled.div<StyledProps>`
         width: 27.625rem; /* 442px */
         height: 1.75rem; /* 28px */
-        margin: 0 auto;
         color: var(--error-02);
-        display: ${(props) => (props.$isError ? "block" : "none")}; // 조건부 렌더링
+        display: ${(props) => (props.$isError ? "flex" : "none")}; // 조건부 렌더링
+        align-items:center;
+        padding-left:1.25rem;
+        margin:0.375rem auto 1.25rem;
+
+        > img{
+            width:1rem;
+            height:1rem;
+        }
 
         > p {
-            margin: 0.75rem 0; /* 12px */
-            padding: 0; 
-            float: left;
+            margin:0;
+            padding-left:0.5rem;
+            padding-top:0.25rem;
         }
     `
 
 export default function Login(){
 
     // 비밀번호 찾기
-    // const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+    const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
     
-    // const FindPassword = (type?: string) => {
-    //     console.log(type);
+    const FindPassword = (type?: string) => {
+        console.log(type);
 
-    //     if(type){
-    //         setIsModalClick(type);
-    //     } else{
-    //         setIsModalClick();
-    //     }
+        if(type){
+            setIsModalClick(type);
+        } else{
+            setIsModalClick();
+        }
 
-    // };
+    };
 
     const schema = z.object({
         email: z.string().min(1, "이메일을 입력해주세요.").email("이메일 형식이 올바르지 않습니다."),
@@ -174,14 +188,33 @@ export default function Login(){
         }
     )
 
-    const { register, handleSubmit, formState} = useForm({
+    const { register, handleSubmit, formState} = useForm<FormData>({
         resolver: zodResolver(schema),
         mode: "onChange",
     });
 
-    const onClickSubmit = (data) => {
+    type FormData = z.infer<typeof schema>;
+    const onClickSubmit = async (data: FormData) => {
         console.log(data);
-    }   
+        try{
+            const response = await axios.post('https://api.meet-da.site/auth/login', {
+                email: data.email,
+                password: data.password,
+            });
+            if(response.status === 201){
+                console.log("로그인 성공", response.data);
+            }
+        }catch (error: any) {
+            console.error("로그인 실패", error);
+            if (error.response) {
+                alert(error.response.data.message || "로그인에 실패했습니다.");
+            } else if (error.request) {
+                alert("서버와의 통신에 실패했습니다.");
+            } else {
+                alert("로그인 처리 중 오류가 발생했습니다.");
+            }
+        }
+    }
 
     return(
         <LoginWrap>
@@ -191,15 +224,17 @@ export default function Login(){
                 <Span>회원가입하기</Span>
             </Join>
             <form onSubmit={handleSubmit(onClickSubmit)}>
-                <Input $isError={!!formState.errors.email} type="text" placeholder="이메일" {...register("email")} $isError={!!formState.errors.email} />
+                <Input $isError={!!formState.errors.email} type="text" placeholder="이메일" {...register("email")} />
                 <Error $isError={!!formState.errors.email}>
+                    <img src={error} alt="에러" />
                     {formState.errors.email && <p>{formState.errors.email.message}</p>}
                 </Error>
-                <Input $isError={!!formState.errors.password} type="password" placeholder="비밀번호" {...register("password")} $isError={!!formState.errors.password} />
+                <Input $isError={!!formState.errors.password} type="password" placeholder="비밀번호" {...register("password")} />
                 <Error $isError={!!formState.errors.password}>
+                    <img src={error} alt="에러" />
                     {formState.errors.password && <p>{formState.errors.password.message}</p>}
                 </Error>
-                <LoginButton>로그인 하기</LoginButton>
+                <LoginButton type="submit">로그인 하기</LoginButton>
             </form>
             <SnsWrap>
                 <span>SNS 간편 로그인</span>
@@ -210,7 +245,7 @@ export default function Login(){
                 </Ul>
             </SnsWrap>
             <PasswordReset>
-                {/* <button onClick={() => FindPassword('findPasswordModal')}>비밀번호 찾기</button> */}
+                <button onClick={() => FindPassword('findPasswordModal')}>비밀번호 찾기</button>
             </PasswordReset>
         </LoginWrap>
     )
