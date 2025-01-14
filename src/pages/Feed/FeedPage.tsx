@@ -7,7 +7,7 @@ import test from "/src/assets/testImage.png";
 import happy from "/src/assets/happy.svg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import "/Users/noey/Desktop/meet-so-sa/meet-da-web/node_modules/swiper/swiper.css";
+import "/node_modules/swiper/swiper.css";
 import { Link } from "react-router-dom";
 
 const Layout = styled.div`
@@ -30,7 +30,7 @@ const SearchBarWrap = styled.div`
   gap: 2.25rem;
   width: 100%;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 1.125rem;
   }
 `;
@@ -50,7 +50,7 @@ const SearchBarContainer = styled.div`
   gap: 0.5rem;
   box-shadow: 0rem 0.25rem 0.25rem 0rem rgba(0, 0, 0, 0.25);
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     padding: 0.75rem 1.125rem;
     height: 2.625rem; /* 더 작은 화면에서 높이 조정 */
   }
@@ -70,7 +70,7 @@ const SearchInput = styled.input`
     font-weight: var(--font-regular);
   }
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.875rem;
 
     &::placeholder {
@@ -87,7 +87,7 @@ const SearchIcon = styled(IoSearch)`
   color: var(--search-placeholder);
   font-size: 1.5rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.875rem;
   }
 `;
@@ -106,7 +106,7 @@ const ButtonWrap = styled.div`
   gap: 1.5rem;
   width: 100%;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     gap: 0.75rem;
   }
 `;
@@ -122,7 +122,7 @@ const PostContainer = styled.div`
     grid-template-columns: repeat(2, 1fr); /* 1줄에 2개 */
   }
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     grid-template-columns: repeat(2, 1fr); /* 1줄에 2개 */
     row-gap: 1.5rem;
     column-gap: 1rem;
@@ -146,7 +146,7 @@ const PostItem = styled(Link)`
     margin: auto;
   }
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     width: 11rem;
     padding-bottom: 0.5rem;
   }
@@ -161,7 +161,7 @@ const PostTitle = styled.div`
   text-align: start;
   padding: 0 1rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.875rem;
     padding: 0 0.75rem;
   }
@@ -172,7 +172,7 @@ const MoodImage = styled.img`
   height: 1.5rem;
   object-fit: cover;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     width: 1rem; /* 작은 화면에 적응 */
     height: 1rem;
   }
@@ -187,7 +187,7 @@ const PostText = styled.div`
   line-height: 1.5;
   padding: 0 1rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.75rem;
     padding: 0 0.75rem;
   }
@@ -204,7 +204,7 @@ const PostInfoWrap = styled.div`
   gap: 0.25rem;
   padding: 0 1rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     padding: 0 0.75rem;
   }
 `;
@@ -214,7 +214,7 @@ const PostInfo = styled.div`
   font-size: 0.875rem;
   font-weight: var(--font-regular);
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.625rem;
   }
 `;
@@ -224,7 +224,7 @@ const InfoWrap = styled.div`
   justify-content: space-between;
   padding: 0 1rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     padding: 0 0.75rem;
   }
 `;
@@ -237,7 +237,7 @@ const UserInfo = styled.div`
   font-weight: var(--font-medium);
   align-items: center;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.625rem;
   }
 `;
@@ -248,7 +248,7 @@ const UserImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     width: 1rem;
     height: 1rem;
   }
@@ -262,7 +262,7 @@ const LikeContainer = styled.div`
   font-weight: var(--font-regular);
   align-items: center;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.625rem;
   }
 `;
@@ -271,7 +271,7 @@ const LikeIcon = styled(IoHeart)`
   color: var(--diary-text);
   font-size: 0.875rem;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     font-size: 0.625rem;
   }
 `;
@@ -289,17 +289,18 @@ const SwiperImage = styled.img`
   object-fit: cover;
   border-radius: 0.5625rem 0.5625rem 0 0;
 
-  @media (max-width: 430px) {
+  @media (max-width: 390px) {
     height: 6.5rem;
   }
 `;
 
 export default function FeedPage() {
-  const [Latest, setLatest] = useState(true);
-  const [Popular, setPopular] = useState(true);
+  const [activeTab, setActiveTab] = useState("Latest");
 
-  const LatestClick = () => setLatest(!Latest);
-  const PopularClick = () => setPopular(!Popular);
+  const TabItems = [
+    { key: "Latest", label: "최신" },
+    { key: "Popular", label: "인기" },
+  ];
 
   return (
     <>
@@ -315,12 +316,15 @@ export default function FeedPage() {
         </SearchBarWrap>
         <PostWrap>
           <ButtonWrap>
-            <FeedButton isClicked={Latest} onClick={LatestClick}>
-              최신
-            </FeedButton>
-            <FeedButton isClicked={Popular} onClick={PopularClick}>
-              인기
-            </FeedButton>
+            {TabItems.map((menu) => (
+              <FeedButton
+                key={menu.key}
+                isClicked={activeTab !== menu.key}
+                onClick={() => setActiveTab(menu.key)}
+              >
+                {menu.label}
+              </FeedButton>
+            ))}
           </ButtonWrap>
           <PostContainer>
             <PostItem to="/Page1">

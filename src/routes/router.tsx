@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
+// import App from "../App";
 import Page1 from "../pages/Page1/Page1";
 import Page2 from "../pages/Page2/Page2";
 import FeedPage from "@/pages/Feed/FeedPage";
@@ -7,8 +7,12 @@ import MypageNavigation from "@/components/layout/navigation/MypageNavigation";
 import MoodReport from "@/pages/Mypage/MoodReport";
 import DiaryManagement from "@/pages/Mypage/DiaryManagement";
 import PointManagement from "@/pages/Mypage/PointManagement";
-import Theme from "@/pages/Mypage/Theme";
+import Theme from "@/pages/Mypage/Theme/Theme";
 import Settings from "@/pages/Mypage/Settings";
+import Emoji from "@/pages/Mypage/Theme/TabMenu/Emoji";
+import Font from "@/pages/Mypage/Theme/TabMenu/Font";
+import Own from "@/pages/Mypage/Theme/TabMenu/Own";
+import MainPage from "@/pages/Calendar/MainPage";
 import Join from "@/pages/auth/Join";
 import Login from "@/pages/auth/Login";
 import PrivateRoute from "@/components/PrivateRoute/Private";
@@ -16,7 +20,7 @@ import PrivateRoute from "@/components/PrivateRoute/Private";
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <MainPage />,
     children: [
       {
         path: "/page1",
@@ -44,6 +48,7 @@ export const router = createBrowserRouter([
           <PrivateRoute element={<MypageNavigation />} isLoggedIn={false} />
         ), // MypageNavigation 컴포넌트 추가
         children: [
+          { index: true, element: <MoodReport /> }, // 기본 라우트 설정
           {
             path: "mood-report",
             element: (
@@ -64,7 +69,22 @@ export const router = createBrowserRouter([
           },
           {
             path: "theme",
-            element: <PrivateRoute element={<Theme />} isLoggedIn={false} />, // 테마 페이지
+            element: <Theme />, // 테마 페이지
+            children: [
+              { index: true, element: <Emoji /> }, // 기본 라우트 설정
+              {
+                path: "emoji",
+                element: <Emoji />,
+              },
+              {
+                path: "font",
+                element: <Font />,
+              },
+              {
+                path: "own",
+                element: <Own />,
+              },
+            ],
           },
           {
             path: "settings",

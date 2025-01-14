@@ -1,23 +1,16 @@
 import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
 import FindPasswordModal from "./FindPasswordModal";
-import SignUpModal from "./SignUpModal";
+import React from "react";
 import NoticeModal from "./NoticeModal";
-
-// import React from "react"
-// import MoodTrackerModal from "./MoodTrackerModal"
-// import BoardWriteModal from "./BoardWriteModal"
-// import CommentWriteModal from "./CommentWriteModal"
-// import ThemaBuyModal from "./ThemaBuyModal"
-// import ThemaBuyCompleteModal from "./ThemaBuyCompleteModal"
-// import ChangePasswordModal from "./ChangePasswordModal"
-// import DeleteIdModal from "./DeleteIdModal"
-// import DeleteIdCompleteModal from "./DeleteIdCompleteModal"
-// import DeleteThemaModal from "./DeleteThemaModal"
-// import DeleteThemaCompleteModal from "./DeleteThemaCompleteModal"
-// import FriendModal from "./FriendModal"
-// import PopularDiaryModal from "./PopularDiaryModal"
-// import TodayMoodModal from "./TodayMood"
+import SignUpModal from "./SignUpModal";
+import ThemaBuyCompleteModal from "./ThemeBuyCompleteModal";
+import ChangePasswordModal from "./ChangePasswordModal";
+import FriendModal from "./FriendModal";
+import MoodTrackerModal from "./MoodTrackerModal";
+import PointModal from "./PointModal";
+import DeleteCompleteModal from "./DeleteCompleteModal";
+import DeleteModal from "./DeleteModal";
 
 const ModalWrap = styled.div`
   position: fixed;
@@ -33,7 +26,7 @@ const ModalWrap = styled.div`
 
 const ModalContainer = styled.div`
   min-width: 30.25rem;
-  // background-color:#fff;
+  // background-color:var(--white);
   text-align: center;
   position: relative;
   z-index: 100;
@@ -58,36 +51,24 @@ export default function ModalTemplate() {
           switch (useIsModal) {
             case "findPasswordModal":
               return <FindPasswordModal />;
+            case "moodTrackerModal":
+              return <MoodTrackerModal />;
             case "noticeModal":
               return <NoticeModal />;
             case "signUpModal":
               return <SignUpModal />;
-            case "moodTrackerModal":
-              return <MoodTrackerModal />;
-            case "boardWriteModal":
-              return <BoardWriteModal />;
-            case "commentWriteModal":
-              return <CommentWriteModal />;
-            case "themaBuyModal":
-              return <ThemaBuyModal />;
             case "themaCompleteModal":
               return <ThemaBuyCompleteModal />;
             case "changePasswordModal":
               return <ChangePasswordModal />;
-            case "deleteIdModal":
-              return <DeleteIdModal />;
-            case "deleteIdCompleteModal":
-              return <DeleteIdCompleteModal />;
-            case "deleteThemaModal":
-              return <DeleteThemaModal />;
-            case "deleteThemaCompleteModal":
-              return <DeleteThemaCompleteModal />;
+            case "deleteModal":
+              return <DeleteModal />;
+            case "deleteCompleteModal":
+              return <DeleteCompleteModal />;
             case "friendModal":
               return <FriendModal />;
-            case "popularDiaryModal":
-              return <PopularDiaryModal />;
-            case "todayMoodModal":
-              return <TodayMoodModal />;
+            case "pointModal":
+              return <PointModal />;
             default:
               return <p>{useIsModal}</p>;
           }

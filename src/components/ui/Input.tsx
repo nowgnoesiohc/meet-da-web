@@ -26,7 +26,7 @@ export const commonStyle = css<CommonProps>`
   border-radius: 12px;
   font-size: 16px;
   outline: none;
-  color: #000;
+  color: var(--black);
   ::placeholder {
     color: ${({ exceeded }) =>
       exceeded ? "var(--error-02)" : "var(--text-02)"};

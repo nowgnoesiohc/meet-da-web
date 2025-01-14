@@ -4,16 +4,12 @@ import { OrangeButton } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
 
-const NoticeModalWrap = styled.div`
+const Wrap = styled.div`
   width: 30.25rem;
-  background-color: #fff;
+  background-color: var(--white);
   border-radius: 1.875rem;
+  padding-top: 4.125rem;
   padding-bottom: 2.75rem;
-  margin: 0 auto;
-
-  @media (max-width: 781px) {
-    width: 30.25rem;
-  }
 
   @media (max-width: 390px) {
     width: 20rem;
@@ -22,9 +18,6 @@ const NoticeModalWrap = styled.div`
 `;
 
 const NoticeText = styled.div`
-  padding-top: 4.125rem;
-  margin-bottom: 2.75rem;
-
   > h2 {
     margin: 0;
     font-size: 1.625rem;
@@ -52,10 +45,24 @@ const NoticeText = styled.div`
 `;
 
 const Button = styled.button`
-  color: #fff;
+  color: var(--white);
   border-radius: 0.625rem;
-  font-size: 1.25rem;
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-medium);
+  padding: 0;
+  margin-top: 2.875rem;
+
+  > button {
+    width: 7.625rem;
+    height: 3rem;
+    font-size: 1.25rem;
+  }
+
+  @media (max-width: 390px) {
+    > button {
+      width: 6.25rem;
+      font-size: 1.125rem;
+    }
+  }
 `;
 
 export default function NoticeModal() {
@@ -68,10 +75,9 @@ export default function NoticeModal() {
     handleClose();
     navigate("/auth/login");
   };
-
   return (
     <>
-      <NoticeModalWrap>
+      <Wrap>
         <CloseButton />
         <NoticeText>
           <h2>알림</h2>
@@ -79,11 +85,9 @@ export default function NoticeModal() {
           <p>로그인 하시겠습니까?</p>
         </NoticeText>
         <Button>
-          <OrangeButton variant="signupToLogin" onClick={handleLogin}>
-            로그인
-          </OrangeButton>
+          <OrangeButton variant="signupToLogin" onClick={handleLogin}>로그인</OrangeButton>
         </Button>
-      </NoticeModalWrap>
+      </Wrap>
     </>
   );
 }
