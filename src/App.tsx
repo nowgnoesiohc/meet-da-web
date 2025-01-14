@@ -19,8 +19,6 @@ function App() {
           <ModalTemplate />
         </ModalPortal>
       )}
-      {/* <Navigation />
-      <MypageNavigation /> */}
     </>
   );
 }

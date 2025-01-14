@@ -151,7 +151,6 @@ const ButtonWrap = styled.div`
 
 export default function MoodTrackerModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
   const moods = [
@@ -168,16 +167,6 @@ export default function MoodTrackerModal() {
 
   const CloseButton = () => {
     useSetIsModalClick();
-  };
-
-  const savePoint = (type?: string) => {
-    console.log(type);
-
-    if (type) {
-      setIsModalClick(type);
-    } else {
-      setIsModalClick();
-    }
   };
 
   return (
@@ -205,12 +194,7 @@ export default function MoodTrackerModal() {
           <RecordButton variant="moodCancel" onClick={CloseButton}>
             취소
           </RecordButton>
-          <RecordButton
-            variant="moodSubmit"
-            onClick={() => savePoint("pointModal")}
-          >
-            등록
-          </RecordButton>
+          <RecordButton variant="moodSubmit">등록</RecordButton>
         </ButtonWrap>
       </Wrap>
     </>
