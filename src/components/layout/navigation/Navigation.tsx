@@ -3,7 +3,8 @@ import logo from "/src/assets/logo.png";
 import home from "/src/assets/homeIcon.png";
 import calendar from "/src/assets/calendarIcon.png";
 import post from "/src/assets/postIcon.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const NavigationBar = styled.div`
   display: flex;
@@ -89,32 +90,67 @@ const MyProfileButton = styled.button`
 `;
 
 export default function Navigation() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+
+  useEffect(() => {
+    // 페이지 로드 및 경로 변경시 로그인 상태 확인
+    checkLoginStatus();
+  }, [location.pathname]); // location.pathname만 의존성으로 추가
+
+  // 로그인 상태 확인 함수
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  };
+  const handleLogin = () => {
+    navigate("/auth/login");
+  };
+
+  const handleSignUp = () => {
+    navigate("/auth/join");
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    setIsLoggedIn(false);
+    navigate("/auth/login");
+  };
   return (
     <>
-      <NavigationBar>
-        <LogoButton to="/Page1" />
-        <ButtonWrapper>
-          <ImageButtonGroup>
-            <ImageButton variant="home" to="/Page1" />
-            <ImageButton variant="post" to="/Page1" />
-            <ImageButton variant="calendar" to="/Page1" />
-          </ImageButtonGroup>
-          <TextButtonGroup>
-            <TextButton variant="after">마이 페이지</TextButton>
-            <TextButton variant="after">로그아웃</TextButton>
-          </TextButtonGroup>
-          <MyProfileButton />
-        </ButtonWrapper>
-      </NavigationBar>
-      <NavigationBar>
-        <LogoButton to="/Page1" />
-        <ButtonWrapper>
-          <TextButtonGroup>
-            <TextButton variant="before">Login</TextButton>
-            <TextButton variant="before">Signup</TextButton>
-          </TextButtonGroup>
-        </ButtonWrapper>
-      </NavigationBar>
+      {isLoggedIn ? (
+        <NavigationBar>
+          <LogoButton to="/Page1" />
+          <ButtonWrapper>
+            <ImageButtonGroup>
+              <ImageButton variant="home" to="/Page1" />
+              <ImageButton variant="post" to="/Page1" />
+              <ImageButton variant="calendar" to="/Page1" />
+            </ImageButtonGroup>
+            <TextButtonGroup>
+              <TextButton variant="after">마이 페이지</TextButton>
+              <TextButton variant="after" onClick={handleLogout}>
+                로그아웃
+              </TextButton>
+            </TextButtonGroup>
+            <MyProfileButton />
+          </ButtonWrapper>
+        </NavigationBar>
+      ) : (
+        <NavigationBar>
+          <LogoButton to="/Page1" />
+          <ButtonWrapper>
+            <TextButtonGroup>
+              <TextButton variant="before" onClick={handleLogin}>
+                Login
+              </TextButton>
+              <TextButton variant="before" onClick={handleSignUp}>
+                Signup
+              </TextButton>
+            </TextButtonGroup>
+          </ButtonWrapper>
+        </NavigationBar>
+      )}
     </>
   );
 }

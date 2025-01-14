@@ -11,6 +11,7 @@ import Theme from "@/pages/Mypage/Theme";
 import Settings from "@/pages/Mypage/Settings";
 import Join from "@/pages/auth/Join";
 import Login from "@/pages/auth/Login";
+import PrivateRoute from "@/components/PrivateRoute/Private";
 
 export const router = createBrowserRouter([
   {
@@ -19,47 +20,55 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/page1",
-        element: <Page1 />,
+        element: <PrivateRoute element={<Page1 />} isLoggedIn={false} />,
       },
       {
         path: "/page2",
-        element: <Page2 />,
+        element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
       },
       {
         path: "/feed",
-        element: <FeedPage />,
+        element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
       },
       {
         path: "auth/login",
-        element: <Login />
+        element: <Login />,
       },
       {
         path: "auth/join",
-        element: <Join />
+        element: <Join />,
       },
       {
         path: "/mypage",
-        element: <MypageNavigation />, // MypageNavigation 컴포넌트 추가
+        element: (
+          <PrivateRoute element={<MypageNavigation />} isLoggedIn={false} />
+        ), // MypageNavigation 컴포넌트 추가
         children: [
           {
             path: "mood-report",
-            element: <MoodReport />, // 무드 리포트 페이지
+            element: (
+              <PrivateRoute element={<MoodReport />} isLoggedIn={false} />
+            ), // 무드 리포트 페이지
           },
           {
             path: "diary-management",
-            element: <DiaryManagement />, // 다이어리 관리 페이지
+            element: (
+              <PrivateRoute element={<DiaryManagement />} isLoggedIn={false} />
+            ), // 다이어리 관리 페이지
           },
           {
             path: "point-management",
-            element: <PointManagement />, // 포인트 관리 페이지
+            element: (
+              <PrivateRoute element={<PointManagement />} isLoggedIn={false} />
+            ), // 포인트 관리 페이지
           },
           {
             path: "theme",
-            element: <Theme />, // 테마 페이지
+            element: <PrivateRoute element={<Theme />} isLoggedIn={false} />, // 테마 페이지
           },
           {
             path: "settings",
-            element: <Settings />, // 설정 페이지
+            element: <PrivateRoute element={<Settings />} isLoggedIn={false} />, // 설정 페이지
           },
         ],
       },
