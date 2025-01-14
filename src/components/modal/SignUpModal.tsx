@@ -2,6 +2,8 @@ import styled from "styled-components";
 import CloseButton from "./CloseButton";
 import signUpImg from "../../assets/images/signUp.svg";
 import { OrangeButton, OrangeLineButton } from "../ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
+import { useNavigate } from "react-router-dom";
 
 const Wrap = styled.div`
   width: 36.5rem;
@@ -65,6 +67,15 @@ const Button = styled.div`
 `;
 
 export default function SignUpModal() {
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const handleClose = () => {
+    setIsModalClick(undefined);
+  };
+  const navigate = useNavigate();
+  const handleLogin = () => {
+    handleClose();
+    navigate("/auth/login");
+  };
   return (
     <>
       <Wrap>
@@ -77,7 +88,7 @@ export default function SignUpModal() {
         </Title>
         <Button>
           <OrangeLineButton variant="moveToHome">🏠</OrangeLineButton>
-          <OrangeButton variant="signupToLogin">로그인</OrangeButton>
+          <OrangeButton variant="signupToLogin" onClick={handleLogin}>로그인</OrangeButton>
         </Button>
       </Wrap>
     </>

@@ -13,6 +13,9 @@ import Emoji from "@/pages/Mypage/Theme/TabMenu/Emoji";
 import Font from "@/pages/Mypage/Theme/TabMenu/Font";
 import Own from "@/pages/Mypage/Theme/TabMenu/Own";
 import MainPage from "@/pages/Calendar/MainPage";
+import Join from "@/pages/auth/Join";
+import Login from "@/pages/auth/Login";
+import PrivateRoute from "@/components/PrivateRoute/Private";
 
 export const router = createBrowserRouter([
   {
@@ -21,32 +24,48 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/page1",
-        element: <Page1 />,
+        element: <PrivateRoute element={<Page1 />} isLoggedIn={false} />,
       },
       {
         path: "/page2",
-        element: <Page2 />,
+        element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
       },
       {
         path: "/feed",
-        element: <FeedPage />,
+        element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
+      },
+      {
+        path: "auth/login",
+        element: <Login />,
+      },
+      {
+        path: "auth/join",
+        element: <Join />,
       },
       {
         path: "/mypage",
-        element: <MypageNavigation />, // MypageNavigation 컴포넌트 추가
+        element: (
+          <PrivateRoute element={<MypageNavigation />} isLoggedIn={false} />
+        ), // MypageNavigation 컴포넌트 추가
         children: [
           { index: true, element: <MoodReport /> }, // 기본 라우트 설정
           {
             path: "mood-report",
-            element: <MoodReport />, // 무드 리포트 페이지
+            element: (
+              <PrivateRoute element={<MoodReport />} isLoggedIn={false} />
+            ), // 무드 리포트 페이지
           },
           {
             path: "diary-management",
-            element: <DiaryManagement />, // 다이어리 관리 페이지
+            element: (
+              <PrivateRoute element={<DiaryManagement />} isLoggedIn={false} />
+            ), // 다이어리 관리 페이지
           },
           {
             path: "point-management",
-            element: <PointManagement />, // 포인트 관리 페이지
+            element: (
+              <PrivateRoute element={<PointManagement />} isLoggedIn={false} />
+            ), // 포인트 관리 페이지
           },
           {
             path: "theme",
@@ -69,7 +88,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "settings",
-            element: <Settings />, // 설정 페이지
+            element: <PrivateRoute element={<Settings />} isLoggedIn={false} />, // 설정 페이지
           },
         ],
       },

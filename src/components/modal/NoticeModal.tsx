@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import CloseButton from "./CloseButton";
 import { OrangeButton } from "../ui/Button";
+import { useNavigate } from "react-router-dom";
+import { useIsModalStore } from "@/store/ModalStore";
 
 const Wrap = styled.div`
   width: 30.25rem;
@@ -64,6 +66,15 @@ const Button = styled.button`
 `;
 
 export default function NoticeModal() {
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const handleClose = () => {
+    setIsModalClick(undefined);
+  };
+  const navigate = useNavigate();
+  const handleLogin = () => {
+    handleClose();
+    navigate("/auth/login");
+  };
   return (
     <>
       <Wrap>
@@ -74,7 +85,7 @@ export default function NoticeModal() {
           <p>로그인 하시겠습니까?</p>
         </NoticeText>
         <Button>
-          <OrangeButton variant="signupToLogin">로그인</OrangeButton>
+          <OrangeButton variant="signupToLogin" onClick={handleLogin}>로그인</OrangeButton>
         </Button>
       </Wrap>
     </>
