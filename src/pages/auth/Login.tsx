@@ -1,12 +1,12 @@
 import styled from "styled-components";
-import loginLogo from "../../assets/loginLogo.png";
-import naver from "../../assets/naver.png";
-import google from "../../assets/google.png";
-import kakao from "../../assets/kakao.png";
-import naverHover from "../../assets/naver-hover.png";
-import googleHover from "../../assets/google-hover.png";
-import kakaoHover from "../../assets/kakao-hover.png";
-import error from "../../assets/error.png";
+import loginLogo from "../../assets/images/loginLogo.png";
+import naver from "../../assets/icon/naver.png";
+import google from "../../assets/icon/google.png";
+import kakao from "../../assets/icon/kakao.png";
+import naverHover from "../../assets/icon/naver-hover.png";
+import googleHover from "../../assets/icon/google-hover.png";
+import kakaoHover from "../../assets/icon/kakao-hover.png";
+import error from "../../assets/icon/error.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ interface StyledProps {
 const LoginWrap = styled.div`
   width: 34.5rem; /* 552px */
   height: 43.75rem; /* 700px */
-  margin: 0 auto;
+  margin: 6.25rem auto;
   text-align: center;
 `;
 

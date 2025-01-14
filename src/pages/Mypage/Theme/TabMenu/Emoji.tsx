@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
-import themeSet from "/src/assets/themeset.svg";
+import themeSet from "/src/assets/theme/themeset.svg";
 import { useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";

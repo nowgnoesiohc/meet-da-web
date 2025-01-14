@@ -16,22 +16,27 @@ import MainPage from "@/pages/Calendar/MainPage";
 import Join from "@/pages/auth/Join";
 import Login from "@/pages/auth/Login";
 import PrivateRoute from "@/components/PrivateRoute/Private";
+import App from "@/App";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainPage />,
+    element: <MainPage />, // 루트 경로에서만 MainPage 렌더링
+  },
+  {
+    path: "/",
+    element: <App />,
     children: [
       {
-        path: "/page1",
+        path: "page1",
         element: <PrivateRoute element={<Page1 />} isLoggedIn={false} />,
       },
       {
-        path: "/page2",
+        path: "page2",
         element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
       },
       {
-        path: "/feed",
+        path: "feed",
         element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
       },
       {
@@ -43,52 +48,43 @@ export const router = createBrowserRouter([
         element: <Join />,
       },
       {
-        path: "/mypage",
+        path: "mypage",
         element: (
           <PrivateRoute element={<MypageNavigation />} isLoggedIn={false} />
-        ), // MypageNavigation 컴포넌트 추가
+        ),
         children: [
-          { index: true, element: <MoodReport /> }, // 기본 라우트 설정
+          { index: true, element: <MoodReport /> },
           {
             path: "mood-report",
             element: (
               <PrivateRoute element={<MoodReport />} isLoggedIn={false} />
-            ), // 무드 리포트 페이지
+            ),
           },
           {
             path: "diary-management",
             element: (
               <PrivateRoute element={<DiaryManagement />} isLoggedIn={false} />
-            ), // 다이어리 관리 페이지
+            ),
           },
           {
             path: "point-management",
             element: (
               <PrivateRoute element={<PointManagement />} isLoggedIn={false} />
-            ), // 포인트 관리 페이지
+            ),
           },
           {
             path: "theme",
-            element: <Theme />, // 테마 페이지
+            element: <Theme />,
             children: [
-              { index: true, element: <Emoji /> }, // 기본 라우트 설정
-              {
-                path: "emoji",
-                element: <Emoji />,
-              },
-              {
-                path: "font",
-                element: <Font />,
-              },
-              {
-                path: "own",
-                element: <Own />,
-              },
+              { index: true, element: <Emoji /> },
+              { path: "emoji", element: <Emoji /> },
+              { path: "font", element: <Font /> },
+              { path: "own", element: <Own /> },
             ],
           },
           {
             path: "settings",
-            element: <PrivateRoute element={<Settings />} isLoggedIn={false} />, // 설정 페이지
+            element: <PrivateRoute element={<Settings />} isLoggedIn={false} />,
           },
         ],
       },

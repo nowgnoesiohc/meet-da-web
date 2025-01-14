@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import ModalCloseButton from "../../assets/images/modalClose.svg";
+import ModalCloseButton from "../../assets/icon/modalClose.svg";
 import { useIsModalStore } from "../../store/ModalStore";
 
 const CloseButtonWrap = styled.div`
