@@ -1,12 +1,11 @@
 import styled from "styled-components";
-import loginLogo from "../../assets/loginLogo.png";
-import naver from "../../assets/naver.png";
-import google from "../../assets/google.png";
-import kakao from "../../assets/kakao.png";
-import naverHover from "../../assets/naver-hover.png";
-import googleHover from "../../assets/google-hover.png";
-import kakaoHover from "../../assets/kakao-hover.png";
-import error from "../../assets/error.png";
+import loginLogo from "../../assets/images/loginLogo.png";
+import naver from "../../assets/images/naver.png";
+import google from "../../assets/images/google.png";
+import kakao from "../../assets/images/kakao.png";
+import naverHover from "../../assets/images/naver-hover.png";
+import googleHover from "../../assets/images/google-hover.png";
+import kakaoHover from "../../assets/images/kakao-hover.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -250,7 +249,7 @@ export default function Login() {
           {...register("email")}
         />
         <Error $isError={!!formState.errors.email}>
-          <img src={error} alt="에러" />
+          {/* <img src={error} alt="에러" /> */}
           {formState.errors.email && <p>{formState.errors.email.message}</p>}
         </Error>
         <Input
@@ -260,7 +259,7 @@ export default function Login() {
           {...register("password")}
         />
         <Error $isError={!!formState.errors.password}>
-          <img src={error} alt="에러" />
+          {/* <img src={error} alt="에러" /> */}
           {formState.errors.password && (
             <p>{formState.errors.password.message}</p>
           )}

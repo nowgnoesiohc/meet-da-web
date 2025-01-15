@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import CloseButton from "./CloseButton";
-import Lock from "../../assets/images/lock.svg";
+import Lock from "../../assets/icon/lock.svg";
 import { OrangeButton } from "../ui/Button";
 
 const Wrap = styled.div`

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import test from "/src/assets/testImage.png";
+import test from "/src/assets/test/testImage.png";
 // import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
 import { useEffect, useState } from "react";

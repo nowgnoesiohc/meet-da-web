@@ -6,11 +6,11 @@ import GlobalStyles from "@/styles/GlobalStyle";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import CalLarge from "@/assets/캘린더배경.png";
-import CalMedium from "@/assets/캘린더배경_781.png";
-import CalSmall from "@/assets/캘린더배경_390.png";
-import test from "@/assets/testImage.png";
-import happy from "@/assets/happy.svg";
+import CalLarge from "@/assets/images/캘린더배경.png";
+import CalMedium from "@/assets/images/캘린더배경_781.png";
+import CalSmall from "@/assets/images/캘린더배경_390.png";
+import test from "@/assets/test/testImage.png";
+import happy from "@/assets/mood/happy.svg";
 
 const Layout = styled.div`
   display: flex;
@@ -168,7 +168,7 @@ const DateCell = styled.div<{ isCurrentMonth: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 120px;
+  height: 3.75rem;
   font-size: 1.25rem;
   font-weight: var(--font-regular);
   color: var(--search-placeholder);

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import ModalCloseButton from "../../assets/images/modalClose.svg";
 import { useIsModalStore } from "../../store/ModalStore";
 
 const CloseButtonWrap = styled.div`
@@ -28,7 +27,7 @@ export default function CloseButton() {
     <>
       <CloseButtonWrap>
         <button onClick={CloseModal}>
-          <img src={ModalCloseButton} alt="모달종료" />
+          <img alt="모달종료" />
         </button>
       </CloseButtonWrap>
     </>

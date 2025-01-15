@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
-import retrosans from "/src/assets/retrosans.svg";
-import cabinet from "/src/assets/cabinet.svg";
+import retrosans from "/src/assets/theme/retrosans.svg";
+import cabinet from "/src/assets/theme/cabinet.svg";
 import { useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";

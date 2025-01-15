@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import 기쁨 from "../../assets/images/기쁨.svg";
-import 슬픔 from "../../assets/images/슬픔.svg";
-import 평범 from "../../assets/images/평범.svg";
-import 피곤 from "../../assets/images/피곤.svg";
-import 화남 from "../../assets/images/화남.svg";
+import happy from "../../assets/mood/happy.svg";
+import sad from "../../assets/mood/sad.svg";
+import normal from "../../assets/mood/normal.svg";
+import tired from "../../assets/mood/tired.svg";
+import angry from "../../assets/mood/angry.svg";
 import { useIsModalStore } from "../../store/ModalStore";
 import { RecordButton } from "../ui/Button";
 import { Textarea } from "@/components/ui/Input";
@@ -154,11 +154,11 @@ export default function MoodTrackerModal() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
 
   const moods = [
-    { id: "기쁨", src: 기쁨 },
-    { id: "슬픔", src: 슬픔 },
-    { id: "평범", src: 평범 },
-    { id: "피곤", src: 피곤 },
-    { id: "화남", src: 화남 },
+    { id: "기쁨", src: happy },
+    { id: "슬픔", src: sad },
+    { id: "평범", src: normal },
+    { id: "피곤", src: tired },
+    { id: "화남", src: angry },
   ];
 
   const handleMoodClick = (id: string) => {
