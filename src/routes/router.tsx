@@ -17,11 +17,13 @@ import Login from "@/pages/auth/Login";
 import PrivateRoute from "@/components/PrivateRoute/Private";
 import App from "@/App";
 import CalendarPage from "@/pages/Calendar/CalendarPage";
+import BoardWrite from "@/pages/board/new/BoardWrite";
+import BoardDetail from "@/pages/board/[boardId]/Detail";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <FeedPage />,
+    element: <PrivateRoute element={<FeedPage />} />,
   },
   {
     path: "/",
@@ -38,6 +40,18 @@ export const router = createBrowserRouter([
       {
         path: "/calendar",
         element: <PrivateRoute element={<CalendarPage />} />,
+      },
+      {
+        path: "/board/new",
+        element: <PrivateRoute element={<BoardWrite isEdit={false} />} />,
+      },
+      {
+        path: "/board/edit/:boardId",
+        element: <PrivateRoute element={<BoardWrite isEdit={true} />} />,
+      },
+      {
+        path: "board/:boardId",
+        element: <PrivateRoute element={<BoardDetail />} />,
       },
       {
         path: "auth/login",
