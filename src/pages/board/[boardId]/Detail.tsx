@@ -6,8 +6,11 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { AiOutlineDelete } from "react-icons/ai";
 import { AiOutlineComment } from "react-icons/ai";
 import { AiOutlineUpload } from "react-icons/ai";
-import { AiOutlineHeart } from "react-icons/ai";
-import { FiBookmark } from "react-icons/fi";
+import { IoIosHeart } from "react-icons/io";
+import { IoIosHeartEmpty } from "react-icons/io";
+import { FaBookmark } from "react-icons/fa";
+import { FaRegBookmark } from "react-icons/fa";
+import { BsArrowReturnRight } from "react-icons/bs";
 
 import {
   CommentButton,
@@ -103,7 +106,7 @@ const FrameWrapper = styled.div`
   justify-content: flex-start;
 `;
 
-const BookmarkIcon = styled(FiBookmark)`
+const BookmarkIcon = styled(FaRegBookmark)`
   position: absolute;
   top: 0rem;
   left: 0rem;
@@ -112,6 +115,16 @@ const BookmarkIcon = styled(FiBookmark)`
   overflow: hidden;
   cursor: pointer;
   color: var(--black);
+  font-size: 1.5rem;
+  cursor: pointer;
+`;
+const BookmarkHoverIcon = styled(FaBookmark)`
+  font-size: 1.5rem;
+  position: absolute;
+  top: 0rem;
+  left: 0rem;
+  color: var(--main-orange);
+  cursor: pointer;
 `;
 
 const UploadIcon = styled(AiOutlineUpload)`
@@ -213,6 +226,7 @@ const LikeWrap = styled.div`
   justify-content: flex-start;
   flex-direction: row;
   gap: 0.625rem;
+  cursor: pointer;
 
   > span {
     position: relative;
@@ -220,7 +234,11 @@ const LikeWrap = styled.div`
     font-size: 1.25rem;
   }
 `;
-const HeartIcon = styled(AiOutlineHeart)`
+const HeartIcon = styled(IoIosHeartEmpty)`
+  font-size: 1.5rem;
+  color: var(--main-orange);
+`;
+const HeratHoverIcon = styled(IoIosHeart)`
   font-size: 1.5rem;
   color: var(--main-orange);
 `;
@@ -231,7 +249,7 @@ const Button = styled.div`
   margin: 0 auto;
   display: flex;
   gap: 2rem;
-  margin-top: 3.75rem;
+  margin-top: 60px;
   margin-bottom: 6.125rem;
 
   > button {
@@ -400,6 +418,8 @@ const Reply = styled.div`
     gap: 0;
     display: flex;
     justify-content: flex-end;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
     padding-right: 2rem;
 
     > button {
@@ -427,16 +447,14 @@ const TextAreaWrap = styled.div`
   position: relative;
   display: flex;
   justify-content: center;
-
-  > img {
-    position: absolute;
-    top: 0.62%;
-    right: 97.87%;
-    left: 0%;
-    bottom: 87.04%;
-  }
 `;
-
+const ArrowIcon = styled(BsArrowReturnRight)`
+  position: absolute;
+  top: 0.62%;
+  right: 97.87%;
+  left: 0%;
+  bottom: 87.04%;
+`;
 interface Post {
   id: string;
   title: string;
@@ -448,6 +466,7 @@ interface Post {
 }
 
 export default function BoardDetail() {
+  const [isHover, setIsHover] = useState(false);
   const { boardId } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -541,7 +560,12 @@ export default function BoardDetail() {
           </FrameGroup>
         </FrameWrapper>
         <IconWrap>
-          <BookmarkIcon />
+          <div
+            onMouseEnter={() => setIsHover(true)}
+            onMouseLeave={() => setIsHover(false)}
+          >
+            {isHover ? <BookmarkHoverIcon /> : <BookmarkIcon />}
+          </div>
           <UploadIcon />
         </IconWrap>
       </FrameParentRoot>
@@ -554,8 +578,11 @@ export default function BoardDetail() {
         </SubImageWrap>
       </ImageWrap>
       <Text dangerouslySetInnerHTML={{ __html: post.content }}></Text>
-      <LikeWrap>
-        <HeartIcon />
+      <LikeWrap
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+      >
+        {isHover ? <HeratHoverIcon /> : <HeartIcon />}
         <span>21</span>
       </LikeWrap>
       <Button>
@@ -602,7 +629,7 @@ export default function BoardDetail() {
         </ReplyButtonWrap>
         <Reply>
           <TextAreaWrap>
-            {/* <img src={ArrowImg} alt="답글 화살표" /> */}
+            <ArrowIcon />
             <TextArea placeholder="댓글을 작성하세요." />
           </TextAreaWrap>
           <Button>
