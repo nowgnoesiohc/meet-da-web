@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import logo from "/src/assets/logo.png";
-import home from "/src/assets/homeIcon.png";
-import calendar from "/src/assets/calendarIcon.png";
-import post from "/src/assets/postIcon.png";
+import logo from "/src/assets/images/logo.png";
+import home from "/src/assets/icon/homeIcon.png";
+import calendar from "/src/assets/icon/calendarIcon.png";
+import post from "/src/assets/icon/postIcon.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -116,16 +116,17 @@ export default function Navigation() {
     setIsLoggedIn(false);
     navigate("/auth/login");
   };
+
   return (
     <>
       {isLoggedIn ? (
         <NavigationBar>
-          <LogoButton to="/Page1" />
+          <LogoButton to="/" />
           <ButtonWrapper>
             <ImageButtonGroup>
-              <ImageButton variant="home" to="/Page1" />
+              <ImageButton variant="home" to="/feed" />
               <ImageButton variant="post" to="/Page1" />
-              <ImageButton variant="calendar" to="/Page1" />
+              <ImageButton variant="calendar" to="/" />
             </ImageButtonGroup>
             <TextButtonGroup>
               <TextButton variant="after">마이 페이지</TextButton>
@@ -138,7 +139,7 @@ export default function Navigation() {
         </NavigationBar>
       ) : (
         <NavigationBar>
-          <LogoButton to="/Page1" />
+          <LogoButton to="/" />
           <ButtonWrapper>
             <TextButtonGroup>
               <TextButton variant="before" onClick={handleLogin}>
