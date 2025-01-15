@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import ModalCloseButton from "../../assets/icon/modalClose.svg";
 import { useIsModalStore } from "../../store/ModalStore";
+import { AiOutlineClose } from "react-icons/ai";
 
 const CloseButtonWrap = styled.div`
   position: absolute;
@@ -17,6 +17,14 @@ const CloseButtonWrap = styled.div`
     }
   }
 `;
+const IconStyle = styled(AiOutlineClose)`
+  font-size: 1.75rem;
+  color: var(--text-02);
+
+  @media (max-width: 390px) {
+    font-size: 1.125rem;
+  }
+`;
 
 export default function CloseButton() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -28,7 +36,7 @@ export default function CloseButton() {
     <>
       <CloseButtonWrap>
         <button onClick={CloseModal}>
-          <img src={ModalCloseButton} alt="모달종료" />
+          <IconStyle />
         </button>
       </CloseButtonWrap>
     </>

@@ -36,8 +36,8 @@ export const router = createBrowserRouter([
         element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
       },
       {
-        path: "feed",
-        element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
+        path: "/feed",
+        element: <FeedPage />,
       },
       {
         path: "auth/login",

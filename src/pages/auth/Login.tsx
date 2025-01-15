@@ -6,7 +6,6 @@ import kakao from "../../assets/icon/kakao.png";
 import naverHover from "../../assets/icon/naver-hover.png";
 import googleHover from "../../assets/icon/google-hover.png";
 import kakaoHover from "../../assets/icon/kakao-hover.png";
-import error from "../../assets/icon/error.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,7 +22,7 @@ interface StyledProps {
 const LoginWrap = styled.div`
   width: 34.5rem; /* 552px */
   height: 43.75rem; /* 700px */
-  margin: 6.25rem auto;
+  margin: 0 auto;
   text-align: center;
 `;
 
@@ -219,12 +218,12 @@ export default function Login() {
         );
         navigate("/");
       }
-    } catch (error: any) {
-      console.error("로그인 실패", error);
-      if (error.response) {
-        alert(error.response.data.message || "로그인에 실패했습니다.");
-      } else if (error.request) {
-        alert("서버와의 통신에 실패했습니다.");
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const apiError = error as {
+          response?: { data?: { message?: string } };
+        };
+        alert(apiError.response?.data?.message || "로그인에 실패했습니다.");
       } else {
         alert("로그인 처리 중 오류가 발생했습니다.");
       }
@@ -250,7 +249,7 @@ export default function Login() {
           {...register("email")}
         />
         <Error $isError={!!formState.errors.email}>
-          <img src={error} alt="에러" />
+          {/* <img src={error} alt="에러" /> */}
           {formState.errors.email && <p>{formState.errors.email.message}</p>}
         </Error>
         <Input
@@ -260,7 +259,7 @@ export default function Login() {
           {...register("password")}
         />
         <Error $isError={!!formState.errors.password}>
-          <img src={error} alt="에러" />
+          {/* <img src={error} alt="에러" /> */}
           {formState.errors.password && (
             <p>{formState.errors.password.message}</p>
           )}

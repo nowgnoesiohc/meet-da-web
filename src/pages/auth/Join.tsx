@@ -6,15 +6,14 @@ import kakao from "../../assets/icon/kakao.png";
 import naverHover from "../../assets/icon/naver-hover.png";
 import googleHover from "../../assets/icon/google-hover.png";
 import kakaoHover from "../../assets/icon/kakao-hover.png";
-import error from "../../assets/icon/error.png";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import Navigation from "@/components/layout/navigation/Navigation";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useEffect } from "react";
 import { useIsModalStore } from "@/store/ModalStore";
+import { AiOutlineClose } from "react-icons/ai";
 
 interface StyledProps {
   $isError?: boolean;
@@ -102,16 +101,14 @@ const Error = styled.div<StyledProps>`
   align-items: center;
   padding-left: 1.25rem;
 
-  > img {
-    width: 1rem;
-    height: 1rem;
-  }
-
   > p {
     margin: 0;
     padding-left: 0.5rem;
     padding-top: 0.25rem;
   }
+`;
+const ErrorIcon = styled(AiOutlineClose)<StyledProps>`
+  font-size: 1rem;
 `;
 
 const JoinButton = styled.button`
@@ -178,10 +175,10 @@ const Kakao = styled.button`
 `;
 
 interface AuthType {
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
 }
 
-const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
+const Join: React.FC<AuthType> = () => {
   const navigate = useNavigate();
   const handleLoing = () => {
     navigate("/auth/login");
@@ -215,6 +212,8 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
     mode: "onChange",
   });
 
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
   const onClickSubmit = async (data: FormData) => {
     console.log(data);
     try {
@@ -227,29 +226,17 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
       );
       if (response.status === 201) {
         console.log("회원가입 성공", response.data);
+        setIsModalClick("signUpModal");
       }
-    } catch (error: any) {
-      console.error("회원가입 실패", error);
-      if (error.response) {
-        alert(error.response.data.message || "회원가입에 실패했습니다.");
-      } else if (error.request) {
-        alert("서버와의 통신에 실패했습니다.");
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "message" in error) {
+        const apiError = error as { message: string };
+        alert(apiError.message || "회원가입에 실패했습니다.");
       } else {
         alert("회원가입 처리 중 오류가 발생했습니다.");
       }
     }
   };
-
-  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setIsModalClick("signUpModal"); // 로그인하지 않은 경우 모달 열기
-    }
-  }, [isLoggedIn, setIsModalClick]);
-  if (!isLoggedIn) {
-    return null; // 다른 요소를 렌더링하지 않음
-  }
 
   return (
     <>
@@ -270,7 +257,7 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
             $isError={!!formState.errors.email}
           />
           <Error $isError={!!formState.errors.email}>
-            <img src={error} alt="에러" />
+            <ErrorIcon />
             {formState.errors.email && <p>{formState.errors.email.message}</p>}
           </Error>
           <Input
@@ -280,7 +267,7 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
             $isError={!!formState.errors.password}
           />
           <Error $isError={!!formState.errors.password}>
-            <img src={error} alt="에러" />
+            <ErrorIcon />
             {formState.errors.password && (
               <p>{formState.errors.password.message}</p>
             )}
@@ -292,7 +279,7 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
             $isError={!!formState.errors.confirmPassword}
           />
           <Error $isError={!!formState.errors.confirmPassword}>
-            <img src={error} alt="에러" />
+            <ErrorIcon />
             {formState.errors.confirmPassword && (
               <p>{formState.errors.confirmPassword.message}</p>
             )}
