@@ -13,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // import Navigation from "@/components/layout/navigation/Navigation";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useEffect } from "react";
 import { useIsModalStore } from "@/store/ModalStore";
 
 interface StyledProps {
@@ -178,10 +177,10 @@ const Kakao = styled.button`
 `;
 
 interface AuthType {
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
 }
 
-const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
+const Join: React.FC<AuthType> = () => {
   const navigate = useNavigate();
   const handleLoing = () => {
     navigate("/auth/login");
@@ -215,6 +214,8 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
     mode: "onChange",
   });
 
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
   const onClickSubmit = async (data: FormData) => {
     console.log(data);
     try {
@@ -227,29 +228,17 @@ const Join: React.FC<AuthType> = ({ isLoggedIn }) => {
       );
       if (response.status === 201) {
         console.log("회원가입 성공", response.data);
+        setIsModalClick("signUpModal");
       }
-    } catch (error: any) {
-      console.error("회원가입 실패", error);
-      if (error.response) {
-        alert(error.response.data.message || "회원가입에 실패했습니다.");
-      } else if (error.request) {
-        alert("서버와의 통신에 실패했습니다.");
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "message" in error) {
+        const apiError = error as { message: string };
+        alert(apiError.message || "회원가입에 실패했습니다.");
       } else {
         alert("회원가입 처리 중 오류가 발생했습니다.");
       }
     }
   };
-
-  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      setIsModalClick("signUpModal"); // 로그인하지 않은 경우 모달 열기
-    }
-  }, [isLoggedIn, setIsModalClick]);
-  if (!isLoggedIn) {
-    return null; // 다른 요소를 렌더링하지 않음
-  }
 
   return (
     <>

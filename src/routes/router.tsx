@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/feed",
-        element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
+        element: <FeedPage />,
       },
       {
         path: "auth/login",

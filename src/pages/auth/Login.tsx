@@ -219,12 +219,12 @@ export default function Login() {
         );
         navigate("/");
       }
-    } catch (error: any) {
-      console.error("로그인 실패", error);
-      if (error.response) {
-        alert(error.response.data.message || "로그인에 실패했습니다.");
-      } else if (error.request) {
-        alert("서버와의 통신에 실패했습니다.");
+    } catch (error: unknown) {
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const apiError = error as {
+          response?: { data?: { message?: string } };
+        };
+        alert(apiError.response?.data?.message || "로그인에 실패했습니다.");
       } else {
         alert("로그인 처리 중 오류가 발생했습니다.");
       }
