@@ -17,6 +17,8 @@ import Join from "@/pages/auth/Join";
 import Login from "@/pages/auth/Login";
 import PrivateRoute from "@/components/PrivateRoute/Private";
 import App from "@/App";
+import BoardWrite from "@/pages/board/new/BoardWrite";
+import BoardDetail from "@/pages/board/[boardId]/Detail";
 
 export const router = createBrowserRouter([
   {
@@ -36,8 +38,30 @@ export const router = createBrowserRouter([
         element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
       },
       {
-        path: "/feed",
-        element: <FeedPage />,
+        path: "feed",
+        element: <PrivateRoute element={<FeedPage />} isLoggedIn={false} />,
+      },
+      {
+        path: "/board/new",
+        element: (
+          <PrivateRoute
+            element={<BoardWrite isEdit={false} />}
+            isLoggedIn={false}
+          />
+        ),
+      },
+      {
+        path: "/board/edit/:boardId",
+        element: (
+          <PrivateRoute
+            element={<BoardWrite isEdit={true} />}
+            isLoggedIn={false}
+          />
+        ),
+      },
+      {
+        path: "board/:boardId",
+        element: <PrivateRoute element={<BoardDetail />} isLoggedIn={false} />,
       },
       {
         path: "auth/login",
