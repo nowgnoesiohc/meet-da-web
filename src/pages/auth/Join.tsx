@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import loginLogo from "../../assets/images/loginLogo.png";
-import naver from "../../assets/images/naver.png";
-import google from "../../assets/images/google.png";
-import kakao from "../../assets/images/kakao.png";
-import naverHover from "../../assets/images/naver-hover.png";
-import googleHover from "../../assets/images/google-hover.png";
-import kakaoHover from "../../assets/images/kakao-hover.png";
+import naver from "../../assets/icon/naver.png";
+import google from "../../assets/icon/google.png";
+import kakao from "../../assets/icon/kakao.png";
+import naverHover from "../../assets/icon/naver-hover.png";
+import googleHover from "../../assets/icon/google-hover.png";
+import kakaoHover from "../../assets/icon/kakao-hover.png";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useIsModalStore } from "@/store/ModalStore";
+import { AiOutlineClose } from "react-icons/ai";
 
 interface StyledProps {
   $isError?: boolean;
@@ -100,16 +101,14 @@ const Error = styled.div<StyledProps>`
   align-items: center;
   padding-left: 1.25rem;
 
-  > img {
-    width: 1rem;
-    height: 1rem;
-  }
-
   > p {
     margin: 0;
     padding-left: 0.5rem;
     padding-top: 0.25rem;
   }
+`;
+const ErrorIcon = styled(AiOutlineClose)<StyledProps>`
+  font-size: 1rem;
 `;
 
 const JoinButton = styled.button`
@@ -258,7 +257,7 @@ const Join: React.FC<AuthType> = () => {
             $isError={!!formState.errors.email}
           />
           <Error $isError={!!formState.errors.email}>
-            {/* <img src={error} alt="에러" /> */}
+            <ErrorIcon />
             {formState.errors.email && <p>{formState.errors.email.message}</p>}
           </Error>
           <Input
@@ -268,7 +267,7 @@ const Join: React.FC<AuthType> = () => {
             $isError={!!formState.errors.password}
           />
           <Error $isError={!!formState.errors.password}>
-            {/* <img src={error} alt="에러" /> */}
+            <ErrorIcon />
             {formState.errors.password && (
               <p>{formState.errors.password.message}</p>
             )}
@@ -280,7 +279,7 @@ const Join: React.FC<AuthType> = () => {
             $isError={!!formState.errors.confirmPassword}
           />
           <Error $isError={!!formState.errors.confirmPassword}>
-            {/* <img src={error} alt="에러" /> */}
+            <ErrorIcon />
             {formState.errors.confirmPassword && (
               <p>{formState.errors.confirmPassword.message}</p>
             )}
