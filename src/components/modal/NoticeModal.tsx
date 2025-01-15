@@ -75,6 +75,7 @@ export default function NoticeModal() {
     handleClose();
     navigate("/auth/login");
   };
+
   return (
     <>
       <Wrap>
@@ -85,7 +86,9 @@ export default function NoticeModal() {
           <p>로그인 하시겠습니까?</p>
         </NoticeText>
         <Button>
-          <OrangeButton variant="signupToLogin" onClick={handleLogin}>로그인</OrangeButton>
+          <OrangeButton variant="signupToLogin" onClick={handleLogin}>
+            로그인
+          </OrangeButton>
         </Button>
       </Wrap>
     </>

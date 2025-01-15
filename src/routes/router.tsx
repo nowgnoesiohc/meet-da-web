@@ -12,16 +12,16 @@ import Settings from "@/pages/Mypage/Settings";
 import Emoji from "@/pages/Mypage/Theme/TabMenu/Emoji";
 import Font from "@/pages/Mypage/Theme/TabMenu/Font";
 import Own from "@/pages/Mypage/Theme/TabMenu/Own";
-import MainPage from "@/pages/Calendar/MainPage";
 import Join from "@/pages/auth/Join";
 import Login from "@/pages/auth/Login";
 import PrivateRoute from "@/components/PrivateRoute/Private";
 import App from "@/App";
+import CalendarPage from "@/pages/Calendar/CalendarPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainPage />, // 루트 경로에서만 MainPage 렌더링
+    element: <FeedPage />,
   },
   {
     path: "/",
@@ -29,15 +29,15 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "page1",
-        element: <PrivateRoute element={<Page1 />} isLoggedIn={false} />,
+        element: <PrivateRoute element={<Page1 />} />,
       },
       {
         path: "page2",
-        element: <PrivateRoute element={<Page2 />} isLoggedIn={false} />,
+        element: <PrivateRoute element={<Page2 />} />,
       },
       {
-        path: "/feed",
-        element: <FeedPage />,
+        path: "/calendar",
+        element: <PrivateRoute element={<CalendarPage />} />,
       },
       {
         path: "auth/login",
@@ -49,28 +49,20 @@ export const router = createBrowserRouter([
       },
       {
         path: "mypage",
-        element: (
-          <PrivateRoute element={<MypageNavigation />} isLoggedIn={false} />
-        ),
+        element: <PrivateRoute element={<MypageNavigation />} />,
         children: [
           { index: true, element: <MoodReport /> },
           {
             path: "mood-report",
-            element: (
-              <PrivateRoute element={<MoodReport />} isLoggedIn={false} />
-            ),
+            element: <PrivateRoute element={<MoodReport />} />,
           },
           {
             path: "diary-management",
-            element: (
-              <PrivateRoute element={<DiaryManagement />} isLoggedIn={false} />
-            ),
+            element: <PrivateRoute element={<DiaryManagement />} />,
           },
           {
             path: "point-management",
-            element: (
-              <PrivateRoute element={<PointManagement />} isLoggedIn={false} />
-            ),
+            element: <PrivateRoute element={<PointManagement />} />,
           },
           {
             path: "theme",
@@ -84,7 +76,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "settings",
-            element: <PrivateRoute element={<Settings />} isLoggedIn={false} />,
+            element: <PrivateRoute element={<Settings />} />,
           },
         ],
       },

@@ -78,14 +78,30 @@ const TextButton = styled.button<{ variant: "before" | "after" }>`
   cursor: pointer;
 `;
 
-const MyProfileButton = styled.button`
+// const MyProfileButton = styled.button`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: clamp(1.25rem, 4vw, 2.5rem);
+//   height: clamp(1.25rem, 4vw, 2.5rem);
+//   border-radius: 50%;
+//   background-color: var(--line-basic);
+//   cursor: pointer;
+// `;
+
+const MyProfileButton = styled.button<{ profileImageUrl: string | null }>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: clamp(1.25rem, 4vw, 2.5rem);
   height: clamp(1.25rem, 4vw, 2.5rem);
   border-radius: 50%;
-  background-color: var(--line-basic);
+  background-color: ${(props) =>
+    props.profileImageUrl ? "transparent" : "var(--line-basic)"};
+  background-image: ${(props) =>
+    props.profileImageUrl ? `url(${props.profileImageUrl})` : "none"};
+  background-size: cover;
+  background-position: center;
   cursor: pointer;
 `;
 
@@ -93,17 +109,45 @@ export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkLoginStatus();
+    // 로그인 후 프로필 데이터를 API로부터 가져오기
+    if (isLoggedIn) {
+      fetchProfileData();
+    }
+  }, [location.pathname, isLoggedIn]); // location.pathname과 isLoggedIn 상태에 의존
+
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!token);
+  };
+
+  const fetchProfileData = async () => {
+    const userId = "user-id"; // 실제 유저 ID로 대체
+    try {
+      const response = await fetch(`/user/${userId}/profile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfileImageUrl(data.profileImage); // 프로필 이미지 URL을 상태에 저장
+      } else {
+        console.error("프로필 데이터를 가져오는 데 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("프로필 데이터를 가져오는 중 에러가 발생했습니다:", error);
+    }
+  };
 
   useEffect(() => {
     // 페이지 로드 및 경로 변경시 로그인 상태 확인
     checkLoginStatus();
   }, [location.pathname]); // location.pathname만 의존성으로 추가
 
-  // 로그인 상태 확인 함수
-  const checkLoginStatus = () => {
-    const token = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!token);
-  };
   const handleLogin = () => {
     navigate("/auth/login");
   };
@@ -117,6 +161,10 @@ export default function Navigation() {
     navigate("/auth/login");
   };
 
+  const handleMypage = () => {
+    navigate("/mypage");
+  };
+
   return (
     <>
       {isLoggedIn ? (
@@ -124,17 +172,22 @@ export default function Navigation() {
           <LogoButton to="/" />
           <ButtonWrapper>
             <ImageButtonGroup>
-              <ImageButton variant="home" to="/feed" />
+              <ImageButton variant="home" to="/" />
               <ImageButton variant="post" to="/Page1" />
-              <ImageButton variant="calendar" to="/" />
+              <ImageButton variant="calendar" to="/calendar" />
             </ImageButtonGroup>
             <TextButtonGroup>
-              <TextButton variant="after">마이 페이지</TextButton>
+              <TextButton variant="after" onClick={handleMypage}>
+                마이 페이지
+              </TextButton>
               <TextButton variant="after" onClick={handleLogout}>
                 로그아웃
               </TextButton>
             </TextButtonGroup>
-            <MyProfileButton />
+            <MyProfileButton
+              profileImageUrl={profileImageUrl}
+              onClick={handleMypage}
+            />
           </ButtonWrapper>
         </NavigationBar>
       ) : (

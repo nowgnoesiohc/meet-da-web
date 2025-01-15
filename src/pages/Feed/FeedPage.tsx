@@ -8,7 +8,12 @@ import happy from "/src/assets/mood/happy.svg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "/node_modules/swiper/swiper.css";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+import GlobalStyles from "@/styles/GlobalStyle";
+import Header from "@/components/layout/Header";
+import ModalPortal from "@/components/modal/ModalPortal";
+import ModalTemplate from "@/components/modal/ModalTemplate";
+import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
   display: flex;
@@ -295,6 +300,7 @@ const SwiperImage = styled.img`
 `;
 
 export default function FeedPage() {
+  const useIsModal = useIsModalStore((state) => state.isModal);
   const [activeTab, setActiveTab] = useState("Latest");
 
   const TabItems = [
@@ -304,6 +310,15 @@ export default function FeedPage() {
 
   return (
     <>
+      <GlobalStyles />
+      <Header />
+      <Outlet />
+      {useIsModal && (
+        <ModalPortal>
+          <ModalTemplate />
+        </ModalPortal>
+      )}
+
       <Layout>
         <SearchBarWrap>
           흥미로운 이야기를 발견해 보세요!
@@ -327,7 +342,7 @@ export default function FeedPage() {
             ))}
           </ButtonWrap>
           <PostContainer>
-            <PostItem to="/Page1">
+            <PostItem to="/auth/login">
               <SwiperWrap>
                 <Swiper
                   spaceBetween={30}

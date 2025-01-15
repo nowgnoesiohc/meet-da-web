@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import test from "/src/assets/test/testImage.png";
 // import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
 import { useEffect, useState } from "react";
 import { HiPencil } from "react-icons/hi2";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
+import axios from "axios";
 
 const Layout = styled.div`
   display: flex;
@@ -169,8 +169,25 @@ const ProfileContainer = styled.div`
 const ProfileImage = styled.img`
   width: 10rem;
   height: 10rem;
-  border-radius: 0.625rem; /* 둥근 이미지 */
-  object-fit: cover; /* 이미지가 부모 크기에 맞게 조정 */
+  border-radius: 0.625rem;
+  object-fit: cover;
+
+  @media (max-width: 781px) {
+    width: 8.75rem;
+    height: 8.75rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 4.625rem;
+    height: 4.625rem;
+  }
+`;
+
+const ProfileImagePlaceholder = styled.div`
+  width: 10rem;
+  height: 10rem;
+  border-radius: 0.625rem;
+  background-color: var(--line-basic);
 
   @media (max-width: 781px) {
     width: 8.75rem;
@@ -275,7 +292,29 @@ const UserState = styled.div`
 export default function MypageNavigation() {
   // 메뉴 상태를 배열로 관리
   const [activeMenu, setActiveMenu] = useState("MoodReport");
+
+  const [userData, setUserData] = useState({
+    name: "",
+    profileImage: "",
+    description: "",
+  });
+
+  // 로그인된 유저 정보
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const response = await axios.get("/user/{userId}/profile");
+        const { name, profileImage, description } = response.data;
+        setUserData({ name, profileImage, description });
+      } catch (error) {
+        console.error("유저 정보를 불러오는 데 실패했습니다:", error);
+      }
+    }
+    fetchUserData();
+  }, []);
+
   const location = useLocation(); // 현재 경로를 가져옴
+  const navigate = useNavigate();
 
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
@@ -308,19 +347,35 @@ export default function MypageNavigation() {
     { key: "Setting", path: "settings", label: "설정" },
   ];
 
+  const linkCalendar = () => {
+    navigate("/calendar");
+  };
+
+  const handleDiaryClick = () => {
+    setActiveMenu("Diary"); // 다이어리 메뉴 활성화
+    navigate("/diary-management"); // 다이어리 관리 페이지로 이동
+  };
+
   return (
     <Layout>
       <NavigationWrapper>
         <ProfileContainer>
-          <ProfileImage src={test} alt="Profile" />
+          {/* 프로필 이미지 */}
+          {userData.profileImage ? (
+            <ProfileImage src={userData.profileImage} alt="Profile" />
+          ) : (
+            <ProfileImagePlaceholder>
+              {/* 이미지를 등록하지 않은 경우의 스타일 */}
+            </ProfileImagePlaceholder>
+          )}
           <EditButton>
             <IconStyle />
           </EditButton>
         </ProfileContainer>
         <UserInfo>
           <UserTextWrapper>
-            <UserName>믿음소망사과</UserName>
-            <UserState>믿음 소망 사랑보다 강력한 사과</UserState>
+            <UserName>{userData.name || "기본 이름"}</UserName>
+            <UserState>{userData.description || "기본 상태 메시지"}</UserState>
           </UserTextWrapper>
           <ButtonWrapper>
             <ProfileButton
@@ -329,8 +384,12 @@ export default function MypageNavigation() {
             >
               17명의 친구
             </ProfileButton>
-            <ProfileButton variant="diary">38개의 다이어리</ProfileButton>
-            <ProfileButton variant="mood">97개의 무드</ProfileButton>
+            <ProfileButton variant="diary" onClick={handleDiaryClick}>
+              38개의 다이어리
+            </ProfileButton>
+            <ProfileButton variant="mood" onClick={linkCalendar}>
+              97개의 무드
+            </ProfileButton>
           </ButtonWrapper>
         </UserInfo>
       </NavigationWrapper>
