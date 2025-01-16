@@ -27,7 +27,7 @@ interface StyledProps {
 
 const LoginWrap = styled.div`
   width: 34.5rem;
-  margin: 4.375rem auto;
+  margin: 10% auto;
   text-align: center;
 `;
 

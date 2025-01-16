@@ -6,6 +6,7 @@ import { HiPencil } from "react-icons/hi2";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const Layout = styled.div`
   display: flex;
@@ -294,18 +295,32 @@ export default function MypageNavigation() {
   const [activeMenu, setActiveMenu] = useState("MoodReport");
 
   const [userData, setUserData] = useState({
-    name: "",
+    username: "",
     profileImage: "",
     description: "",
   });
 
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      return null; // 토큰이 없을 경우 null 반환
+    }
+    const userId = jwtDecode(token).sub;
+    if (!userId) return null;
+    else return userId;
+  };
+
   // 로그인된 유저 정보
   useEffect(() => {
     async function fetchUserData() {
+      const userId = await getUserId();
       try {
-        const response = await axios.get("/user/{userId}/profile");
-        const { name, profileImage, description } = response.data;
-        setUserData({ name, profileImage, description });
+        const response = await axios.get(
+          `https://api.meet-da.site/user/${userId}/`
+        );
+        const { username, profileImage, description } = response.data;
+        setUserData({ username, profileImage, description });
       } catch (error) {
         console.error("유저 정보를 불러오는 데 실패했습니다:", error);
       }
@@ -374,8 +389,10 @@ export default function MypageNavigation() {
         </ProfileContainer>
         <UserInfo>
           <UserTextWrapper>
-            <UserName>{userData.name || "기본 이름"}</UserName>
-            <UserState>{userData.description || "기본 상태 메시지"}</UserState>
+            <UserName>{userData.username}</UserName>
+            <UserState>
+              {userData.description || "MEET·DA에서 서로를 믿어봐요!"}
+            </UserState>
           </UserTextWrapper>
           <ButtonWrapper>
             <ProfileButton

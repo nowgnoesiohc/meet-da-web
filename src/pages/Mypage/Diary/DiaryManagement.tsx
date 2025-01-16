@@ -77,19 +77,18 @@ const Content = styled.div`
   width: 100%;
 `;
 
-export default function Theme() {
+export default function DiaryManagement() {
   const navigate = useNavigate();
   const location = useLocation();
 
   // 메뉴 데이터 정의
   const TabItems = [
-    { key: "Emoji", path: "emoji", label: "이모지" },
-    { key: "Font", path: "font", label: "폰트" },
-    { key: "Own", path: "own", label: "보유 테마" },
+    { key: "Mydiary", path: "mydiary", label: "내 다이어리" },
+    { key: "Bookmark", path: "bookmark", label: "북마크" },
   ];
 
   // 현재 활성 탭을 상태로 관리
-  const [activeTab, setActiveTab] = useState("Emoji");
+  const [activeTab, setActiveTab] = useState("Mydiary");
 
   // 컴포넌트가 처음 로드되었을 때 기본 경로로 리다이렉트
   useEffect(() => {
@@ -138,14 +137,25 @@ export default function Theme() {
           ))}
         </TabWrap>
         {/* Own 탭일 때만 삭제하기 버튼 표시 */}
-        {activeTab === "Own" && (
+        {activeTab === "Mydiary" && (
           <ButtonWrapper>
             <DiarySettingButton
               variant="delete"
-              style={{ width: "100%" }}
+              style={{ width: "100%", fontSize: "1.375rem" }}
               onClick={() => isModalOpen("deleteModal")}
             >
               삭제하기
+            </DiarySettingButton>
+          </ButtonWrapper>
+        )}
+        {activeTab === "Bookmark" && (
+          <ButtonWrapper>
+            <DiarySettingButton
+              variant="bookmark"
+              style={{ width: "100%", fontSize: "1.25rem" }}
+              onClick={() => isModalOpen("deleteModal")}
+            >
+              북마크 해제
             </DiarySettingButton>
           </ButtonWrapper>
         )}

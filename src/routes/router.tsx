@@ -5,7 +5,7 @@ import Page2 from "../pages/Page2/Page2";
 import FeedPage from "@/pages/Feed/FeedPage";
 import MypageNavigation from "@/components/layout/navigation/MypageNavigation";
 import MoodReport from "@/pages/Mypage/MoodReport";
-import DiaryManagement from "@/pages/Mypage/DiaryManagement";
+import DiaryManagement from "@/pages/Mypage/Diary/DiaryManagement";
 import PointManagement from "@/pages/Mypage/PointManagement";
 import Theme from "@/pages/Mypage/Theme/Theme";
 import Settings from "@/pages/Mypage/Settings";
@@ -19,11 +19,13 @@ import App from "@/App";
 import CalendarPage from "@/pages/Calendar/CalendarPage";
 import BoardWrite from "@/pages/board/new/BoardWrite";
 import BoardDetail from "@/pages/board/[boardId]/Detail";
+import MyDiary from "@/pages/Mypage/Diary/TabMenu/MyDiary";
+import BookMark from "@/pages/Mypage/Diary/TabMenu/Bookmark";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <PrivateRoute element={<FeedPage />} />,
+    element: <FeedPage />,
   },
   {
     path: "/",
@@ -72,7 +74,12 @@ export const router = createBrowserRouter([
           },
           {
             path: "diary-management",
-            element: <PrivateRoute element={<DiaryManagement />} />,
+            element: <DiaryManagement />,
+            children: [
+              { index: true, element: <MyDiary /> },
+              { path: "mydiary", element: <MyDiary /> },
+              { path: "bookmark", element: <BookMark /> },
+            ],
           },
           {
             path: "point-management",

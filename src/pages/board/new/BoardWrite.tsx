@@ -150,6 +150,7 @@ const DropdownItem = styled.li<DropdownItemProps>`
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 0.375rem;
 
   // 선택된 항목 스타일
   background-color: ${({ isSelected }) =>
@@ -365,7 +366,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   // 드롭다운
   // 상태 관리
   const [isOpen, setIsOpen] = useState<boolean>(false); // 메뉴 열림 여부
-  const [selected, setSelected] = useState("PUBLIC"); // 선택된 메뉴
+  const [selected, setSelected] = useState<Visibility>("PUBLIC"); // 선택된 메뉴
   const menuRef = useRef<HTMLDivElement>(null);
 
   // 메뉴 토글 함수
@@ -469,14 +470,29 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     }
   };
 
+  const [today, setToday] = useState(""); // 오늘 날짜 상태
+
+  // 날짜 포맷팅 함수
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // 0-based index, +1
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  useEffect(() => {
+    const currentDate = new Date();
+    setToday(formatDate(currentDate));
+  }, []);
+
   return (
     <Wrap>
-      <h2>2024년 12월 12일</h2>
+      <h2>{today}</h2>
       <TitleWrap>
         <p>Q. 올해 가장 감사했던 순간은 언제인가요?</p>
         <div ref={menuRef}>
           <DropdownContainer onClick={toggleDropdown}>
-            <SelectMenu>{selected}</SelectMenu>
+            <SelectMenu>{descriptions[selected]}</SelectMenu>
             <AiOutlineDown />
           </DropdownContainer>
 

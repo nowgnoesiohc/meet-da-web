@@ -5,6 +5,8 @@ import calendar from "/src/assets/icon/calendarIcon.png";
 import post from "/src/assets/icon/postIcon.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const NavigationBar = styled.div`
   display: flex;
@@ -78,69 +80,87 @@ const TextButton = styled.button<{ variant: "before" | "after" }>`
   cursor: pointer;
 `;
 
-// const MyProfileButton = styled.button`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: clamp(1.25rem, 4vw, 2.5rem);
-//   height: clamp(1.25rem, 4vw, 2.5rem);
-//   border-radius: 50%;
-//   background-color: var(--line-basic);
-//   cursor: pointer;
-// `;
-
-const MyProfileButton = styled.button<{ profileImageUrl: string | null }>`
+const MyProfileButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   width: clamp(1.25rem, 4vw, 2.5rem);
   height: clamp(1.25rem, 4vw, 2.5rem);
   border-radius: 50%;
-  background-color: ${(props) =>
-    props.profileImageUrl ? "transparent" : "var(--line-basic)"};
-  background-image: ${(props) =>
-    props.profileImageUrl ? `url(${props.profileImageUrl})` : "none"};
-  background-size: cover;
-  background-position: center;
   cursor: pointer;
+  overflow: hidden;
+  background-color: var(--line-basic);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const ProfileImagePlaceholder = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--line-basic);
+
+  @media (max-width: 781px) {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
 `;
 
 export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+
+  const [userData, setUserData] = useState({
+    username: "",
+    profileImage: "",
+    description: "",
+  });
+
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      return null; // 토큰이 없을 경우 null 반환
+    }
+    const userId = jwtDecode(token).sub;
+    if (!userId) return null;
+    return userId;
+  };
+
+  const fetchUserData = async () => {
+    const userId = await getUserId();
+    if (!userId) return; // 유저 ID가 없으면 중단
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/`
+      );
+      const { username, profileImage, description } = response.data;
+      setUserData({ username, profileImage, description });
+    } catch (error) {
+      console.error("유저 정보를 불러오는 데 실패했습니다:", error);
+    }
+  };
 
   useEffect(() => {
     checkLoginStatus();
-    // 로그인 후 프로필 데이터를 API로부터 가져오기
     if (isLoggedIn) {
-      fetchProfileData();
+      fetchUserData();
     }
   }, [location.pathname, isLoggedIn]); // location.pathname과 isLoggedIn 상태에 의존
 
   const checkLoginStatus = () => {
     const token = localStorage.getItem("accessToken");
     setIsLoggedIn(!!token);
-  };
-
-  const fetchProfileData = async () => {
-    const userId = "user-id"; // 실제 유저 ID로 대체
-    try {
-      const response = await fetch(`/user/${userId}/profile`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setProfileImageUrl(data.profileImage); // 프로필 이미지 URL을 상태에 저장
-      } else {
-        console.error("프로필 데이터를 가져오는 데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("프로필 데이터를 가져오는 중 에러가 발생했습니다:", error);
-    }
   };
 
   useEffect(() => {
@@ -155,6 +175,7 @@ export default function Navigation() {
   const handleSignUp = () => {
     navigate("/auth/join");
   };
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     setIsLoggedIn(false);
@@ -173,7 +194,7 @@ export default function Navigation() {
           <ButtonWrapper>
             <ImageButtonGroup>
               <ImageButton variant="home" to="/" />
-              <ImageButton variant="post" to="/Page1" />
+              <ImageButton variant="post" to="/board/new" />
               <ImageButton variant="calendar" to="/calendar" />
             </ImageButtonGroup>
             <TextButtonGroup>
@@ -184,10 +205,21 @@ export default function Navigation() {
                 로그아웃
               </TextButton>
             </TextButtonGroup>
-            <MyProfileButton
+            {/* <MyProfileButton
               profileImageUrl={profileImageUrl}
               onClick={handleMypage}
-            />
+            /> */}
+
+            {/* 프로필 이미지 */}
+            {userData.profileImage ? (
+              <MyProfileButton onClick={handleMypage}>
+                <img src={userData.profileImage} alt="User Profile" />
+              </MyProfileButton>
+            ) : (
+              <ProfileImagePlaceholder>
+                {/* 이미지를 등록하지 않은 경우의 스타일 */}
+              </ProfileImagePlaceholder>
+            )}
           </ButtonWrapper>
         </NavigationBar>
       ) : (
