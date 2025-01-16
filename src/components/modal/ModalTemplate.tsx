@@ -11,6 +11,7 @@ import MoodTrackerModal from "./MoodTrackerModal";
 import PointModal from "./PointModal";
 import DeleteCompleteModal from "./DeleteCompleteModal";
 import DeleteModal from "./DeleteModal";
+import DeleteIdModal from "./DeleteIdModal";
 
 const ModalWrap = styled.div`
   position: fixed;
@@ -61,6 +62,8 @@ export default function ModalTemplate() {
               return <ThemaBuyCompleteModal />;
             case "changePasswordModal":
               return <ChangePasswordModal />;
+            case "deleteIdModal":
+              return <DeleteIdModal />;
             case "deleteModal":
               return <DeleteModal />;
             case "deleteCompleteModal":

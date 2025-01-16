@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useIsModalStore } from "@/store/ModalStore";
 import { AiOutlineClose } from "react-icons/ai";
+import { OrangeButton } from "@/components/ui/Button";
 
 interface StyledProps {
   $isError?: boolean;
@@ -27,9 +28,17 @@ interface StyledProps {
 
 const LoginWrap = styled.div`
   width: 34.5rem;
-  margin: 0 auto;
+  margin: 10% auto;
   text-align: center;
   padding-bottom: 6rem;
+
+  @media (max-width: 390px) {
+    width: 22.5rem;
+
+    form {
+      width: 22.5rem;
+    }
+  }
 `;
 
 const LoginLogo = styled(Link)<StyledProps>`
@@ -39,12 +48,27 @@ const LoginLogo = styled(Link)<StyledProps>`
   background-image: url(${loginLogo});
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+
+  @media (max-width: 390px) {
+    background-size: contain;
+    width: 22.5rem;
+    height: 5.4375rem;
+  }
 `;
 
 const JoinTitle = styled.div`
   margin-top: 1.5rem;
   margin-bottom: 3rem;
   font-size: 1.25rem;
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    margin: 1.5rem auto 1.125rem;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+  }
 `;
 
 const LoginButton = styled.button<{ variant: "login" }>`
@@ -90,6 +114,11 @@ const Input = styled.input<StyledProps>`
     color: ${(props) =>
       props.$isError ? "var(--error-02)" : "var(--text-02)"}; // 에러 시 빨간색
   }
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    font-size: 1.125rem;
+  }
 `;
 
 const Error = styled.div<StyledProps>`
@@ -106,19 +135,26 @@ const Error = styled.div<StyledProps>`
     padding-left: 0.5rem;
     padding-top: 0.25rem;
   }
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    padding-left: 0.375rem;
+    font-size: 0.75rem;
+
+    > p {
+      padding-left: 0.1875rem;
+      text-align: left;
+    }
+  }
 `;
 const ErrorIcon = styled(AiOutlineClose)<StyledProps>`
   font-size: 1rem;
 `;
 
-const JoinButton = styled.button`
-  width: 27.625rem;
-  height: 4.25rem;
-  border-radius: 0.75rem;
-  background-color: var(--main-orange);
-  color: #fff;
+const Button = styled.div`
+  display: flex;
+  justify-content: center;
   margin-top: 2.25rem;
-  font-size: 1.5rem;
 `;
 
 const SnsWrap = styled.div`
@@ -133,6 +169,16 @@ const SnsWrap = styled.div`
 
   > span {
     font-size: 1.25rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+
+    > span {
+      width: 5.4375rem;
+      white-space: nowrap;
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -164,6 +210,10 @@ const Google = styled.button`
   &:hover {
     background-image: url(${googleHover});
   }
+
+  @media (max-width: 390px) {
+    margin: 0 0.625rem;
+  }
 `;
 const Kakao = styled.button`
   background-image: url(${kakao});
@@ -192,10 +242,10 @@ const Join: React.FC<AuthType> = () => {
       password: z
         .string()
         .min(8, {
-          message: "비밀번호는 영문, 숫자 조합의 8자 이상 입력해야합니다.",
+          message: "비밀번호는 영문, 숫자 조합 8자 이상 입력해주세요.",
         })
         .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-          message: "비밀번호는 영문, 숫자 조합의 8자 이상 입력해야합니다.",
+          message: "비밀번호는 영문, 숫자 조합 8자 이상 입력해주세요.",
         }),
       confirmPassword: z.string().min(1, "비밀번호 확인을 입력해주세요."),
     })
@@ -284,7 +334,11 @@ const Join: React.FC<AuthType> = () => {
               <p>{formState.errors.confirmPassword.message}</p>
             )}
           </Error>
-          <JoinButton type="submit">가입하기</JoinButton>
+          <Button>
+            <OrangeButton variant="membership" type="submit">
+              가입하기
+            </OrangeButton>
+          </Button>
         </form>
         <SnsWrap>
           <span>간편 회원가입</span>

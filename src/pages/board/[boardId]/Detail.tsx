@@ -20,14 +20,18 @@ import {
 
 const Wrap = styled.div`
   width: 62.125rem;
-  margin: 0 auto;
-  padding-bottom: 11rem;
+  margin: 5.25rem auto 11rem;
   h2 {
     margin: 0;
   }
   p {
     margin: 0;
     margin-top: 0.75rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 20rem;
+    margin: 10% auto;
   }
 `;
 
@@ -38,6 +42,15 @@ const Title = styled.div`
   }
   > h2 {
     font-weight: var(--font-medium);
+  }
+
+  @media (max-width: 390px) {
+    > p {
+      font-size: 1.125rem;
+    }
+    > h2 {
+      font-size: 1rem;
+    }
   }
 `;
 
@@ -97,6 +110,11 @@ const FrameGroup = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 0.75rem;
+
+  @media (max-width: 390px) {
+    width: 20rem;
+    font-size: 0.75rem;
+  }
 `;
 
 const FrameWrapper = styled.div`
@@ -117,6 +135,12 @@ const BookmarkIcon = styled(FaRegBookmark)`
   color: var(--black);
   font-size: 1.5rem;
   cursor: pointer;
+
+  @media (max-width: 390px) {
+    font-size: 0.75rem;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
 `;
 const BookmarkHoverIcon = styled(FaBookmark)`
   font-size: 1.5rem;
@@ -125,6 +149,17 @@ const BookmarkHoverIcon = styled(FaBookmark)`
   left: 0rem;
   color: var(--main-orange);
   cursor: pointer;
+
+  @media (max-width: 390px) {
+    font-size: 0.75rem;
+    width: 0.75rem;
+    height: 0.75rem;
+
+    div {
+      width: 12px;
+      height: 12px;
+    }
+  }
 `;
 
 const UploadIcon = styled(AiOutlineUpload)`
@@ -136,12 +171,34 @@ const UploadIcon = styled(AiOutlineUpload)`
   overflow: hidden;
   cursor: pointer;
   color: var(--black);
+
+  @media (max-width: 390px) {
+    font-size: 0.75rem;
+    width: 0.75rem;
+    height: 0.75rem;
+
+    div {
+      width: 12px;
+      height: 12px;
+    }
+  }
 `;
 
 const IconWrap = styled.div`
   width: 4.875rem;
   position: relative;
   height: 1.5rem;
+  display: flex;
+
+  @media (max-width: 390px) {
+    margin-top: 0.5rem;
+    float: right;
+
+    button {
+      width: 12px;
+      height: 12px;
+    }
+  }
 `;
 
 const FrameParentRoot = styled.div`
@@ -156,6 +213,11 @@ const FrameParentRoot = styled.div`
   font-size: 1.25rem;
   color: #f3752e;
   margin-top: 1.875rem;
+
+  @media (max-width: 390px) {
+    display: block;
+    height: auto;
+  }
 `;
 
 // 이미지
@@ -165,6 +227,25 @@ const MainImage = styled.img`
   border-radius: 0.5rem;
   height: 27.875rem;
   object-fit: cover;
+
+  @media (max-width: 390px) {
+    width: 20rem;
+    height: 10rem;
+  }
+`;
+const SubImageWrap = styled.div`
+  width: 17.25rem;
+  max-height: 27.875rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  @media (max-width: 390px) {
+    height: 10rem;
+  }
 `;
 const SubImage = styled.img`
   align-self: stretch;
@@ -176,6 +257,10 @@ const SubImage = styled.img`
   flex-shrink: 0;
   object-fit: cover;
   background-color: #333;
+
+  @media (max-width: 390px) {
+    height: 3.5rem;
+  }
 `;
 const SubImageOpacity = styled.img`
   align-self: stretch;
@@ -188,14 +273,10 @@ const SubImageOpacity = styled.img`
   object-fit: cover;
   opacity: 0.5;
   background-color: #333;
-`;
-const SubImageWrap = styled.div`
-  width: 17.25rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 1rem;
+
+  @media (max-width: 390px) {
+    height: 3.5rem;
+  }
 `;
 const ImageWrap = styled.div`
   width: 100%;
@@ -208,6 +289,10 @@ const ImageWrap = styled.div`
   justify-content: flex-start;
   gap: 2rem;
   margin-top: 3.75rem;
+
+  @media (max-width: 390px) {
+    height: 10rem;
+  }
 `;
 
 const Text = styled.div`
@@ -226,12 +311,20 @@ const LikeWrap = styled.div`
   justify-content: flex-start;
   flex-direction: row;
   gap: 0.625rem;
-  cursor: pointer;
 
-  > span {
-    position: relative;
-    line-height: 1.5rem;
-    font-size: 1.25rem;
+  div {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > span {
+      position: relative;
+      line-height: 1.5rem;
+      font-size: 1.25rem;
+      margin-left: 0.625rem;
+      padding-top: 0.25rem;
+    }
   }
 `;
 const HeartIcon = styled(IoIosHeartEmpty)`
@@ -254,16 +347,14 @@ const Button = styled.div`
 
   > button {
     width: 7rem;
-    height: 3.25rem;
     border-radius: 0.625rem;
     color: #fff;
     font-size: 1.125rem;
   }
-  > button:first-child {
-    background-color: var(--line-basic);
-  }
-  > button:last-child {
-    background-color: var(--orange-button);
+
+  @media (max-width: 390px) {
+    margin-top: 1.75rem;
+    margin-bottom: 4.5rem;
   }
 `;
 
@@ -291,7 +382,12 @@ const ProfileImage = styled.div`
   width: 5rem;
   height: 5rem;
   border-radius: 6.25rem;
-  background-color: var(--line-basic);
+  /* background-color: var(--line-basic); */
+
+  @media (max-width: 390px) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 `;
 
 const Line = styled.div`
@@ -299,6 +395,11 @@ const Line = styled.div`
   border-top: 0.0625rem solid var(--line-basic);
   margin-top: 6.875rem;
   margin-bottom: 5.125rem;
+
+  @media (max-width: 390px) {
+    margin-top: 3.75rem;
+    margin-bottom: 2.875rem;
+  }
 `;
 
 const CommentCount = styled.div`
@@ -325,6 +426,10 @@ const CommentButtonWrap = styled.div`
   display: flex;
   flex-direction: row-reverse;
   margin-top: 1.5rem;
+
+  @media (max-width: 390px) {
+    margin-top: 0.75rem;
+  }
 `;
 
 const CommentList = styled.div`
@@ -352,6 +457,21 @@ const CommentList = styled.div`
         font-size: 0.875rem;
         color: var(--text-03);
       }
+    }
+  }
+
+  @media (max-width: 390px) {
+    margin-top: 3.5rem;
+
+    ${ProfileWrap} {
+      ${ProfileImage} {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+    }
+
+    ${Profile} {
+      left: 3.375rem !important;
     }
   }
 `;
@@ -405,10 +525,14 @@ const Reply = styled.div`
   background-color: var(--bg-02);
   padding: 1.875rem 1.875rem 1.25rem 1.875rem;
   float: right;
+  margin-bottom: 11rem;
   /* margin:0 auto; */
 
+  ${Line} {
+    margin: 1.5rem 0;
+  }
   ${TextArea} {
-    width: 51.375rem;
+    width: 53.875rem;
     height: 6.25rem;
     resize: none;
   }
@@ -420,7 +544,6 @@ const Reply = styled.div`
     justify-content: flex-end;
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
-    padding-right: 2rem;
 
     > button {
       font-size: 1rem;
@@ -436,6 +559,15 @@ const Reply = styled.div`
       display: unset;
     }
   }
+
+  @media (max-width: 390px) {
+    width: 18.75rem;
+    padding: 1.25rem;
+
+    ${TextArea} {
+      width: 15.125rem;
+    }
+  }
 `;
 
 const ReplyIcon = styled(AiOutlineComment)`
@@ -446,7 +578,7 @@ const ReplyIcon = styled(AiOutlineComment)`
 const TextAreaWrap = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 `;
 const ArrowIcon = styled(BsArrowReturnRight)`
   position: absolute;
@@ -454,23 +586,71 @@ const ArrowIcon = styled(BsArrowReturnRight)`
   right: 97.87%;
   left: 0%;
   bottom: 87.04%;
+
+  @media (max-width: 390px) {
+    left: -1%;
+  }
 `;
 interface Post {
   id: string;
   title: string;
   content: string;
-  author: string;
+  author: Author;
   createdAt: string;
   visibility: string;
+  images: string[];
+  likes: number;
+  viewCount: number;
+  bookmarks: string[];
   // 필요한 다른 속성들 추가
 }
 
+interface Author {
+  username: string;
+  profileImage: string;
+  description: string;
+}
+
 export default function BoardDetail() {
-  const [isHover, setIsHover] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  // const [isBookmarkHover, setIsBookmarkHover] = useState(false);
+  const [isLikeHover, setIsLikeHover] = useState(false);
   const { boardId } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const toggleBookmark = async () => {
+    const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
+    const userId = localStorage.getItem("userId");
+    try {
+      const response = await axios.post(
+        `https://api.meet-da.site/board/toggle-bookmark`,
+        {
+          boardId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // 인증 헤더 추가
+          },
+        }
+      );
+
+      console.log("API 응답:", response.data); // 응답 데이터 확인
+
+      if (response.status === 200) {
+        const updatedBookmarks = response.data.bookmarks;
+        const isUserBookmarked = updatedBookmarks.includes(userId || "");
+
+        console.log("북마크 상태 변경 전:", isBookmarked);
+        setIsBookmarked(isUserBookmarked); // 상태 업데이트
+        console.log("북마크 상태 변경 후:", isUserBookmarked);
+      }
+    } catch (error) {
+      console.error("북마크 설정 실패:", error);
+      alert("북마크 설정 중 오류가 발생했습니다.");
+    }
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -479,8 +659,14 @@ export default function BoardDetail() {
           `https://api.meet-da.site/board/${boardId}`
         );
 
+        // console.log("API 응답:", response.data); // 데이터 구조 확인
+
         if (response.data) {
           setPost(response.data);
+
+          const userId = localStorage.getItem("userId");
+          const isUserBookmark = response.data.bookmarks.includes(userId || "");
+          setIsBookmarked(isUserBookmark);
         } else {
           console.error("데이터가 없습니다");
         }
@@ -491,6 +677,7 @@ export default function BoardDetail() {
             console.error("게시글을 찾을 수 없습니다");
           } else {
             console.error("서버 에러:", error.response?.data);
+            console.error("서버 상태 코드:", error.response?.status);
           }
         } else {
           console.error("게시글 가져오기 실패:", error);
@@ -535,8 +722,6 @@ export default function BoardDetail() {
   return (
     <Wrap>
       <Title>
-        {/* <h2>2024년 12월 12일</h2> */}
-        {/* <p>Q. 올해 가장 감사했던 순간은 언제인가요?</p> */}
         <h2>{post.createdAt.substring(0, 10)}</h2>
         <p>{post.title}</p>
       </Title>
@@ -547,7 +732,7 @@ export default function BoardDetail() {
               <MoodWrap>
                 <Div>
                   <Span>{`오늘 `}</Span>
-                  <UserName>{post.author}</UserName>
+                  <UserName>{post.author.username}</UserName>
                   <Span>님의 기분은...</Span>
                 </Div>
                 {/* <MoodIcon alt="피곤" src={EmotionImg} /> */}
@@ -560,30 +745,29 @@ export default function BoardDetail() {
           </FrameGroup>
         </FrameWrapper>
         <IconWrap>
-          <div
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
-          >
-            {isHover ? <BookmarkHoverIcon /> : <BookmarkIcon />}
-          </div>
+          <button onClick={toggleBookmark}>
+            {isBookmarked ? <BookmarkIcon /> : <BookmarkHoverIcon />}
+          </button>
           <UploadIcon />
         </IconWrap>
       </FrameParentRoot>
       <ImageWrap>
-        <MainImage alt="" src="Rectangle 3028.png" />
+        <MainImage alt="" />
         <SubImageWrap>
-          <SubImage alt="" src="Rectangle 3029.png" />
-          <SubImageOpacity alt="" src="Rectangle 3030.png" />
-          <SubImageOpacity alt="" src="Rectangle 3031.png" />
+          <SubImage alt="" />
+          <SubImageOpacity alt="" />
+          <SubImageOpacity alt="" />
         </SubImageWrap>
       </ImageWrap>
       <Text dangerouslySetInnerHTML={{ __html: post.content }}></Text>
-      <LikeWrap
-        onMouseEnter={() => setIsHover(true)}
-        onMouseLeave={() => setIsHover(false)}
-      >
-        {isHover ? <HeratHoverIcon /> : <HeartIcon />}
-        <span>21</span>
+      <LikeWrap>
+        <div
+          onMouseEnter={() => setIsLikeHover(true)}
+          onMouseLeave={() => setIsLikeHover(false)}
+        >
+          {isLikeHover ? <HeratHoverIcon /> : <HeartIcon />}
+          <span>21</span>
+        </div>
       </LikeWrap>
       <Button>
         <DiaryButton variant="delete" onClick={handleDelete}>
@@ -594,10 +778,10 @@ export default function BoardDetail() {
         </DiaryButton>
       </Button>
       <ProfileWrap>
-        <ProfileImage></ProfileImage>
+        <ProfileImage>{post.author.profileImage}</ProfileImage>
         <Profile>
-          <p>{post.author}</p>
-          <span>도토리가 좋아요</span>
+          <p>{post.author.username}</p>
+          <span>{post.author.description}</span>
         </Profile>
       </ProfileWrap>
       <Line></Line>
@@ -609,7 +793,7 @@ export default function BoardDetail() {
       <CommentList>
         <ListArray>
           <ProfileWrap>
-            <ProfileImage></ProfileImage>
+            <ProfileImage>{post.author.profileImage}</ProfileImage>
             <Profile>
               <p>믿음소망사과</p>
               <span>방금 전</span>
@@ -636,6 +820,20 @@ export default function BoardDetail() {
             <button>취소</button>
             <ReplyButton variant="comment">댓글 작성</ReplyButton>
           </Button>
+          <Line></Line>
+          <ListArray>
+            <ProfileWrap>
+              <ProfileImage>{post.author.profileImage}</ProfileImage>
+              <Profile>
+                <p>믿음소망사과</p>
+                <span>방금 전</span>
+              </Profile>
+            </ProfileWrap>
+            <IconButton>
+              <EditIcon />
+              <DeleteIcon />
+            </IconButton>
+          </ListArray>
         </Reply>
       </CommentList>
     </Wrap>
