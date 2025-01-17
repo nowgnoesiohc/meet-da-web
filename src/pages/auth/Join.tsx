@@ -147,6 +147,7 @@ const Error = styled.div<StyledProps>`
     }
   }
 `;
+
 const ErrorIcon = styled(AiOutlineClose)<StyledProps>`
   font-size: 1rem;
 `;

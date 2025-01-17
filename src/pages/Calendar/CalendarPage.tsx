@@ -1,9 +1,4 @@
-import Header from "@/components/layout/Header";
-import ModalPortal from "@/components/modal/ModalPortal";
-import ModalTemplate from "@/components/modal/ModalTemplate";
 import { useIsModalStore } from "@/store/ModalStore";
-import GlobalStyles from "@/styles/GlobalStyle";
-import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import CalLarge from "@/assets/images/캘린더배경.png";
@@ -284,8 +279,7 @@ const PastDiary = styled.div`
   }
 `;
 
-export default function MainPage() {
-  const useIsModal = useIsModalStore((state) => state.isModal);
+export default function CalendarPage() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
   const [calendarSrc, setCalendarSrc] = useState(CalLarge);
@@ -388,15 +382,6 @@ export default function MainPage() {
 
   return (
     <>
-      <GlobalStyles />
-      <Header />
-      <Outlet />
-      {useIsModal && (
-        <ModalPortal>
-          <ModalTemplate />
-        </ModalPortal>
-      )}
-
       <Layout>
         <UserWrap>
           <UserInfo>

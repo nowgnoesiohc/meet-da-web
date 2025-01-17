@@ -3,12 +3,18 @@ import { IoSearch } from "react-icons/io5";
 import { useState } from "react";
 import { FeedButton } from "@/components/ui/Button";
 import { IoHeart } from "react-icons/io5";
-import test from "/src/assets/test/testImage.png";
-import happy from "/src/assets/mood/happy.svg";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "/node_modules/swiper/swiper.css";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+import GlobalStyles from "@/styles/GlobalStyle";
+import Header from "@/components/layout/Header";
+import ModalPortal from "@/components/modal/ModalPortal";
+import ModalTemplate from "@/components/modal/ModalTemplate";
+import { useIsModalStore } from "@/store/ModalStore";
+import test from "@/assets/test/testImage.png";
+import happy from "@/assets/mood/happy.svg";
+// import axios from "axios";
 
 const Layout = styled.div`
   display: flex;
@@ -152,6 +158,29 @@ const PostItem = styled(Link)`
   }
 `;
 
+// const PostItem = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   width: 17.25rem;
+//   height: auto;
+//   background-color: var(--white);
+//   padding-bottom: 0.75rem;
+//   border: 1px solid var(--line-diary);
+//   border-radius: 0.625rem;
+//   text-align: center;
+//   gap: 0.75rem;
+//   box-shadow: 0.125rem 0.125rem 0.5rem 0rem rgba(0, 0, 0, 0.25);
+
+//   @media (max-width: 781px) {
+//     margin: auto;
+//   }
+
+//   @media (max-width: 390px) {
+//     width: 11rem;
+//     padding-bottom: 0.5rem;
+//   }
+// `;
+
 const PostTitle = styled.div`
   display: flex;
   justify-content: space-between;
@@ -294,16 +323,67 @@ const SwiperImage = styled.img`
   }
 `;
 
+// interface Post {
+//   _id: string;
+//   title: string;
+//   author: string; // 단순 문자열로 변경
+//   content: string;
+//   images: string[];
+//   visibility: string;
+//   likes: string[];
+//   viewCount: number;
+//   createdAt: string;
+// }
+
 export default function FeedPage() {
+  const useIsModal = useIsModalStore((state) => state.isModal);
   const [activeTab, setActiveTab] = useState("Latest");
+  // const [posts, setPosts] = useState<Post[]>([]);
+  // const navigate = useNavigate();
+  // const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  // const accessToken = localStorage.getItem("accessToken");
 
   const TabItems = [
     { key: "Latest", label: "최신" },
     { key: "Popular", label: "인기" },
   ];
 
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await axios.get<Post[]>("/board/{boardId}");
+  //       setPosts(response.data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch posts:", error);
+  //     }
+  //   };
+
+  //   fetchPosts();
+  // }, []);
+
+  // // PostItem 클릭 시 처리
+  // const handlePostClick = (postId: string) => {
+  //   if (!accessToken) {
+  //     // 로그인되지 않았다면 모달 띄우기
+  //     setIsModalClick("noticeModal");
+  //     return;
+  //   }
+
+  //   // 로그인된 경우 게시글 상세 페이지로 이동
+  //   navigate(`/board/${postId}`);
+  // };
+
   return (
     <>
+      <GlobalStyles />
+      <Header />
+      <Outlet />
+      {useIsModal && (
+        <ModalPortal>
+          <ModalTemplate />
+        </ModalPortal>
+      )}
+
       <Layout>
         <SearchBarWrap>
           흥미로운 이야기를 발견해 보세요!
@@ -326,8 +406,54 @@ export default function FeedPage() {
               </FeedButton>
             ))}
           </ButtonWrap>
+          {/* <PostContainer>
+            {posts.map((post) => (
+              <PostItem
+                key={post._id}
+                onClick={() => handlePostClick(post._id)}
+              >
+                <SwiperWrap>
+                  <Swiper
+                    spaceBetween={30}
+                    pagination={{
+                      clickable: true,
+                    }}
+                    modules={[Pagination]}
+                    className="mySwiper"
+                  >
+                    {post.images.map((image, index) => (
+                      <SwiperSlide key={index}>
+                        <SwiperImage src={image} alt={`post-image-${index}`} />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </SwiperWrap>
+                <PostTitle>{post.title}</PostTitle>
+                <PostText>{post.content}</PostText>
+                <BottomWrap>
+                  <PostInfoWrap>
+                    <PostInfo>
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </PostInfo>
+                    <PostInfo>·</PostInfo>
+                    <PostInfo>{post.viewCount} views</PostInfo>
+                  </PostInfoWrap>
+                  <InfoWrap>
+                    <UserInfo>
+                      <UserImage src={post.author.image} alt="user" />
+                      {post.author.name}
+                    </UserInfo>
+                    <LikeContainer>
+                      <LikeIcon />
+                      {post.likes.length}
+                    </LikeContainer>
+                  </InfoWrap>
+                </BottomWrap>
+              </PostItem>
+            ))}
+          </PostContainer> */}
           <PostContainer>
-            <PostItem to="/Page1">
+            <PostItem to="/auth/login">
               <SwiperWrap>
                 <Swiper
                   spaceBetween={30}
@@ -373,190 +499,6 @@ export default function FeedPage() {
                 </InfoWrap>
               </BottomWrap>
             </PostItem>
-            {/* <PostItem to="/Page1">
-              <SwiperWrap>
-                <Swiper
-                  spaceBetween={30}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  modules={[Pagination]}
-                  className="mySwiper"
-                >
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                </Swiper>
-              </SwiperWrap>
-              <PostTitle>
-                나의 단점 중 하나를 고칠 수...
-                <MoodImage src={happy} alt="happy" />
-              </PostTitle>
-              <PostText>
-                첫눈 오는 이런 오후에 너에게 전화를 걸 수만 있다면 기쁠 텐데
-                벌써 일년이 지났는데 난 아직 미련 가득해서 쓸쓸...
-              </PostText>
-              <BottomWrap>
-                <PostInfoWrap>
-                  <PostInfo>방금 전</PostInfo>
-                  <PostInfo>·</PostInfo>
-                  <PostInfo>0개의 댓글</PostInfo>
-                </PostInfoWrap>
-                <InfoWrap>
-                  <UserInfo>
-                    <UserImage src={test} alt="test" />
-                    다람지
-                  </UserInfo>
-                  <LikeContainer>
-                    <LikeIcon />0
-                  </LikeContainer>
-                </InfoWrap>
-              </BottomWrap>
-            </PostItem>
-            <PostItem to="/Page1">
-              <SwiperWrap>
-                <Swiper
-                  spaceBetween={30}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  modules={[Pagination]}
-                  className="mySwiper"
-                >
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                </Swiper>
-              </SwiperWrap>
-              <PostTitle>
-                나의 단점 중 하나를 고칠 수...
-                <MoodImage src={happy} alt="happy" />
-              </PostTitle>
-              <PostText>
-                첫눈 오는 이런 오후에 너에게 전화를 걸 수만 있다면 기쁠 텐데
-                벌써 일년이 지났는데 난 아직 미련 가득해서 쓸쓸...
-              </PostText>
-              <BottomWrap>
-                <PostInfoWrap>
-                  <PostInfo>방금 전</PostInfo>
-                  <PostInfo>·</PostInfo>
-                  <PostInfo>0개의 댓글</PostInfo>
-                </PostInfoWrap>
-                <InfoWrap>
-                  <UserInfo>
-                    <UserImage src={test} alt="test" />
-                    다람지
-                  </UserInfo>
-                  <LikeContainer>
-                    <LikeIcon />0
-                  </LikeContainer>
-                </InfoWrap>
-              </BottomWrap>
-            </PostItem>
-            <PostItem to="/Page1">
-              <SwiperWrap>
-                <Swiper
-                  spaceBetween={30}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  modules={[Pagination]}
-                  className="mySwiper"
-                >
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                </Swiper>
-              </SwiperWrap>
-              <PostTitle>
-                나의 단점 중 하나를 고칠 수...
-                <MoodImage src={happy} alt="happy" />
-              </PostTitle>
-              <PostText>
-                첫눈 오는 이런 오후에 너에게 전화를 걸 수만 있다면 기쁠 텐데
-                벌써 일년이 지났는데 난 아직 미련 가득해서 쓸쓸...
-              </PostText>
-              <BottomWrap>
-                <PostInfoWrap>
-                  <PostInfo>방금 전</PostInfo>
-                  <PostInfo>·</PostInfo>
-                  <PostInfo>0개의 댓글</PostInfo>
-                </PostInfoWrap>
-                <InfoWrap>
-                  <UserInfo>
-                    <UserImage src={test} alt="test" />
-                    다람지
-                  </UserInfo>
-                  <LikeContainer>
-                    <LikeIcon />0
-                  </LikeContainer>
-                </InfoWrap>
-              </BottomWrap>
-            </PostItem>
-            <PostItem to="/Page1">
-              <SwiperWrap>
-                <Swiper
-                  spaceBetween={30}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  modules={[Pagination]}
-                  className="mySwiper"
-                >
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                </Swiper>
-              </SwiperWrap>
-              <PostTitle>
-                나의 단점 중 하나를 고칠 수...
-                <MoodImage src={happy} alt="happy" />
-              </PostTitle>
-              <PostText>
-                첫눈 오는 이런 오후에 너에게 전화를 걸 수만 있다면 기쁠 텐데
-                벌써 일년이 지났는데 난 아직 미련 가득해서 쓸쓸...
-              </PostText>
-              <BottomWrap>
-                <PostInfoWrap>
-                  <PostInfo>방금 전</PostInfo>
-                  <PostInfo>·</PostInfo>
-                  <PostInfo>0개의 댓글</PostInfo>
-                </PostInfoWrap>
-                <InfoWrap>
-                  <UserInfo>
-                    <UserImage src={test} alt="test" />
-                    다람지
-                  </UserInfo>
-                  <LikeContainer>
-                    <LikeIcon />0
-                  </LikeContainer>
-                </InfoWrap>
-              </BottomWrap>
-            </PostItem> */}
           </PostContainer>
         </PostWrap>
       </Layout>
