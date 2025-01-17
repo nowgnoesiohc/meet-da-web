@@ -280,7 +280,7 @@ export default function MypageNavigation() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
   const isModalOpen = (type?: string) => {
-    console.log(type);
+    // console.log(type);
 
     if (type) {
       setIsModalClick(type);
