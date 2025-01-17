@@ -34,7 +34,14 @@ const ModalContainer = styled.div`
   border-radius: 1.25rem;
 `;
 
-export default function ModalTemplate() {
+type ModalTemplateProps = {
+  modalData: {
+    mood: string | null;
+    memo: string;
+  };
+};
+
+export default function ModalTemplate({ modalData }: ModalTemplateProps) {
   const useIsModal = useIsModalStore((state) => state.isModal);
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
@@ -53,7 +60,12 @@ export default function ModalTemplate() {
             case "findPasswordModal":
               return <FindPasswordModal />;
             case "moodTrackerModal":
-              return <MoodTrackerModal />;
+              return (
+                <MoodTrackerModal
+                  initialMood={modalData.mood}
+                  initialMemo={modalData.memo}
+                />
+              );
             case "noticeModal":
               return <NoticeModal />;
             case "signUpModal":
