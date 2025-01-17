@@ -13,6 +13,8 @@ import axios from "axios";
 import { useIsModalStore } from "@/store/ModalStore";
 // import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { OrangeButton } from "@/components/ui/Button";
+import { AiOutlineClose } from "react-icons/ai";
 // import { useIsModalStore } from "../../store/ModalStore";
 
 interface StyledProps {
@@ -24,6 +26,14 @@ const LoginWrap = styled.div`
   height: 43.75rem; /* 700px */
   margin: 10% auto;
   text-align: center;
+
+  @media (max-width: 390px) {
+    width: 22.5rem;
+
+    form {
+      width: 22.5rem;
+    }
+  }
 `;
 
 const LoginLogo = styled.div`
@@ -32,11 +42,25 @@ const LoginLogo = styled.div`
   background-image: url(${loginLogo});
   background-size: cover;
   background-position: center;
+
+  @media (max-width: 390px) {
+    background-size: contain;
+    width: 22.5rem;
+    height: 5.4375rem;
+  }
 `;
 
 const Join = styled.div`
   margin-top: 1.5rem; /* 24px */
   margin-bottom: 3rem; /* 48px */
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    margin: 1.5rem auto 1.125rem;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+  }
 `;
 
 const Span = styled.span`
@@ -69,16 +93,20 @@ const Input = styled.input<StyledProps>`
     color: ${(props) =>
       props.$isError ? "var(--error-02)" : "var(--text-02)"}; // 에러 시 빨간색
   }
-`;
 
-const LoginButton = styled.button`
-  width: 27.625rem; /* 442px */
-  height: 4.25rem; /* 68px */
-  border-radius: 0.75rem; /* 12px */
-  background-color: var(--main-orange);
-  color: #fff;
-  margin-top: 2.25rem; /* 36px */
-  font-size: 1.5rem; /* 24px */
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    font-size: 1.125rem;
+  }
+`;
+const Button = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2.25rem;
+
+  @media (max-width: 390px) {
+    margin-top: 1.25rem;
+  }
 `;
 
 const SnsWrap = styled.div`
@@ -91,6 +119,16 @@ const SnsWrap = styled.div`
   margin-top: 2.375rem; /* 38px */
   color: var(--main-text);
   font-size: 1.25rem; /* 20px */
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+
+    > span {
+      width: 5.4375rem;
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+  }
 `;
 
 const Ul = styled.ul`
@@ -122,6 +160,10 @@ const Google = styled.button`
   &:hover {
     background-image: url(${googleHover});
   }
+
+  @media (max-width: 390px) {
+    margin: 0 0.625rem;
+  }
 `;
 
 const Kakao = styled.button`
@@ -144,6 +186,17 @@ const PasswordReset = styled.button`
     color: var(--main-text);
     font-size: 1.25rem; /* 20px */
   }
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    button {
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+  }
+`;
+const ErrorIcon = styled(AiOutlineClose)<StyledProps>`
+  font-size: 1rem;
 `;
 
 const Error = styled.div<StyledProps>`
@@ -164,6 +217,17 @@ const Error = styled.div<StyledProps>`
     margin: 0;
     padding-left: 0.5rem;
     padding-top: 0.25rem;
+  }
+
+  @media (max-width: 390px) {
+    width: 17.5rem;
+    padding-left: 0.375rem;
+    font-size: 0.75rem;
+
+    > p {
+      padding-left: 0.1875rem;
+      text-align: left;
+    }
   }
 `;
 
@@ -190,7 +254,7 @@ export default function Login() {
       .string()
       .min(1, { message: "비밀번호를 입력해주세요." })
       .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-        message: "비밀번호는 영문, 숫자 조합의 8자 이상 입력해야합니다.",
+        message: "비밀번호는 영문, 숫자 조합 8자 이상 입력해주세요.",
       }),
   });
 
@@ -249,7 +313,7 @@ export default function Login() {
           {...register("email")}
         />
         <Error $isError={!!formState.errors.email}>
-          {/* <img src={error} alt="에러" /> */}
+          <ErrorIcon />
           {formState.errors.email && <p>{formState.errors.email.message}</p>}
         </Error>
         <Input
@@ -259,12 +323,16 @@ export default function Login() {
           {...register("password")}
         />
         <Error $isError={!!formState.errors.password}>
-          {/* <img src={error} alt="에러" /> */}
+          <ErrorIcon />
           {formState.errors.password && (
             <p>{formState.errors.password.message}</p>
           )}
         </Error>
-        <LoginButton type="submit">로그인 하기</LoginButton>
+        <Button>
+          <OrangeButton variant="membership" type="submit">
+            로그인 하기
+          </OrangeButton>
+        </Button>
       </form>
       <SnsWrap>
         <span>SNS 간편 로그인</span>

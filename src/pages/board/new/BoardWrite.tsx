@@ -6,6 +6,7 @@ import { AiOutlineDown } from "react-icons/ai";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { RecordButton } from "@/components/ui/Button";
+import { jwtDecode } from "jwt-decode";
 
 interface DropdownItemProps {
   isSelected: boolean;
@@ -53,7 +54,7 @@ const Wrap = styled.div`
 
   @media (max-width: 781px) {
     width: 40rem;
-    margin: 0 auto;
+    margin: 10% auto;
   }
   @media (max-width: 390px) {
     h2 {
@@ -242,6 +243,7 @@ interface BoarWriteProps {
 type Visibility = "PUBLIC" | "FRIENDS_ONLY" | "PRIVATE";
 
 const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
+  const [currentDate, setCurrentDate] = useState<string>(""); // 현재 날짜 상태
   // HTML 태그 제거 함수
   const stripHtmlTags = (html: string) => {
     const div = document.createElement("div");
@@ -427,13 +429,80 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     }
   }, [isEdit, boardId]);
 
+  // 날짜
+  useEffect(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    const formattedDate = `${year}년 ${month}월 ${day}일`;
+    setCurrentDate(formattedDate);
+  }, []);
+
+  const [userInfo, setUserInfo] = useState<{
+    id: string;
+    username: string;
+  } | null>(null);
+
+  // 컴포넌트가 마운트될 때 사용자 정보를 가져오기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const info = await getUserInfo();
+      setUserInfo(info);
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const getUserInfo = async (): Promise<{
+    id: string;
+    username: string;
+  } | null> => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        console.warn("토큰이 존재하지 않습니다.");
+        return null;
+      }
+
+      const decoded: { sub: string; username: string } = jwtDecode(token);
+      if (!decoded.sub) {
+        console.warn("userId가 토큰에 포함되어 있지 않습니다.");
+        return null;
+      }
+
+      // JWT 토큰에 username이 없다면, API를 통해 사용자 정보를 가져오는 방법
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${decoded.sub}`
+      );
+
+      return {
+        id: decoded.sub,
+        username: response.data.username, // API 응답에서 username을 가져옴
+      };
+    } catch (error) {
+      console.error("사용자 정보 가져오기 중 오류가 발생했습니다.", error);
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
+    const userInfo = await getUserInfo();
+    if (!userInfo) {
+      alert("사용자 정보를 가져올 수 없습니다.");
+      return;
+    }
+    console.log(userInfo);
+
     const postData = {
-      title: title, // 제목 설정
+      title: title,
       content: content,
-      images: [], // 이미지 배열 (필요에 따라 추가)
-      visibility: selected, // 가시성
-      author: "test@test.com", // 테스트용 이메일
+      images: [], // 이미지 배열
+      visibility: selected,
+      author: userInfo.id,
+      authorName: userInfo.username,
+      createdAt: currentDate,
     };
 
     try {
@@ -487,9 +556,9 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
 
   return (
     <Wrap>
-      <h2>{today}</h2>
+      <h2>2024년 12월 12일</h2>
       <TitleWrap>
-        <p>Q. 올해 가장 감사했던 순간은 언제인가요?</p>
+        <p>{title}</p>
         <div ref={menuRef}>
           <DropdownContainer onClick={toggleDropdown}>
             <SelectMenu>{descriptions[selected]}</SelectMenu>
@@ -527,7 +596,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
         </p>
       </EditorWrap>
       <WriteEmotion>
-        <p>오늘 다람지님의 기분은...</p>
+        <p>오늘 {userInfo ? userInfo.username : "사용자"} 님의 기분은...</p>
       </WriteEmotion>
       <ButtonWrap>
         <RecordButton variant="moodCancel" onClick={onClickCancel}>
