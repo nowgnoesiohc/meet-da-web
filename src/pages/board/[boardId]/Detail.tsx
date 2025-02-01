@@ -770,10 +770,10 @@ export default function BoardDetail() {
         </div>
       </LikeWrap>
       <Button>
-        <DiaryButton variant="delete" onClick={handleDelete}>
+        <DiaryButton $variant="delete" onClick={handleDelete}>
           삭제하기
         </DiaryButton>
-        <DiaryButton variant="modify" onClick={handleEdit}>
+        <DiaryButton $variant="modify" onClick={handleEdit}>
           수정하기
         </DiaryButton>
       </Button>
@@ -818,7 +818,7 @@ export default function BoardDetail() {
           </TextAreaWrap>
           <Button>
             <button>취소</button>
-            <ReplyButton variant="comment">댓글 작성</ReplyButton>
+            <ReplyButton $variant="comment">댓글 작성</ReplyButton>
           </Button>
           <Line></Line>
           <ListArray>

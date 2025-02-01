@@ -83,10 +83,10 @@ export default function DeleteThemeModal() {
           <p>삭제한 테마와 사용된 포인트는 복구되지 않습니다.</p>
         </Title>
         <Button>
-          <OrangeLineButton variant="modal" onClick={onClickCancel}>
+          <OrangeLineButton $variant="modal" onClick={onClickCancel}>
             취소
           </OrangeLineButton>
-          <OrangeButton variant="confirm">확인</OrangeButton>
+          <OrangeButton $variant="confirm">확인</OrangeButton>
         </Button>
       </DeleteThemaWrap>
     </>

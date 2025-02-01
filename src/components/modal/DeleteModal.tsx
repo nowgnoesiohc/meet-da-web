@@ -86,10 +86,10 @@ export default function DeleteModal() {
           <p>300 포인트 차감됩니다.</p> {/* 회원탈퇴 모달에선 제거 */}
         </Title>
         <Button>
-          <OrangeLineButton variant="modal" onClick={onClickCancel}>
+          <OrangeLineButton $variant="modal" onClick={onClickCancel}>
             취소
           </OrangeLineButton>
-          <OrangeButton variant="confirm">확인</OrangeButton>
+          <OrangeButton $variant="confirm">확인</OrangeButton>
         </Button>
       </Wrap>
     </>

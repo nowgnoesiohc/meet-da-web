@@ -107,7 +107,7 @@ const SideMenuTextStyle = {
 };
 
 const SideMenuText = styled.button<{
-  variant: "clicked" | "unclicked";
+  $variant: "clicked" | "unclicked";
   isClicked: boolean;
 }>`
   display: flex;
@@ -137,7 +137,7 @@ const SideMenuPointStyle = {
 };
 
 const SideMenuPoint = styled.button<{
-  variant: "clicked" | "unclicked";
+  $variant: "clicked" | "unclicked";
   isClicked: boolean;
 }>`
   display: flex;
@@ -436,15 +436,15 @@ export default function MypageNavigation() {
           </UserTextWrapper>
           <ButtonWrapper>
             <ProfileButton
-              variant="friend"
+              $variant="friend"
               onClick={() => isModalOpen("friendModal")}
             >
               17명의 친구
             </ProfileButton>
-            <ProfileButton variant="diary" onClick={handleDiaryClick}>
+            <ProfileButton $variant="diary" onClick={handleDiaryClick}>
               {posts.length}개의 다이어리
             </ProfileButton>
-            <ProfileButton variant="mood" onClick={linkCalendar}>
+            <ProfileButton $variant="mood" onClick={linkCalendar}>
               97개의 무드
             </ProfileButton>
           </ButtonWrapper>
@@ -456,12 +456,12 @@ export default function MypageNavigation() {
             <SideMenu key={menu.key}>
               <SideMenuPoint
                 isClicked={activeMenu === menu.key}
-                variant="clicked"
+                $variant="clicked"
               />
               <Link to={menu.path}>
                 <SideMenuText
                   isClicked={activeMenu === menu.key}
-                  variant="clicked"
+                  $variant="clicked"
                   onClick={() => setActiveMenu(menu.key)}
                 >
                   {menu.label}

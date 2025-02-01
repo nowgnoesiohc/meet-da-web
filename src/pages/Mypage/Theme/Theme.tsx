@@ -141,7 +141,7 @@ export default function Theme() {
         {activeTab === "Own" && (
           <ButtonWrapper>
             <DiarySettingButton
-              variant="delete"
+              $variant="delete"
               style={{ width: "100%" }}
               onClick={() => isModalOpen("deleteModal")}
             >

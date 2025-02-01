@@ -329,7 +329,7 @@ export default function Login() {
           )}
         </Error>
         <Button>
-          <OrangeButton variant="membership" type="submit">
+          <OrangeButton $variant="membership" type="submit">
             로그인 하기
           </OrangeButton>
         </Button>

@@ -139,7 +139,7 @@ export default function DiaryManagement() {
         {activeTab === "Mydiary" && (
           <ButtonWrapper>
             <DiarySettingButton
-              variant="delete"
+              $variant="delete"
               style={{ width: "100%", fontSize: "1.375rem" }}
               onClick={() => isModalOpen("deleteModal")}
             >
@@ -150,7 +150,7 @@ export default function DiaryManagement() {
         {activeTab === "Bookmark" && (
           <ButtonWrapper>
             <DiarySettingButton
-              variant="bookmark"
+              $variant="bookmark"
               style={{ width: "100%", fontSize: "1.25rem" }}
               onClick={() => isModalOpen("deleteModal")}
             >

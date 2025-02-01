@@ -63,7 +63,7 @@ const GlobalStyles = createGlobalStyle`
 
   @font-face {
     font-family: 'Pretendard';
-    src: url('/fonts/Pretendard-Regular.woff2') format('woff2'),
+    src: url('/fonts/Pretendard-Regular.woff2?v=2') format('woff2'),
          url('/fonts/Pretendard-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;

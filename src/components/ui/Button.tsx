@@ -160,7 +160,7 @@ const FriendButtonStyle = {
 };
 
 export const FriendButton = styled.button<{
-  variant:
+  $variant:
     | "follow"
     | "unfollow"
     | "diaryFollow"
@@ -171,30 +171,30 @@ export const FriendButton = styled.button<{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => FriendButtonStyle[props.variant].default.width};
-  height: ${(props) => FriendButtonStyle[props.variant].default.height};
+  width: ${(props) => FriendButtonStyle[props.$variant].default.width};
+  height: ${(props) => FriendButtonStyle[props.$variant].default.height};
   background-color: none;
-  border: ${(props) => FriendButtonStyle[props.variant].default.border};
+  border: ${(props) => FriendButtonStyle[props.$variant].default.border};
   border-radius: ${(props) =>
-    FriendButtonStyle[props.variant].default.borderRadius};
-  color: ${(props) => FriendButtonStyle[props.variant].default.color};
+    FriendButtonStyle[props.$variant].default.borderRadius};
+  color: ${(props) => FriendButtonStyle[props.$variant].default.color};
   text-align: center;
-  font-size: ${(props) => FriendButtonStyle[props.variant].default.fontSize};
+  font-size: ${(props) => FriendButtonStyle[props.$variant].default.fontSize};
   font-weight: var(--font-semibold);
 
   &:hover {
-    background-color: ${({ variant }) => {
+    background-color: ${({ $variant }) => {
       if (
-        variant === "follow" ||
-        variant === "diaryFollow" ||
-        variant === "modalFollow"
+        $variant === "follow" ||
+        $variant === "diaryFollow" ||
+        $variant === "modalFollow"
       ) {
         return "var(--hover-green)";
       }
       if (
-        variant === "unfollow" ||
-        variant === "diaryUnfollow" ||
-        variant === "modalUnfollow"
+        $variant === "unfollow" ||
+        $variant === "diaryUnfollow" ||
+        $variant === "modalUnfollow"
       ) {
         return "var(--hover-orange)";
       }
@@ -202,19 +202,19 @@ export const FriendButton = styled.button<{
   }
 
   @media (max-width: 781px) {
-    width: ${(props) => FriendButtonStyle[props.variant].tablet.width};
-    height: ${(props) => FriendButtonStyle[props.variant].tablet.height};
+    width: ${(props) => FriendButtonStyle[props.$variant].tablet.width};
+    height: ${(props) => FriendButtonStyle[props.$variant].tablet.height};
     border-radius: ${(props) =>
-      FriendButtonStyle[props.variant].tablet.borderRadius};
-    font-size: ${(props) => FriendButtonStyle[props.variant].tablet.fontSize};
+      FriendButtonStyle[props.$variant].tablet.borderRadius};
+    font-size: ${(props) => FriendButtonStyle[props.$variant].tablet.fontSize};
   }
 
   @media (max-width: 390px) {
-    width: ${(props) => FriendButtonStyle[props.variant].mobile.width};
-    height: ${(props) => FriendButtonStyle[props.variant].mobile.height};
+    width: ${(props) => FriendButtonStyle[props.$variant].mobile.width};
+    height: ${(props) => FriendButtonStyle[props.$variant].mobile.height};
     border-radius: ${(props) =>
-      FriendButtonStyle[props.variant].mobile.borderRadius};
-    font-size: ${(props) => FriendButtonStyle[props.variant].mobile.fontSize};
+      FriendButtonStyle[props.$variant].mobile.borderRadius};
+    font-size: ${(props) => FriendButtonStyle[props.$variant].mobile.fontSize};
   }
 `;
 
@@ -333,36 +333,36 @@ const RecordButtonStyle = {
 };
 
 export const RecordButton = styled.button<{
-  variant: "moodCancel" | "moodSubmit" | "diaryCancel" | "diarySubmit";
+  $variant: "moodCancel" | "moodSubmit" | "diaryCancel" | "diarySubmit";
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => RecordButtonStyle[props.variant].default.width};
-  height: ${(props) => RecordButtonStyle[props.variant].default.height};
+  width: ${(props) => RecordButtonStyle[props.$variant].default.width};
+  height: ${(props) => RecordButtonStyle[props.$variant].default.height};
   border-radius: ${(props) =>
-    RecordButtonStyle[props.variant].default.borderRadius};
+    RecordButtonStyle[props.$variant].default.borderRadius};
   background-color: ${(props) =>
-    RecordButtonStyle[props.variant].default.backgroundColor};
+    RecordButtonStyle[props.$variant].default.backgroundColor};
   color: var(--white);
   text-align: center;
-  font-size: ${(props) => RecordButtonStyle[props.variant].default.fontSize};
+  font-size: ${(props) => RecordButtonStyle[props.$variant].default.fontSize};
   font-weight: var(--font-semibold);
 
   @media (max-width: 781px) {
-    width: ${(props) => RecordButtonStyle[props.variant].tablet.width};
-    height: ${(props) => RecordButtonStyle[props.variant].tablet.height};
+    width: ${(props) => RecordButtonStyle[props.$variant].tablet.width};
+    height: ${(props) => RecordButtonStyle[props.$variant].tablet.height};
     border-radius: ${(props) =>
-      RecordButtonStyle[props.variant].tablet.borderRadius};
-    font-size: ${(props) => RecordButtonStyle[props.variant].tablet.fontSize};
+      RecordButtonStyle[props.$variant].tablet.borderRadius};
+    font-size: ${(props) => RecordButtonStyle[props.$variant].tablet.fontSize};
   }
 
   @media (max-width: 390px) {
-    width: ${(props) => RecordButtonStyle[props.variant].mobile.width};
-    height: ${(props) => RecordButtonStyle[props.variant].mobile.height};
+    width: ${(props) => RecordButtonStyle[props.$variant].mobile.width};
+    height: ${(props) => RecordButtonStyle[props.$variant].mobile.height};
     border-radius: ${(props) =>
-      RecordButtonStyle[props.variant].mobile.borderRadius};
-    font-size: ${(props) => RecordButtonStyle[props.variant].mobile.fontSize};
+      RecordButtonStyle[props.$variant].mobile.borderRadius};
+    font-size: ${(props) => RecordButtonStyle[props.$variant].mobile.fontSize};
   }
 `;
 
@@ -426,31 +426,31 @@ const OrangeButtonStyle = {
 };
 
 export const OrangeButton = styled.button<{
-  variant: "membership" | "mailSend" | "confirm" | "signupToLogin";
+  $variant: "membership" | "mailSend" | "confirm" | "signupToLogin";
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => OrangeButtonStyle[props.variant].default.width};
-  height: ${(props) => OrangeButtonStyle[props.variant].default.height};
+  width: ${(props) => OrangeButtonStyle[props.$variant].default.width};
+  height: ${(props) => OrangeButtonStyle[props.$variant].default.height};
   border-radius: ${(props) =>
-    OrangeButtonStyle[props.variant].default.borderRadius};
+    OrangeButtonStyle[props.$variant].default.borderRadius};
   background-color: var(--main-orange);
   color: var(--white);
   text-align: center;
-  font-size: ${(props) => OrangeButtonStyle[props.variant].default.fontSize};
+  font-size: ${(props) => OrangeButtonStyle[props.$variant].default.fontSize};
   font-weight: var(--font-semibold);
 
   @media (max-width: 390px) {
-    width: ${(props) => OrangeButtonStyle[props.variant].mobile.width};
-    height: ${(props) => OrangeButtonStyle[props.variant].mobile.height};
+    width: ${(props) => OrangeButtonStyle[props.$variant].mobile.width};
+    height: ${(props) => OrangeButtonStyle[props.$variant].mobile.height};
     border-radius: ${(props) =>
-      OrangeButtonStyle[props.variant].mobile.borderRadius};
-    font-size: ${(props) => OrangeButtonStyle[props.variant].mobile.fontSize};
+      OrangeButtonStyle[props.$variant].mobile.borderRadius};
+    font-size: ${(props) => OrangeButtonStyle[props.$variant].mobile.fontSize};
   }
 `;
 
-export const DiaryButton = styled.button<{ variant: "delete" | "modify" }>`
+export const DiaryButton = styled.button<{ $variant: "delete" | "modify" }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -458,7 +458,7 @@ export const DiaryButton = styled.button<{ variant: "delete" | "modify" }>`
   height: 3.25rem;
   border-radius: 0.625rem;
   background-color: ${(props) =>
-    props.variant === "delete" ? "var(--line-basic)" : "var(--orange-button)"};
+    props.$variant === "delete" ? "var(--line-basic)" : "var(--orange-button)"};
   color: var(--white);
   text-align: center;
   font-size: 1.125rem;
@@ -494,7 +494,7 @@ export const CommentButton = styled.button`
 `;
 
 export const ReplyButton = styled.button<{
-  variant: "cancel" | "comment";
+  $variant: "cancel" | "comment";
 }>`
   display: flex;
   align-items: center;
@@ -502,9 +502,9 @@ export const ReplyButton = styled.button<{
   height: 2.625rem;
   border-radius: 0.5rem;
   background-color: ${(props) =>
-    props.variant === "cancel" ? "none" : "var(--comment-button)"};
+    props.$variant === "cancel" ? "none" : "var(--comment-button)"};
   color: ${(props) =>
-    props.variant === "cancel" ? "var(--comment-button)" : "var(--white)"};
+    props.$variant === "cancel" ? "var(--comment-button)" : "var(--white)"};
   font-size: 1rem;
   font-weight: var(--font-semibold);
 
@@ -517,12 +517,12 @@ export const ReplyButton = styled.button<{
 `;
 
 export const DiarySettingButton = styled.button<{
-  variant: "delete" | "bookmark";
+  $variant: "delete" | "bookmark";
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => (props.variant === "delete" ? "7.75rem" : "9.375rem")};
+  width: ${(props) => (props.$variant === "delete" ? "7.75rem" : "9.375rem")};
   height: 3.75rem;
   border-radius: 0.625rem;
   background-color: var(--orange-button);
@@ -591,18 +591,18 @@ const ProfileButtonStyle = {
 };
 
 export const ProfileButton = styled.button<{
-  variant: "friend" | "diary" | "mood";
+  $variant: "friend" | "diary" | "mood";
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => ProfileButtonStyle[props.variant].default.width};
-  height: ${(props) => ProfileButtonStyle[props.variant].default.height};
+  width: ${(props) => ProfileButtonStyle[props.$variant].default.width};
+  height: ${(props) => ProfileButtonStyle[props.$variant].default.height};
   border-radius: ${(props) =>
-    ProfileButtonStyle[props.variant].default.borderRadius};
+    ProfileButtonStyle[props.$variant].default.borderRadius};
   background-color: var(--bg-02);
   color: var(--main-text);
-  font-size: ${(props) => ProfileButtonStyle[props.variant].default.fontSize};
+  font-size: ${(props) => ProfileButtonStyle[props.$variant].default.fontSize};
   font-weight: var(--font-medium);
 
   &:hover {
@@ -610,16 +610,16 @@ export const ProfileButton = styled.button<{
   }
 
   @media (max-width: 390px) {
-    width: ${(props) => ProfileButtonStyle[props.variant].mobile.width};
-    height: ${(props) => ProfileButtonStyle[props.variant].mobile.height};
+    width: ${(props) => ProfileButtonStyle[props.$variant].mobile.width};
+    height: ${(props) => ProfileButtonStyle[props.$variant].mobile.height};
     border-radius: ${(props) =>
-      ProfileButtonStyle[props.variant].mobile.borderRadius};
-    font-size: ${(props) => ProfileButtonStyle[props.variant].mobile.fontSize};
+      ProfileButtonStyle[props.$variant].mobile.borderRadius};
+    font-size: ${(props) => ProfileButtonStyle[props.$variant].mobile.fontSize};
   }
 `;
 
 export const MypageButton = styled.button<{
-  variant: "cancel" | "active";
+  $variant: "cancel" | "active";
   disabled?: boolean;
 }>`
   display: flex;
@@ -630,7 +630,7 @@ export const MypageButton = styled.button<{
   border: ${(props) =>
     props.disabled
       ? "none"
-      : `1px solid ${props.variant === "active" ? "var(--main-text)" : "none"}`};
+      : `1px solid ${props.$variant === "active" ? "var(--main-text)" : "none"}`};
   border-radius: 0.5rem;
   background-color: ${(props) =>
     props.disabled ? "var(--disable-button)" : "var(--white)"};
@@ -644,7 +644,7 @@ export const MypageButton = styled.button<{
       if (props.disabled) {
         return "var(--disable-button)"; // Disabled 상태에서는 hover 효과 제거
       }
-      return props.variant === "active"
+      return props.$variant === "active"
         ? "var(--bg-02)" // Active일 때 hover 배경색
         : "var(--bg-02)"; // Cancel일 때 hover 배경색
     }};
@@ -707,36 +707,36 @@ const OrangeLineButtonStyle = {
 };
 
 export const OrangeLineButton = styled.button<{
-  variant: "theme" | "moveToHome" | "modal";
+  $variant: "theme" | "moveToHome" | "modal";
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: ${(props) => OrangeLineButtonStyle[props.variant].default.width};
-  height: ${(props) => OrangeLineButtonStyle[props.variant].default.height};
+  width: ${(props) => OrangeLineButtonStyle[props.$variant].default.width};
+  height: ${(props) => OrangeLineButtonStyle[props.$variant].default.height};
   border: 1px solid var(--main-orange);
   border-radius: ${(props) =>
-    OrangeLineButtonStyle[props.variant].default.borderRadius};
+    OrangeLineButtonStyle[props.$variant].default.borderRadius};
   background-color: var(--white);
   color: var(--main-text);
   font-size: ${(props) =>
-    OrangeLineButtonStyle[props.variant].default.fontSize};
+    OrangeLineButtonStyle[props.$variant].default.fontSize};
   font-weight: ${(props) =>
-    OrangeLineButtonStyle[props.variant].default.fontWeight};
+    OrangeLineButtonStyle[props.$variant].default.fontWeight};
 
   &:hover {
     background-color: var(--hover-orange);
   }
 
   @media (max-width: 390px) {
-    width: ${(props) => OrangeLineButtonStyle[props.variant].mobile.width};
-    height: ${(props) => OrangeLineButtonStyle[props.variant].mobile.height};
+    width: ${(props) => OrangeLineButtonStyle[props.$variant].mobile.width};
+    height: ${(props) => OrangeLineButtonStyle[props.$variant].mobile.height};
     border-radius: ${(props) =>
-      OrangeLineButtonStyle[props.variant].mobile.borderRadius};
+      OrangeLineButtonStyle[props.$variant].mobile.borderRadius};
     font-size: ${(props) =>
-      OrangeLineButtonStyle[props.variant].mobile.fontSize};
+      OrangeLineButtonStyle[props.$variant].mobile.fontSize};
     font-weight: ${(props) =>
-      OrangeLineButtonStyle[props.variant].mobile.fontWeight};
+      OrangeLineButtonStyle[props.$variant].mobile.fontWeight};
   }
 `;
 
@@ -752,7 +752,7 @@ const FriendTabButtonStyle = {
 };
 
 export const FriendTabButton = styled.button<{
-  variant: "unclicked" | "clicked";
+  $variant: "unclicked" | "clicked";
   isClicked: boolean;
 }>`
   display: flex;
@@ -778,9 +778,9 @@ export const FriendTabButton = styled.button<{
   }
 `;
 
-export const FeedButton = styled.button<{
-  isClicked: boolean;
-}>`
+export const FeedButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== "isClicked", // `isClicked`가 DOM에 전달되지 않도록 설정
+})<{ isClicked?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;

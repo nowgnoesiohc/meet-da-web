@@ -73,10 +73,10 @@ export default function DeleteIdModal() {
           <p>정말로 탈퇴 하시겠습니까?</p>
         </Title>
         <Button>
-          <OrangeLineButton variant="modal" onClick={onClickCancel}>
+          <OrangeLineButton $variant="modal" onClick={onClickCancel}>
             취소
           </OrangeLineButton>
-          <OrangeButton variant="confirm">확인</OrangeButton>
+          <OrangeButton $variant="confirm">확인</OrangeButton>
         </Button>
       </DeleteIdWrap>
     </>

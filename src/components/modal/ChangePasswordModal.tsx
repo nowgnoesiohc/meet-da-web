@@ -88,7 +88,7 @@ export default function ChangePasswordModal() {
           <p>새로 로그인 해주세요.</p>
         </Title>
         <Button>
-          <OrangeButton variant="confirm" onClick={onClickCheck}>
+          <OrangeButton $variant="confirm" onClick={onClickCheck}>
             확인
           </OrangeButton>
         </Button>

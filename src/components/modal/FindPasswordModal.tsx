@@ -91,7 +91,7 @@ export default function FindPasswordModal() {
           <p>이메일을 통해 비밀번호 재설정 링크를 보내드려요.</p>
         </Title>
         <Input type="text" placeholder="example@meetda.com" />
-        <OrangeButton variant="mailSend">메일 전송하기</OrangeButton>
+        <OrangeButton $variant="mailSend">메일 전송하기</OrangeButton>
       </Wrap>
     </>
   );

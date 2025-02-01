@@ -235,7 +235,7 @@ export default function FriendModal() {
                 onClick={() =>
                   setActiveTab(activeTab === menu.key ? "" : menu.key)
                 }
-                variant={activeTab === menu.key ? "clicked" : "unclicked"}
+                $variant={activeTab === menu.key ? "clicked" : "unclicked"}
               >
                 {menu.label}
               </FriendTabButton>
@@ -254,7 +254,7 @@ export default function FriendModal() {
                 <UserText>믿음소망사랑 아니고 사과</UserText>
               </FriendProfile>
               <FriendButton
-                variant={
+                $variant={
                   activeTab === "following" ? "diaryUnfollow" : "diaryFollow"
                 }
               >

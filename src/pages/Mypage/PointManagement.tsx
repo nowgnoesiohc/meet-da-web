@@ -299,14 +299,14 @@ const ContextList = styled.div`
   }
 `;
 
-const PointList = styled.div<{ variant: "use" | "save" }>`
+const PointList = styled.div<{ $variant: "use" | "save" }>`
   display: flex;
   width: 26%;
   height: 3rem;
   justify-content: center;
   align-items: center;
   color: ${(props) =>
-    props.variant === "use" ? "var(--point-red)" : "var(--point-blue)"};
+    props.$variant === "use" ? "var(--point-red)" : "var(--point-blue)"};
   text-align: center;
   font-size: 1.25rem;
   font-weight: var(--font-regular);
@@ -536,7 +536,7 @@ export default function PointManagement() {
               currentData.map((item, index) => (
                 <EachList key={index}>
                   <ContextList>{item.description}</ContextList>
-                  <PointList variant={item.points > 0 ? "save" : "use"}>
+                  <PointList $variant={item.points > 0 ? "save" : "use"}>
                     {item.points > 0
                       ? `+ ${new Intl.NumberFormat().format(item.points)} P`
                       : `- ${new Intl.NumberFormat().format(

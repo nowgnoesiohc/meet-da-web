@@ -289,7 +289,7 @@ export default function Font() {
                   <PriceText>300P</PriceText>
                 </PriceBox>
                 <OrangeLineButton
-                  variant="theme"
+                  $variant="theme"
                   onClick={() => isModalOpen("deleteModal")}
                 >
                   구매하기
@@ -313,7 +313,7 @@ export default function Font() {
                   가격
                   <PriceText>300P</PriceText>
                 </PriceBox>
-                <OrangeLineButton variant="theme">구매하기</OrangeLineButton>
+                <OrangeLineButton $variant="theme">구매하기</OrangeLineButton>
               </PurchaseBox>
             </FontSet>
           </FontWrapper>

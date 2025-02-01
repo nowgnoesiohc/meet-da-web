@@ -92,7 +92,7 @@ export default function PopularDiaryModal() {
           <p>포인트가 적립되었습니다.</p>
         </Title>
         <Button>
-          <OrangeButton variant="confirm" onClick={onClickCheck}>
+          <OrangeButton $variant="confirm" onClick={onClickCheck}>
             확인
           </OrangeButton>
         </Button>

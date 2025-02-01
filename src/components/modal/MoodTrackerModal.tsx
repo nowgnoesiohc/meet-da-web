@@ -191,10 +191,10 @@ export default function MoodTrackerModal() {
           <Textarea maxLength={100} showCount />
         </TextAreaWrap>
         <ButtonWrap>
-          <RecordButton variant="moodCancel" onClick={CloseButton}>
+          <RecordButton $variant="moodCancel" onClick={CloseButton}>
             취소
           </RecordButton>
-          <RecordButton variant="moodSubmit">등록</RecordButton>
+          <RecordButton $variant="moodSubmit">등록</RecordButton>
         </ButtonWrap>
       </Wrap>
     </>

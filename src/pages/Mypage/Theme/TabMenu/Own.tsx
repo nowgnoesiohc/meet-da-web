@@ -240,7 +240,7 @@ export default function Own() {
                 </ImageBox>
               </ThemeBox>
               <ButtonBox>
-                <OrangeLineButton variant="theme">적용하기</OrangeLineButton>
+                <OrangeLineButton $variant="theme">적용하기</OrangeLineButton>
               </ButtonBox>
             </ThemeSet>
             <ThemeSet>
@@ -256,7 +256,7 @@ export default function Own() {
                 </ImageBox>
               </ThemeBox>
               <ButtonBox>
-                <OrangeLineButton variant="theme">적용하기</OrangeLineButton>
+                <OrangeLineButton $variant="theme">적용하기</OrangeLineButton>
               </ButtonBox>
             </ThemeSet>
           </ThemeWrapper>

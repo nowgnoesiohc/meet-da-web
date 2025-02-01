@@ -44,24 +44,24 @@ const TextButtonGroup = styled.div`
   gap: clamp(0.25rem, 1vw, 0.75rem);
 `;
 
-const ImageButton = styled(Link)<{ variant: "home" | "post" | "calendar" }>`
+const ImageButton = styled(Link)<{ $variant: "home" | "post" | "calendar" }>`
   display: block;
   width: ${(props) =>
-    props.variant === "home"
+    props.$variant === "home"
       ? "clamp(1rem, 5vw, 2.5rem)"
-      : props.variant === "post"
+      : props.$variant === "post"
         ? "clamp(0.75rem, 4.5vw, 2.5rem)"
         : "clamp(0.75rem, 4.5vw, 2.5rem)"};
   height: ${(props) =>
-    props.variant === "home"
+    props.$variant === "home"
       ? "clamp(0.8rem, 4vw, 2.25rem)"
-      : props.variant === "post"
+      : props.$variant === "post"
         ? "clamp(0.6rem, 4vw, 2rem)"
         : "clamp(0.6rem, 4vw, 2rem)"};
   background-image: ${(props) =>
-    props.variant === "home"
+    props.$variant === "home"
       ? `url(${home})`
-      : props.variant === "post"
+      : props.$variant === "post"
         ? `url(${post})`
         : `url(${calendar})`};
   background-size: contain;
@@ -69,14 +69,14 @@ const ImageButton = styled(Link)<{ variant: "home" | "post" | "calendar" }>`
   background-position: center;
 `;
 
-const TextButton = styled.button<{ variant: "before" | "after" }>`
+const TextButton = styled.button<{ $variant: "before" | "after" }>`
   color: ${(props) =>
-    props.variant === "before"
+    props.$variant === "before"
       ? "var(--main-text)"
       : "var(--search-placeholder)"};
   font-size: clamp(0.75rem, 1.5vw, 1rem);
   font-weight: ${(props) =>
-    props.variant === "before" ? "var(--font-medium)" : "var(--font-regular)"};
+    props.$variant === "before" ? "var(--font-medium)" : "var(--font-regular)"};
   cursor: pointer;
 `;
 
@@ -193,15 +193,15 @@ export default function Navigation() {
           <LogoButton to="/" />
           <ButtonWrapper>
             <ImageButtonGroup>
-              <ImageButton variant="home" to="/" />
-              <ImageButton variant="post" to="/board/new" />
-              <ImageButton variant="calendar" to="/calendar" />
+              <ImageButton $variant="home" to="/" />
+              <ImageButton $variant="post" to="/board/new" />
+              <ImageButton $variant="calendar" to="/calendar" />
             </ImageButtonGroup>
             <TextButtonGroup>
-              <TextButton variant="after" onClick={handleMypage}>
+              <TextButton $variant="after" onClick={handleMypage}>
                 마이 페이지
               </TextButton>
-              <TextButton variant="after" onClick={handleLogout}>
+              <TextButton $variant="after" onClick={handleLogout}>
                 로그아웃
               </TextButton>
             </TextButtonGroup>
@@ -227,10 +227,10 @@ export default function Navigation() {
           <LogoButton to="/" />
           <ButtonWrapper>
             <TextButtonGroup>
-              <TextButton variant="before" onClick={handleLogin}>
+              <TextButton $variant="before" onClick={handleLogin}>
                 Login
               </TextButton>
-              <TextButton variant="before" onClick={handleSignUp}>
+              <TextButton $variant="before" onClick={handleSignUp}>
                 Signup
               </TextButton>
             </TextButtonGroup>

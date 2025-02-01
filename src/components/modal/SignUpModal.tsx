@@ -87,8 +87,10 @@ export default function SignUpModal() {
           <p>로그인 후 믿다를 이용해보세요!</p>
         </Title>
         <Button>
-          <OrangeLineButton variant="moveToHome">🏠</OrangeLineButton>
-          <OrangeButton variant="signupToLogin" onClick={handleLogin}>로그인</OrangeButton>
+          <OrangeLineButton $variant="moveToHome">🏠</OrangeLineButton>
+          <OrangeButton $variant="signupToLogin" onClick={handleLogin}>
+            로그인
+          </OrangeButton>
         </Button>
       </Wrap>
     </>
