@@ -136,7 +136,6 @@ export default function DiaryManagement() {
             </TabWrapper>
           ))}
         </TabWrap>
-        {/* Own 탭일 때만 삭제하기 버튼 표시 */}
         {activeTab === "Mydiary" && (
           <ButtonWrapper>
             <DiarySettingButton

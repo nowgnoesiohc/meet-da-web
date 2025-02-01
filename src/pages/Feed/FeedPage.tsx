@@ -1,20 +1,20 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { IoSearch } from "react-icons/io5";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FeedButton } from "@/components/ui/Button";
 import { IoHeart } from "react-icons/io5";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "/node_modules/swiper/swiper.css";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import GlobalStyles from "@/styles/GlobalStyle";
 import Header from "@/components/layout/Header";
 import ModalPortal from "@/components/modal/ModalPortal";
 import ModalTemplate from "@/components/modal/ModalTemplate";
 import { useIsModalStore } from "@/store/ModalStore";
-import test from "@/assets/test/testImage.png";
 import happy from "@/assets/mood/happy.svg";
-// import axios from "axios";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const Layout = styled.div`
   display: flex;
@@ -135,7 +135,7 @@ const PostContainer = styled.div`
   }
 `;
 
-const PostItem = styled(Link)`
+const PostItem = styled.div<{ noImage?: boolean }>`
   display: flex;
   flex-direction: column;
   width: 17.25rem;
@@ -148,6 +148,17 @@ const PostItem = styled(Link)`
   gap: 0.75rem;
   box-shadow: 0.125rem 0.125rem 0.5rem 0rem rgba(0, 0, 0, 0.25);
 
+  ${({ noImage }) =>
+    noImage &&
+    css`
+      ${PostTitle} {
+        margin-top: 20px;
+      }
+      ${PostText} {
+        height: 220px;
+      }
+    `}
+
   @media (max-width: 781px) {
     margin: auto;
   }
@@ -157,29 +168,6 @@ const PostItem = styled(Link)`
     padding-bottom: 0.5rem;
   }
 `;
-
-// const PostItem = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   width: 17.25rem;
-//   height: auto;
-//   background-color: var(--white);
-//   padding-bottom: 0.75rem;
-//   border: 1px solid var(--line-diary);
-//   border-radius: 0.625rem;
-//   text-align: center;
-//   gap: 0.75rem;
-//   box-shadow: 0.125rem 0.125rem 0.5rem 0rem rgba(0, 0, 0, 0.25);
-
-//   @media (max-width: 781px) {
-//     margin: auto;
-//   }
-
-//   @media (max-width: 390px) {
-//     width: 11rem;
-//     padding-bottom: 0.5rem;
-//   }
-// `;
 
 const PostTitle = styled.div`
   display: flex;
@@ -323,55 +311,141 @@ const SwiperImage = styled.img`
   }
 `;
 
-// interface Post {
-//   _id: string;
-//   title: string;
-//   author: string; // 단순 문자열로 변경
-//   content: string;
-//   images: string[];
-//   visibility: string;
-//   likes: string[];
-//   viewCount: number;
-//   createdAt: string;
-// }
+const ProfileImagePlaceholder = styled.div`
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--line-basic);
+
+  @media (max-width: 390px) {
+    width: 1rem;
+    height: 1rem;
+  }
+`;
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  author: Author;
+  createdAt: string;
+  images: string[];
+  likesCount: number;
+}
+
+interface Author {
+  username: string;
+  profileImage: string;
+  mood: string;
+}
+
+const POINTS_PER_PAGE = 12; // 한 페이지에 보여줄 항목 수
 
 export default function FeedPage() {
   const useIsModal = useIsModalStore((state) => state.isModal);
   const [activeTab, setActiveTab] = useState("Latest");
-  // const [posts, setPosts] = useState<Post[]>([]);
-  // const navigate = useNavigate();
-  // const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  // const accessToken = localStorage.getItem("accessToken");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const navigate = useNavigate();
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const TabItems = [
     { key: "Latest", label: "최신" },
     { key: "Popular", label: "인기" },
   ];
 
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     try {
-  //       const response = await axios.get<Post[]>("/board/{boardId}");
-  //       setPosts(response.data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch posts:", error);
-  //     }
-  //   };
+  // 게시글 데이터 가져오기
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const response = await axios.get<Post[]>(
+          `https://api.meet-da.site/board/all-posts?page={page}&sort={sort}`
+        );
+        setPosts(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
+      }
+    }
+    fetchPosts();
+  }, []);
 
-  //   fetchPosts();
-  // }, []);
+  console.log(posts);
 
-  // // PostItem 클릭 시 처리
-  // const handlePostClick = (postId: string) => {
-  //   if (!accessToken) {
-  //     // 로그인되지 않았다면 모달 띄우기
-  //     setIsModalClick("noticeModal");
-  //     return;
-  //   }
+  // 유저 ID 가져오기
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    try {
+      const userId = jwtDecode(token).sub;
+      return userId || null;
+    } catch {
+      return null;
+    }
+  };
 
-  //   // 로그인된 경우 게시글 상세 페이지로 이동
-  //   navigate(`/board/${postId}`);
-  // };
+  // 게시글 클릭 핸들러
+  const handlePostClick = async (boardId: string) => {
+    const userId = await getUserId();
+    if (!userId) {
+      setIsModalClick("noticeModal"); // 로그인 모달 표시
+    } else {
+      navigate(`/board/${boardId}`); // 상세 페이지로 이동
+    }
+  };
+
+  // html 태그 제거하는 정규식
+  const removeHTMLTags = (content: string) => {
+    return content.replace(/<[^>]*>/g, ""); // HTML 태그 제거
+  };
+
+  const [filteredData, setFilteredData] = useState<Post[]>([]); // 필터된 데이터
+  const [searchKeyword, setSearchKeyword] = useState(""); // 검색어
+  const [debouncedKeyword, setDebouncedKeyword] = useState(""); // 디바운싱된 검색어
+
+  // 디바운싱을 위한 useEffect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedKeyword(searchKeyword); // 디바운싱된 검색어 업데이트
+    }, 500); // 0.5초 딜레이
+
+    return () => clearTimeout(handler); // 이전 타이머 클리어
+  }, [searchKeyword]);
+
+  // 디바운싱된 검색어가 변경될 때 데이터 필터링
+  useEffect(() => {
+    const keyword = debouncedKeyword.trim().toLowerCase();
+    if (keyword === "") {
+      setFilteredData(posts); // 검색어가 비어 있으면 전체 데이터
+    } else {
+      const filtered = posts.filter(
+        (item) =>
+          item.title.toLowerCase().includes(keyword) ||
+          item.content.toLowerCase().includes(keyword) ||
+          item.author.username.toLowerCase().includes(keyword)
+      );
+      setFilteredData(filtered);
+    }
+    setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 초기화
+  }, [debouncedKeyword, posts]);
+
+  // 검색어 입력 핸들러
+  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(event.target.value); // 검색어 상태 업데이트
+  };
+
+  // 초기 상태에서 게시글 데이터 설정
+  useEffect(() => {
+    if (posts.length > 0) {
+      setFilteredData(posts); // posts 로드 시 초기 데이터 설정
+    }
+  }, [posts]);
+
+  // 현재 페이지에 표시할 데이터 계산
+  const indexOfLastItem = currentPage * POINTS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - POINTS_PER_PAGE;
+  const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -388,7 +462,12 @@ export default function FeedPage() {
         <SearchBarWrap>
           흥미로운 이야기를 발견해 보세요!
           <SearchBarContainer>
-            <SearchInput type="text" placeholder="기억에 남는 질문이 있나요?" />
+            <SearchInput
+              type="text"
+              placeholder="기억에 남는 질문이 있나요?"
+              value={searchKeyword}
+              onChange={handleSearchInput}
+            />
             <SearchButton>
               <SearchIcon />
             </SearchButton>
@@ -406,99 +485,76 @@ export default function FeedPage() {
               </FeedButton>
             ))}
           </ButtonWrap>
-          {/* <PostContainer>
-            {posts.map((post) => (
+          <PostContainer>
+            {currentData.map((post) => (
               <PostItem
-                key={post._id}
-                onClick={() => handlePostClick(post._id)}
+                key={post.id}
+                onClick={() => handlePostClick(post.id)}
+                noImage={!post.images || post.images.length === 0}
               >
-                <SwiperWrap>
-                  <Swiper
-                    spaceBetween={30}
-                    pagination={{
-                      clickable: true,
-                    }}
-                    modules={[Pagination]}
-                    className="mySwiper"
-                  >
-                    {post.images.map((image, index) => (
-                      <SwiperSlide key={index}>
-                        <SwiperImage src={image} alt={`post-image-${index}`} />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </SwiperWrap>
-                <PostTitle>{post.title}</PostTitle>
-                <PostText>{post.content}</PostText>
+                {post.images && post.images.length > 0 && (
+                  <SwiperWrap>
+                    <Swiper
+                      spaceBetween={30}
+                      pagination={{
+                        clickable: true,
+                      }}
+                      modules={[Pagination]}
+                      className="mySwiper"
+                    >
+                      {post.images.map((image, index) => (
+                        <SwiperSlide key={index}>
+                          <SwiperImage
+                            src={image}
+                            alt={`post-image-${index}`}
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </SwiperWrap>
+                )}
+                <PostTitle>
+                  {post.title.length > 15
+                    ? `${post.title.slice(0, 15)}...`
+                    : post.title || "제목 로드에 문제 발생"}
+                  <MoodImage src={happy} alt="happy" />
+                </PostTitle>
+                <PostText>
+                  {removeHTMLTags(post.content).length > 150
+                    ? `${removeHTMLTags(post.content).slice(0, 150)}...`
+                    : removeHTMLTags(post.content) || "내용 로드에 문제 발생"}
+                </PostText>
                 <BottomWrap>
                   <PostInfoWrap>
                     <PostInfo>
-                      {new Date(post.createdAt).toLocaleDateString()}
+                      {new Date(post.createdAt).toLocaleDateString() ||
+                        "날짜 로드에 문제 발생"}
                     </PostInfo>
                     <PostInfo>·</PostInfo>
-                    <PostInfo>{post.viewCount} views</PostInfo>
+                    <PostInfo>0개의 댓글</PostInfo>
                   </PostInfoWrap>
                   <InfoWrap>
                     <UserInfo>
-                      <UserImage src={post.author.image} alt="user" />
-                      {post.author.name}
+                      {post.author.profileImage ? (
+                        <UserImage
+                          src={post.author.profileImage}
+                          alt="Profile"
+                        />
+                      ) : (
+                        <ProfileImagePlaceholder />
+                      )}
+                      {post.author?.username?.length > 18
+                        ? `${post.author.username.slice(0, 18)}...`
+                        : post.author?.username || "사용자 없음"}
                     </UserInfo>
                     <LikeContainer>
                       <LikeIcon />
-                      {post.likes.length}
+                      {post.likesCount || 0}
                     </LikeContainer>
                   </InfoWrap>
                 </BottomWrap>
               </PostItem>
             ))}
-          </PostContainer> */}
-          <PostContainer>
-            <PostItem to="/auth/login">
-              <SwiperWrap>
-                <Swiper
-                  spaceBetween={30}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  modules={[Pagination]}
-                  className="mySwiper"
-                >
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                  <SwiperSlide>
-                    <SwiperImage src={test} alt="test1" />
-                  </SwiperSlide>
-                </Swiper>
-              </SwiperWrap>
-              <PostTitle>
-                나의 단점 중 하나를 고칠 수...
-                <MoodImage src={happy} alt="happy" />
-              </PostTitle>
-              <PostText>
-                첫눈 오는 이런 오후에 너에게 전화를 걸 수만 있다면 기쁠 텐데
-                벌써 일년이 지났는데 난 아직 미련 가득해서 쓸쓸...
-              </PostText>
-              <BottomWrap>
-                <PostInfoWrap>
-                  <PostInfo>방금 전</PostInfo>
-                  <PostInfo>·</PostInfo>
-                  <PostInfo>0개의 댓글</PostInfo>
-                </PostInfoWrap>
-                <InfoWrap>
-                  <UserInfo>
-                    <UserImage src={test} alt="test" />
-                    다람지
-                  </UserInfo>
-                  <LikeContainer>
-                    <LikeIcon />0
-                  </LikeContainer>
-                </InfoWrap>
-              </BottomWrap>
-            </PostItem>
           </PostContainer>
         </PostWrap>
       </Layout>

@@ -1,10 +1,7 @@
 import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
-// import { FaCheck } from "react-icons/fa6";
-// import themeSet from "/src/assets/theme/themeset.svg";
-// import { useState } from "react";
-// import { OrangeLineButton } from "@/components/ui/Button";
-// import { useIsModalStore } from "@/store/ModalStore";
+import { FaCheck } from "react-icons/fa6";
+import { useState } from "react";
 
 const Layout = styled.div`
   display: flex;
@@ -78,56 +75,7 @@ const SearchIcon = styled(IoSearch)`
   font-size: 1.5rem;
 `;
 
-// const ThemeSet = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   width: 100%;
-//   gap: 0.75rem;
-// `;
-
-// const CheckIcon = styled(FaCheck)`
-//   color: var(--main-orange);
-//   font-size: 1.375rem;
-// `;
-
-// const CheckBox = styled.button<{ isClicked: boolean }>`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   width: 2.25rem;
-//   height: 2.25rem;
-//   border-radius: 0.375rem;
-//   border: ${(props) =>
-//     props.isClicked ? "none" : "1px solid var(--main-text)"};
-//   background-color: ${(props) =>
-//     props.isClicked ? "var(--hover-orange)" : "transparent"};
-//   cursor: pointer;
-
-//   @media (max-width: 781px) {
-//     width: 2.25rem;
-//     height: 2.25rem;
-//   }
-
-//   @media (max-width: 390px) {
-//     width: 1.875rem;
-//     height: 1.875rem;
-//   }
-// `;
-
-// const ImageBox = styled.div`
-//   display: inline-flex;
-//   justify-content: center;
-//   align-items: center;
-//   gap: 1.25rem;
-// `;
-
-// const PurchaseBox = styled.div`
-//   display: inline-flex;
-//   justify-content: space-between;
-//   align-items: center;
-// `;
-
-const ThemeContainer = styled.div`
+const DiaryContainer = styled.div`
   display: flex;
   width: 100%;
   padding: 3.75rem 4.25rem 2.5rem;
@@ -151,7 +99,7 @@ const ThemeContainer = styled.div`
   }
 `;
 
-const ThemeWrapper = styled.div`
+const DiaryWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 기본 1줄에 2개 */
   row-gap: 2.5rem;
@@ -170,95 +118,41 @@ const ThemeWrapper = styled.div`
   }
 `;
 
-// const ThemeTitle = styled.div`
-//   display: flex;
-//   gap: 1.25rem;
-//   color: var(--black);
-//   font-size: 1.25rem;
-//   font-weight: var(--font-medium);
-//   align-items: center;
+const CheckIcon = styled(FaCheck)`
+  color: var(--main-text);
+  font-size: 1.375rem;
+`;
 
-//   @media (max-width: 781px) {
-//     font-size: 1.125rem;
-//   }
+const CheckBox = styled.button<{ isClicked: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.375rem;
+  border: ${(props) =>
+    props.isClicked ? "none" : "1px solid var(--main-text)"};
+  background-color: ${(props) =>
+    props.isClicked ? "var(--bg-02)" : "transparent"};
+  cursor: pointer;
 
-//   @media (max-width: 390px) {
-//     font-size: 1rem;
-//   }
-// `;
+  @media (max-width: 781px) {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
 
-// const ThemeBox = styled.div`
-//   display: inline-flex;
-//   padding: 1.25rem 1.625rem;
-//   flex-direction: column;
-//   align-items: center;
-//   border-radius: 0.625rem;
-//   border: 1px solid var(--main-text);
-
-//   @media (max-width: 781px) {
-//     padding: 1rem 1.25rem;
-//   }
-
-//   @media (max-width: 390px) {
-//     padding: 0.75rem 1rem;
-//   }
-// `;
-
-// const ThemeImage = styled.img`
-//   width: 100%;
-//   object-fit: cover;
-//   }
-// `;
-
-// const PriceBox = styled.div`
-//   display: flex;
-//   gap: 0.5rem;
-//   color: var(--main-orange);
-//   text-align: center;
-//   font-size: 1.25rem;
-//   font-weight: var(--font-medium);
-
-//   @media (max-width: 781px) {
-//     font-size: 1.125rem;
-//   }
-
-//   @media (max-width: 390px) {
-//     font-size: 1rem;
-//   }
-// `;
-
-// const PriceText = styled.div`
-//   color: var(--black);
-//   font-size: 1.25rem;
-//   font-weight: var(--font-regular);
-
-//   @media (max-width: 781px) {
-//     font-size: 1.125rem;
-//   }
-
-//   @media (max-width: 390px) {
-//     font-size: 1rem;
-//   }
-// `;
+  @media (max-width: 390px) {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+`;
 
 export default function BookMark() {
-  //   const [isClicked, setIsClicked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
 
-  //   const checkClick = () => {
-  //     setIsClicked(!isClicked); // 클릭 시 상태 변경
-  //   };
-
-  //   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
-  //   const isModalOpen = (type?: string) => {
-  //     console.log(type);
-
-  //     if (type) {
-  //       setIsModalClick(type);
-  //     } else {
-  //       setIsModalClick();
-  //     }
-  //   };
+  const checkClick = () => {
+    setIsClicked(!isClicked); // 클릭 시 상태 변경
+  };
 
   return (
     <>
@@ -272,9 +166,13 @@ export default function BookMark() {
             <SearchIcon />
           </SearchButton>
         </SearchBarContainer>
-        <ThemeContainer>
-          <ThemeWrapper></ThemeWrapper>
-        </ThemeContainer>
+        <DiaryContainer>
+          <DiaryWrapper>
+            <CheckBox isClicked={isClicked} onClick={checkClick}>
+              {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
+            </CheckBox>
+          </DiaryWrapper>
+        </DiaryContainer>
       </Layout>
     </>
   );

@@ -1,11 +1,14 @@
 import { MypageButton } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useIsModalStore } from "@/store/ModalStore";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { LuImage } from "react-icons/lu";
 
 interface StyledProps {
   $isError?: boolean;
@@ -126,6 +129,22 @@ const Image = styled.div`
     margin-bottom: 0.75rem;
   }
 `;
+
+const UserProfileImage = styled.img`
+  width: 6.25rem;
+  height: 6.25rem;
+  background-color: var(--bg-02);
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0.625rem;
+  margin-left: 5rem;
+
+  @media (max-width: 781px) {
+    margin-left: 0;
+    margin-bottom: 0.75rem;
+  }
+`;
+
 const Change = styled.div`
   margin-left: 1.25rem;
   span {
@@ -173,7 +192,7 @@ const Nickname = styled.div`
   }
   input {
     width: 47.125rem;
-    height: 1.75rem;
+    height: 2.25rem;
     padding: 0 1.25rem;
     border-radius: 0.5rem;
     font-size: 1.125rem;
@@ -393,7 +412,7 @@ const Password = styled.div`
   align-items: center;
 
   input {
-    height: 1.75rem;
+    height: 2.25rem;
     padding: 0 1.25rem;
     padding-top: 0.5rem;
     font-size: 1.125rem;
@@ -418,7 +437,7 @@ const Password = styled.div`
 `;
 const ChangePasswordForm = styled.form<StyledProps>`
   input {
-    height: 1.75rem;
+    height: 2.25rem;
     width: 47.125rem;
     padding: 0 1.25rem;
     font-size: 1.125rem;
@@ -461,6 +480,7 @@ const ChangePasswordForm = styled.form<StyledProps>`
     }
   }
 `;
+
 const InputStyle = styled.input<StyledProps>`
   width: 27.625rem;
   height: 4.25rem;
@@ -480,9 +500,12 @@ const InputStyle = styled.input<StyledProps>`
 
   &::placeholder {
     color: ${(props) =>
-      props.$isError ? "var(--error-02)" : "var(--text-02)"}; // 에러 시 빨간색
+      props.$isError
+        ? "var(--error-02)"
+        : "var(--main-text)"}; // 에러 시 빨간색
   }
 `;
+
 const Error = styled.div<StyledProps>`
   width: 27.625rem;
   /* height:1.75rem; */
@@ -593,6 +616,7 @@ const MemberShipDelete = styled.div`
     align-items: unset;
   }
 `;
+
 const DeleteBox = styled.div<PasswordChangeProps>`
   display: flex;
   justify-content: space-between;
@@ -619,6 +643,12 @@ const DeleteBox = styled.div<PasswordChangeProps>`
       width: ${(props) => (props.infoChangeVisible ? "10.75rem" : "8.25rem")};
     }
   }
+`;
+
+const ImageIcon = styled(LuImage)`
+  font-size: 24px;
+  position: absolute;
+  margin: 40px 0px 0px 35px;
 `;
 
 export default function Settings() {
@@ -704,6 +734,41 @@ export default function Settings() {
     }
   };
 
+  const [userData, setUserData] = useState({
+    username: "",
+    profileImage: "",
+    description: "",
+    email: "",
+  });
+
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      return null; // 토큰이 없을 경우 null 반환
+    }
+    const userId = jwtDecode(token).sub;
+    if (!userId) return null;
+    else return userId;
+  };
+
+  // 로그인된 유저 정보
+  useEffect(() => {
+    async function fetchUserData() {
+      const userId = await getUserId();
+      try {
+        const response = await axios.get(
+          `https://api.meet-da.site/user/${userId}/`
+        );
+        const { username, profileImage, description, email } = response.data;
+        setUserData({ username, profileImage, description, email });
+      } catch (error) {
+        console.error("유저 정보를 불러오는 데 실패했습니다:", error);
+      }
+    }
+    fetchUserData();
+  }, []);
+
   return (
     <>
       <Layout>
@@ -715,7 +780,16 @@ export default function Settings() {
                 <ProfileImage changeVisible={profileShow}>
                   <span>프로필 사진</span>
                   <ImageWrap>
-                    <Image></Image>
+                    {userData.profileImage ? (
+                      <UserProfileImage
+                        src={userData.profileImage}
+                        alt="Profile"
+                      />
+                    ) : (
+                      <Image>
+                        <ImageIcon />
+                      </Image>
+                    )}
                     {profileShow && (
                       <Change>
                         <span>png, jpg, jpeg의 확장자</span>
@@ -728,15 +802,18 @@ export default function Settings() {
                 <Nickname>
                   <span>닉네임</span>
                   {!profileShow ? (
-                    <span>포뇨소스케스키</span>
+                    <span>{userData.username}</span>
                   ) : (
-                    <InputStyle type="text" />
+                    <InputStyle type="text" placeholder={userData.username} />
                   )}
                 </Nickname>
                 <Introduce>
                   <span>자기소개</span>
                   {!profileShow ? (
-                    <span>다양한 믿으미들에게 나를 소개해보세요!</span>
+                    <span>
+                      {userData.description ||
+                        "다양한 믿으미들에게 나를 소개해보세요!"}
+                    </span>
                   ) : (
                     <Textarea placeholder="다양한 믿으미들에게 나를 소개해보세요!" />
                   )}
@@ -764,7 +841,7 @@ export default function Settings() {
               <InfoBox>
                 <Email infoChangeVisible={infoShow}>
                   <span>이메일</span>
-                  <span>pnoyoloveclub@meetsosa.com</span>
+                  <span>{userData.email}</span>
                 </Email>
                 <PasswordWrap>
                   <span>비밀번호</span>

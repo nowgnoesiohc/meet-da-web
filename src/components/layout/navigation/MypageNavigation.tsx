@@ -290,6 +290,22 @@ const UserState = styled.div`
   }
 `;
 
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  author: Author;
+  createdAt: string;
+  images: string[];
+  likesCount: number;
+}
+
+interface Author {
+  username: string;
+  profileImage: string;
+  mood: string;
+}
+
 export default function MypageNavigation() {
   // 메뉴 상태를 배열로 관리
   const [activeMenu, setActiveMenu] = useState("MoodReport");
@@ -368,8 +384,32 @@ export default function MypageNavigation() {
 
   const handleDiaryClick = () => {
     setActiveMenu("Diary"); // 다이어리 메뉴 활성화
-    navigate("/diary-management"); // 다이어리 관리 페이지로 이동
+    navigate("diary-management"); // 다이어리 관리 페이지로 이동
   };
+
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  // 내 게시글 데이터 가져오기
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await axios.get<Post[]>(
+          `https://api.meet-da.site/board/my-posts`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log(response);
+        setPosts(response.data);
+      } catch (error) {
+        console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
+      }
+    }
+    fetchPosts();
+  }, []);
+
+  const token = localStorage.getItem("accessToken");
+  console.log("Token:", token);
+  console.log("Posts state:", posts);
 
   return (
     <Layout>
@@ -402,7 +442,7 @@ export default function MypageNavigation() {
               17명의 친구
             </ProfileButton>
             <ProfileButton variant="diary" onClick={handleDiaryClick}>
-              38개의 다이어리
+              {posts.length}개의 다이어리
             </ProfileButton>
             <ProfileButton variant="mood" onClick={linkCalendar}>
               97개의 무드
