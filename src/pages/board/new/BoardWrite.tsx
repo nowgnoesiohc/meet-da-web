@@ -30,6 +30,8 @@ const QuillWrapper = styled.div`
     white-space: pre-wrap;
     word-break: break-word;
     font-family: inherit;
+    font-size: 1.125rem;
+    padding: 1.75rem 2.5rem;
   }
 
   .ql-toolbar {
@@ -44,7 +46,7 @@ const QuillWrapper = styled.div`
 
 const Wrap = styled.div`
   width: 62.125rem;
-  margin: 0 auto;
+  margin: 5rem auto;
 
   h2 {
     height: 1.5rem;
@@ -126,7 +128,7 @@ const DropdownMenu = styled.ul`
   position: absolute;
   margin: 0;
   margin-top: 0.5rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   z-index: 10;
   background-color: #fff;
   border-radius: 0.625rem;
@@ -141,7 +143,7 @@ const DropdownMenu = styled.ul`
 `;
 
 const DropdownItem = styled.li<DropdownItemProps>`
-  width: 7.75rem;
+  width: 100%;
   height: 3.25rem;
   font-size: 1.125rem;
   list-style: none;
@@ -160,8 +162,10 @@ const DropdownItem = styled.li<DropdownItemProps>`
   &:hover {
     background-color: var(--bg-02);
   }
+
   @media (max-width: 390px) {
     font-size: 1rem;
+    padding: 0rem;
   }
 `;
 
@@ -539,24 +543,9 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     }
   };
 
-  const [today, setToday] = useState(""); // 오늘 날짜 상태
-
-  // 날짜 포맷팅 함수
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // 0-based index, +1
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}년 ${month}월 ${day}일`;
-  };
-
-  useEffect(() => {
-    const currentDate = new Date();
-    setToday(formatDate(currentDate));
-  }, []);
-
   return (
     <Wrap>
-      <h2>2024년 12월 12일</h2>
+      <h2>{currentDate}</h2>
       <TitleWrap>
         <p>{title}</p>
         <div ref={menuRef}>
