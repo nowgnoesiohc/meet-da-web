@@ -821,16 +821,16 @@ export default function Settings() {
               </ProfileBox>
               {!profileShow ? (
                 <SettingButton>
-                  <MypageButton variant="active" onClick={profileSettingClick}>
+                  <MypageButton $variant="active" onClick={profileSettingClick}>
                     설정
                   </MypageButton>
                 </SettingButton>
               ) : (
                 <SaveCancelButton>
-                  <MypageButton variant="cancel" onClick={profileCancelClick}>
+                  <MypageButton $variant="cancel" onClick={profileCancelClick}>
                     취소
                   </MypageButton>
-                  <MypageButton variant="active">저장</MypageButton>
+                  <MypageButton $variant="active">저장</MypageButton>
                 </SaveCancelButton>
               )}
             </ProfileWrap>
@@ -853,7 +853,7 @@ export default function Settings() {
                         disabled
                         style={{ paddingLeft: "0" }}
                       />
-                      <MypageButton variant="active" onClick={passwordChange}>
+                      <MypageButton $variant="active" onClick={passwordChange}>
                         변경
                       </MypageButton>
                     </Password>
@@ -969,11 +969,11 @@ export default function Settings() {
                 <InfoButton>
                   {infoShow && (
                     <InfoSaveCancelButton>
-                      <MypageButton variant="cancel" onClick={infoCancelClick}>
+                      <MypageButton $variant="cancel" onClick={infoCancelClick}>
                         취소
                       </MypageButton>
                       <MypageButton
-                        variant="active"
+                        $variant="active"
                         onClick={() => ChangePassword("changePasswordModal")}
                       >
                         저장
@@ -989,7 +989,7 @@ export default function Settings() {
                       복구되지 않습니다.
                     </span>
                     <MypageButton
-                      variant="active"
+                      $variant="active"
                       onClick={() => DeleteId("deleteIdModal")}
                     >
                       탈퇴

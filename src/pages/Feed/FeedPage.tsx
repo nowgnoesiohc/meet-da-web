@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FeedButton } from "@/components/ui/Button";
 import { IoHeart } from "react-icons/io5";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import "/node_modules/swiper/swiper.css";
 import { Outlet, useNavigate } from "react-router-dom";
 import GlobalStyles from "@/styles/GlobalStyle";
@@ -135,7 +135,9 @@ const PostContainer = styled.div`
   }
 `;
 
-const PostItem = styled.div<{ noImage?: boolean }>`
+const PostItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "noImage", // `noImage`를 DOM으로 전달하지 않음
+})<{ noImage?: boolean }>`
   display: flex;
   flex-direction: column;
   width: 17.25rem;
@@ -152,19 +154,21 @@ const PostItem = styled.div<{ noImage?: boolean }>`
     noImage &&
     css`
       ${PostTitle} {
-        margin-top: 20px;
+        margin-top: 1.25rem;
       }
       ${PostText} {
-        height: 220px;
+        height: 13.75rem;
       }
     `}
 
   @media (max-width: 781px) {
     margin: auto;
+    height: 22rem;
   }
 
   @media (max-width: 390px) {
     width: 11rem;
+    height: 16rem;
     padding-bottom: 0.5rem;
   }
 `;
@@ -213,6 +217,7 @@ const PostText = styled.div`
 const BottomWrap = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top: auto;
   gap: 0.5rem;
 `;
 
@@ -499,7 +504,11 @@ export default function FeedPage() {
                       pagination={{
                         clickable: true,
                       }}
-                      modules={[Pagination]}
+                      modules={[Pagination, Autoplay]}
+                      autoplay={{
+                        delay: 3000, // 3초마다 자동으로 넘김
+                        disableOnInteraction: false, // 사용자가 터치하거나 클릭해도 자동 전환이 계속됨
+                      }}
                       className="mySwiper"
                     >
                       {post.images.map((image, index) => (

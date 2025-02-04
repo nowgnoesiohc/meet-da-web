@@ -71,7 +71,7 @@ const JoinTitle = styled.div`
   }
 `;
 
-const LoginButton = styled.button<{ variant: "login" }>`
+const LoginButton = styled.button<{ $variant: "login" }>`
   font-size: 1.25rem;
   color: var(--text-main);
   cursor: pointer;
@@ -296,7 +296,7 @@ const Join: React.FC<AuthType> = () => {
         <LoginLogo to="/Page1" />
         <JoinTitle>
           <Span>이미 회원이신가요?</Span>
-          <LoginButton variant="login" onClick={handleLoing}>
+          <LoginButton $variant="login" onClick={handleLoing}>
             로그인 하기
           </LoginButton>
         </JoinTitle>
@@ -336,7 +336,7 @@ const Join: React.FC<AuthType> = () => {
             )}
           </Error>
           <Button>
-            <OrangeButton variant="membership" type="submit">
+            <OrangeButton $variant="membership" type="submit">
               가입하기
             </OrangeButton>
           </Button>

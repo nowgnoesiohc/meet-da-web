@@ -362,10 +362,12 @@ export default function DiaryManagement() {
               </TabButton>
             </Tab>
             {active === "diary" && (
-              <DiarySettingButton variant="delete">삭제하기</DiarySettingButton>
+              <DiarySettingButton $variant="delete">
+                삭제하기
+              </DiarySettingButton>
             )}
             {active === "bookmark" && (
-              <DiarySettingButton variant="bookmark">
+              <DiarySettingButton $variant="bookmark">
                 북마크 해제
               </DiarySettingButton>
             )}

@@ -588,11 +588,11 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
         <p>오늘 {userInfo ? userInfo.username : "사용자"} 님의 기분은...</p>
       </WriteEmotion>
       <ButtonWrap>
-        <RecordButton variant="moodCancel" onClick={onClickCancel}>
+        <RecordButton $variant="moodCancel" onClick={onClickCancel}>
           취소
         </RecordButton>
         <RecordButton
-          variant="moodSubmit"
+          $variant="moodSubmit"
           onClick={handleSubmit}
           disabled={text < 1} // 1글자 이상 입력
         >

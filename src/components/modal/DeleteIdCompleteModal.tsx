@@ -82,7 +82,7 @@ export default function DeleteIdCompleteModal() {
           <p>회원 탈퇴가 정상적으로 처리되었습니다.</p>
         </Title>
         <Button>
-          <OrangeButton variant="confirm" onClick={onClickCheck}>
+          <OrangeButton $variant="confirm" onClick={onClickCheck}>
             확인
           </OrangeButton>
         </Button>
