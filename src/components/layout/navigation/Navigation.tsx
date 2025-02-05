@@ -186,14 +186,23 @@ export default function Navigation() {
     navigate("/mypage");
   };
 
+  const handleHomeClick = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    if (location.pathname === "/") {
+      event.preventDefault(); // 기본 이동 방지
+      navigate(0); // 현재 페이지를 새로고침
+    }
+  };
+
   return (
     <>
       {isLoggedIn ? (
         <NavigationBar>
-          <LogoButton to="/" />
+          <LogoButton to="/" onClick={handleHomeClick} />
           <ButtonWrapper>
             <ImageButtonGroup>
-              <ImageButton $variant="home" to="/" />
+              <ImageButton $variant="home" to="/" onClick={handleHomeClick} />
               <ImageButton $variant="post" to="/board/new" />
               <ImageButton $variant="calendar" to="/calendar" />
             </ImageButtonGroup>
@@ -205,12 +214,6 @@ export default function Navigation() {
                 로그아웃
               </TextButton>
             </TextButtonGroup>
-            {/* <MyProfileButton
-              profileImageUrl={profileImageUrl}
-              onClick={handleMypage}
-            /> */}
-
-            {/* 프로필 이미지 */}
             {userData.profileImage ? (
               <MyProfileButton onClick={handleMypage}>
                 <img src={userData.profileImage} alt="User Profile" />
@@ -224,7 +227,7 @@ export default function Navigation() {
         </NavigationBar>
       ) : (
         <NavigationBar>
-          <LogoButton to="/" />
+          <LogoButton to="/" onClick={handleHomeClick} />
           <ButtonWrapper>
             <TextButtonGroup>
               <TextButton $variant="before" onClick={handleLogin}>
