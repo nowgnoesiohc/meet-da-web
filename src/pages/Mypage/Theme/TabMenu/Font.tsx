@@ -151,7 +151,7 @@ const CheckIcon = styled(FaCheck)`
   font-size: 1.375rem;
 `;
 
-const CheckBox = styled.button<{ isClicked: boolean }>`
+const CheckBox = styled.button<{ $isClicked: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -159,9 +159,9 @@ const CheckBox = styled.button<{ isClicked: boolean }>`
   height: 2.25rem;
   border-radius: 0.375rem;
   border: ${(props) =>
-    props.isClicked ? "none" : "1px solid var(--main-text)"};
+    props.$isClicked ? "none" : "1px solid var(--main-text)"};
   background-color: ${(props) =>
-    props.isClicked ? "var(--hover-orange)" : "transparent"};
+    props.$isClicked ? "var(--hover-orange)" : "transparent"};
   cursor: pointer;
 
   @media (max-width: 781px) {
@@ -241,11 +241,21 @@ const PriceText = styled.div`
   }
 `;
 
-export default function Font() {
-  const [isClicked, setIsClicked] = useState(false);
+const fonts = [
+  { id: 1, name: "레트로산스", price: "300P", image: retrosans },
+  { id: 2, name: "캐비닛 그로테스크", price: "280P", image: cabinet },
+];
 
-  const checkClick = () => {
-    setIsClicked(!isClicked); // 클릭 시 상태 변경
+export default function Font() {
+  const [clickedStates, setClickedStates] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  const checkClick = (id: number) => {
+    setClickedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id], // 해당 id의 상태만 변경
+    }));
   };
 
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -271,51 +281,37 @@ export default function Font() {
         </SearchBarContainer>
         <FontContainer>
           <FontWrapper>
-            <FontSet>
-              <FontTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                레트로산스
-              </FontTitle>
-              <FontBox>
-                <ImageBox>
-                  <FontImage src={retrosans} />
-                </ImageBox>
-              </FontBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton
-                  $variant="theme"
-                  onClick={() => isModalOpen("deleteModal")}
-                >
-                  구매하기
-                </OrangeLineButton>
-              </PurchaseBox>
-            </FontSet>
-            <FontSet>
-              <FontTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                캐비닛 그로테스크
-              </FontTitle>
-              <FontBox>
-                <ImageBox>
-                  <FontImage src={cabinet} />
-                </ImageBox>
-              </FontBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton $variant="theme">구매하기</OrangeLineButton>
-              </PurchaseBox>
-            </FontSet>
+            {fonts.map((fonts) => (
+              <FontSet key={fonts.id}>
+                <FontTitle>
+                  <CheckBox
+                    $isClicked={!!clickedStates[fonts.id]}
+                    onClick={() => checkClick(fonts.id)}
+                  >
+                    {!!clickedStates[fonts.id] && <CheckIcon />}
+                    {/* 클릭 시 CheckIcon 표시 */}
+                  </CheckBox>
+                  {fonts.name}
+                </FontTitle>
+                <FontBox>
+                  <ImageBox>
+                    <FontImage src={fonts.image} />
+                  </ImageBox>
+                </FontBox>
+                <PurchaseBox>
+                  <PriceBox>
+                    가격
+                    <PriceText>{fonts.price}</PriceText>
+                  </PriceBox>
+                  <OrangeLineButton
+                    $variant="theme"
+                    onClick={() => isModalOpen("deleteModal")}
+                  >
+                    구매하기
+                  </OrangeLineButton>
+                </PurchaseBox>
+              </FontSet>
+            ))}
           </FontWrapper>
         </FontContainer>
       </Layout>

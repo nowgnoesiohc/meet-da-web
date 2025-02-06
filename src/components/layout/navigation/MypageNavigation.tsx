@@ -1,7 +1,7 @@
 import styled from "styled-components";
 // import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiPencil } from "react-icons/hi2";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
@@ -108,11 +108,11 @@ const SideMenuTextStyle = {
 
 const SideMenuText = styled.button<{
   $variant: "clicked" | "unclicked";
-  isClicked: boolean;
+  $isClicked: boolean;
 }>`
   display: flex;
   color: ${(props) =>
-    props.isClicked
+    props.$isClicked
       ? SideMenuTextStyle.clicked.color
       : SideMenuTextStyle.unclicked.color};
   font-size: 1.25rem;
@@ -138,7 +138,7 @@ const SideMenuPointStyle = {
 
 const SideMenuPoint = styled.button<{
   $variant: "clicked" | "unclicked";
-  isClicked: boolean;
+  $isClicked: boolean;
 }>`
   display: flex;
   align-self: center;
@@ -146,7 +146,7 @@ const SideMenuPoint = styled.button<{
   width: 0.75rem;
   border-radius: 50%; /* 완벽한 원 */
   background-color: ${(props) =>
-    props.isClicked
+    props.$isClicked
       ? SideMenuPointStyle.clicked.backgroundColor
       : SideMenuPointStyle.unclicked.backgroundColor};
 `;
@@ -336,13 +336,13 @@ export default function MypageNavigation() {
           `https://api.meet-da.site/user/${userId}/`
         );
         const { username, profileImage, description } = response.data;
-        setUserData({ username, profileImage, description });
+        setUserData({ username, profileImage, description }); // 유저 정보 업데이트
       } catch (error) {
         console.error("유저 정보를 불러오는 데 실패했습니다:", error);
       }
     }
     fetchUserData();
-  }, []);
+  }, []); // 새로고침 시 최신 데이터 자동 반영
 
   const location = useLocation(); // 현재 경로를 가져옴
   const navigate = useNavigate();
@@ -411,6 +411,69 @@ export default function MypageNavigation() {
   console.log("Token:", token);
   console.log("Posts state:", posts);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // 파일 선택 핸들러 (업로드 후 setUserData 업데이트)
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const newImageUrl = await uploadImage(file); // S3 업로드 후 URL 받아오기
+      if (newImageUrl) {
+        setUserData((prev) => ({ ...prev, profileImage: newImageUrl })); // 상태 즉시 업데이트
+        await updateProfileImage(newImageUrl); // 백엔드 업데이트
+      }
+    }
+  };
+
+  // 백엔드에 프로필 이미지 업데이트 요청
+  const updateProfileImage = async (imageUrl: string) => {
+    try {
+      const userId = await getUserId();
+      console.log("Updating profile image for user:", userId);
+
+      // 백엔드에서 프로필 업데이트 시 기존 데이터 유지하도록 설정
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/profile`,
+        { profileImage: imageUrl }, // profileImage만 보내면 기존 데이터 유지됨
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Profile updated successfully:", response.data);
+    } catch (error) {
+      console.error("Failed to update profile image:", error);
+    }
+  };
+
+  // 파일 업로드 함수 (S3에 업로드)
+  const uploadImage = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        `https://api.meet-da.site/s3/upload`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      return response.data.url; // 업로드된 이미지 URL 반환
+    } catch (error) {
+      console.error("Upload failed:", error);
+      return null;
+    }
+  };
+
+  // EditButton 클릭 시 파일 선택창 열기
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
     <Layout>
       <NavigationWrapper>
@@ -423,7 +486,14 @@ export default function MypageNavigation() {
               {/* 이미지를 등록하지 않은 경우의 스타일 */}
             </ProfileImagePlaceholder>
           )}
-          <EditButton>
+          {/* 숨겨진 파일 선택 input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <EditButton onClick={handleButtonClick}>
             <IconStyle />
           </EditButton>
         </ProfileContainer>
@@ -455,12 +525,12 @@ export default function MypageNavigation() {
           {menuItems.map((menu) => (
             <SideMenu key={menu.key}>
               <SideMenuPoint
-                isClicked={activeMenu === menu.key}
+                $isClicked={activeMenu === menu.key}
                 $variant="clicked"
               />
               <Link to={menu.path}>
                 <SideMenuText
-                  isClicked={activeMenu === menu.key}
+                  $isClicked={activeMenu === menu.key}
                   $variant="clicked"
                   onClick={() => setActiveMenu(menu.key)}
                 >
