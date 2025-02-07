@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { IoSearch } from "react-icons/io5";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FeedButton } from "@/components/ui/Button";
 import { IoHeart } from "react-icons/io5";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -329,6 +329,10 @@ const ProfileImagePlaceholder = styled.div`
   }
 `;
 
+const Sentinel = styled.div`
+  height: 1px;
+`;
+
 interface Post {
   id: string;
   title: string;
@@ -346,37 +350,171 @@ interface Author {
 }
 
 const POINTS_PER_PAGE = 12; // 한 페이지에 보여줄 항목 수
+const BASE_URL = `https://api.meet-da.site`;
+
+// 글자수 초과 시 ... 처리
+const truncateText = (text: string | undefined, maxLength: number) => {
+  if (!text) return ""; // text가 undefined이거나 null이면 빈 문자열 반환
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+};
 
 export default function FeedPage() {
   const useIsModal = useIsModalStore((state) => state.isModal);
-  const [activeTab, setActiveTab] = useState("Latest");
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [activeTab, setActiveTab] = useState<"Latest" | "Popular">("Latest");
+  const [posts, setPosts] = useState<Post[]>([]); // 기본값을 빈 배열로 설정
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const [currentPage, setCurrentPage] = useState(1);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const TabItems = [
-    { key: "Latest", label: "최신" },
-    { key: "Popular", label: "인기" },
-  ];
+  // 정렬 변경 핸들러
+  const handleSortChange = (sortKey: "Latest" | "Popular") => {
+    setActiveTab(sortKey);
+    setCurrentPage(1);
+    setPosts([]);
+    setHasMore(true);
+    fetchPosts(1, sortKey.toLowerCase());
+  };
 
-  // 게시글 데이터 가져오기
-  useEffect(() => {
-    async function fetchPosts() {
+  // 게시글 데이터 요청 함수 (무한스크롤 & 정렬 반영)
+  const fetchPosts = useCallback(
+    async (page: number, sort: string) => {
+      if (!hasMore || isFetching) return;
+
+      setIsFetching(true);
       try {
         const response = await axios.get<Post[]>(
-          `https://api.meet-da.site/board/all-posts?page={page}&sort={sort}`
+          `${BASE_URL}/board/all-posts?page=${page}&sort=${sort}`
         );
-        setPosts(response.data);
-        console.log(response.data);
+
+        if (response.data.length > 0) {
+          setPosts((prev) => {
+            const existingIds = new Set(prev.map((post) => post.id));
+            const newPosts = response.data.filter(
+              (post) => !existingIds.has(post.id)
+            );
+            return [...prev, ...newPosts];
+          });
+
+          if (response.data.length < POINTS_PER_PAGE) {
+            setHasMore(false);
+          }
+        } else {
+          setHasMore(false);
+        }
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
+      } finally {
+        setIsFetching(false);
       }
-    }
-    fetchPosts();
+    },
+    [hasMore, isFetching]
+  );
+
+  // 초기 로딩 전용 useEffect (컴포넌트 마운트 시 한 번만 호출)
+  useEffect(() => {
+    // 컴포넌트가 마운트될 때만 한 번 실행 (빈 검색어인 경우)
+    fetchPosts(1, activeTab.toLowerCase());
   }, []);
 
-  console.log(posts);
+  // 검색어 디바운싱 useEffect (검색어 변경에 따른 호출)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const trimmedKeyword = searchKeyword.trim().toLowerCase();
+      setDebouncedKeyword(trimmedKeyword);
+
+      if (trimmedKeyword === "") {
+        // 검색어가 빈 문자열이면 초기화 후 fetchPosts를 호출하지 않음
+        // 또는 필요에 따라 여기서만 호출
+        return;
+      }
+      searchPosts(trimmedKeyword);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [searchKeyword, activeTab]);
+
+  // currentPage, activeTab에 따른 추가 로딩 (페이지네이션)
+  useEffect(() => {
+    // debouncedKeyword가 있을 경우에는 페이지네이션용 fetchPosts가 호출되지 않도록 할 수 있음
+    if (!debouncedKeyword) {
+      fetchPosts(currentPage, activeTab.toLowerCase());
+    }
+  }, [currentPage, activeTab, debouncedKeyword]);
+
+  // 무한스크롤 감지
+  const lastPostRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetching || !hasMore) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isFetching && hasMore) {
+          setCurrentPage((prev) => prev + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isFetching, hasMore]
+  );
+
+  // Observer 설정 useEffect (Sentinel 요소 관찰)
+  useEffect(() => {
+    if (!sentinelRef.current || isFetching || !hasMore) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !isFetching && hasMore) {
+        setCurrentPage((prev) => prev + 1);
+      }
+    });
+
+    observer.observe(sentinelRef.current);
+
+    return () => observer.disconnect();
+  }, [isFetching, hasMore]);
+
+  // 검색 API 요청 함수
+  const searchPosts = useCallback(
+    async (keyword: string) => {
+      if (!keyword) {
+        setPosts([]); // 검색어 초기화 시 posts를 빈 배열로 설정
+        fetchPosts(1, activeTab.toLowerCase());
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/board/search?query=${keyword}`
+        );
+
+        // 응답이 없거나 배열이 아니면 빈 배열로 설정
+        if (!response.data || !Array.isArray(response.data)) {
+          setPosts([]);
+          return;
+        }
+
+        setPosts(
+          response.data
+            .slice(0, POINTS_PER_PAGE)
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            ) // 최신순 정렬
+        );
+      } catch (error) {
+        console.error("검색 중 오류 발생:", error);
+        setPosts([]); // 검색 실패 시 빈 배열 설정
+      }
+    },
+    [activeTab]
+  );
 
   // 유저 ID 가져오기
   const getUserId = async (): Promise<string | null> => {
@@ -405,53 +543,6 @@ export default function FeedPage() {
     return content.replace(/<[^>]*>/g, ""); // HTML 태그 제거
   };
 
-  const [filteredData, setFilteredData] = useState<Post[]>([]); // 필터된 데이터
-  const [searchKeyword, setSearchKeyword] = useState(""); // 검색어
-  const [debouncedKeyword, setDebouncedKeyword] = useState(""); // 디바운싱된 검색어
-
-  // 디바운싱을 위한 useEffect
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedKeyword(searchKeyword); // 디바운싱된 검색어 업데이트
-    }, 500); // 0.5초 딜레이
-
-    return () => clearTimeout(handler); // 이전 타이머 클리어
-  }, [searchKeyword]);
-
-  // 디바운싱된 검색어가 변경될 때 데이터 필터링
-  useEffect(() => {
-    const keyword = debouncedKeyword.trim().toLowerCase();
-    if (keyword === "") {
-      setFilteredData(posts); // 검색어가 비어 있으면 전체 데이터
-    } else {
-      const filtered = posts.filter(
-        (item) =>
-          item.title.toLowerCase().includes(keyword) ||
-          item.content.toLowerCase().includes(keyword) ||
-          item.author.username.toLowerCase().includes(keyword)
-      );
-      setFilteredData(filtered);
-    }
-    setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 초기화
-  }, [debouncedKeyword, posts]);
-
-  // 검색어 입력 핸들러
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchKeyword(event.target.value); // 검색어 상태 업데이트
-  };
-
-  // 초기 상태에서 게시글 데이터 설정
-  useEffect(() => {
-    if (posts.length > 0) {
-      setFilteredData(posts); // posts 로드 시 초기 데이터 설정
-    }
-  }, [posts]);
-
-  // 현재 페이지에 표시할 데이터 계산
-  const indexOfLastItem = currentPage * POINTS_PER_PAGE;
-  const indexOfFirstItem = indexOfLastItem - POINTS_PER_PAGE;
-  const currentData = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
     <>
       <GlobalStyles />
@@ -465,39 +556,40 @@ export default function FeedPage() {
 
       <Layout>
         <SearchBarWrap>
-          흥미로운 이야기를 발견해 보세요!
           <SearchBarContainer>
             <SearchInput
               type="text"
-              placeholder="기억에 남는 질문이 있나요?"
+              placeholder="검색어를 입력하세요"
               value={searchKeyword}
-              onChange={handleSearchInput}
+              onChange={(e) => setSearchKeyword(e.target.value)}
             />
             <SearchButton>
               <SearchIcon />
             </SearchButton>
           </SearchBarContainer>
         </SearchBarWrap>
+
         <PostWrap>
           <ButtonWrap>
-            {TabItems.map((menu) => (
+            {["Latest", "Popular"].map((key) => (
               <FeedButton
-                key={menu.key}
-                isClicked={activeTab !== menu.key}
-                onClick={() => setActiveTab(menu.key)}
+                key={key}
+                isClicked={activeTab !== key}
+                onClick={() => handleSortChange(key as "Latest" | "Popular")}
               >
-                {menu.label}
+                {key === "Latest" ? "최신" : "인기"}
               </FeedButton>
             ))}
           </ButtonWrap>
+
           <PostContainer>
-            {currentData.map((post) => (
+            {(posts || []).map((post) => (
               <PostItem
                 key={post.id}
                 onClick={() => handlePostClick(post.id)}
                 noImage={!post.images || post.images.length === 0}
               >
-                {post.images && post.images.length > 0 && (
+                {post.images?.length > 0 && (
                   <SwiperWrap>
                     <Swiper
                       spaceBetween={30}
@@ -523,24 +615,17 @@ export default function FeedPage() {
                   </SwiperWrap>
                 )}
                 <PostTitle>
-                  {post.title.length > 15
-                    ? `${post.title.slice(0, 15)}...`
-                    : post.title || "제목 로드에 문제 발생"}
+                  {truncateText(post.title ?? "", 15)}
                   <MoodImage src={happy} alt="happy" />
                 </PostTitle>
                 <PostText>
-                  {removeHTMLTags(post.content).length > 150
-                    ? `${removeHTMLTags(post.content).slice(0, 150)}...`
-                    : removeHTMLTags(post.content) || "내용 로드에 문제 발생"}
+                  {truncateText(removeHTMLTags(post.content) ?? "", 150)}
                 </PostText>
                 <BottomWrap>
                   <PostInfoWrap>
                     <PostInfo>
-                      {new Date(post.createdAt).toLocaleDateString() ||
-                        "날짜 로드에 문제 발생"}
+                      {new Date(post.createdAt).toLocaleDateString()}
                     </PostInfo>
-                    <PostInfo>·</PostInfo>
-                    <PostInfo>0개의 댓글</PostInfo>
                   </PostInfoWrap>
                   <InfoWrap>
                     <UserInfo>
@@ -552,19 +637,18 @@ export default function FeedPage() {
                       ) : (
                         <ProfileImagePlaceholder />
                       )}
-                      {post.author?.username?.length > 18
-                        ? `${post.author.username.slice(0, 18)}...`
-                        : post.author?.username || "사용자 없음"}
+                      {truncateText(post.author.username, 18)}
                     </UserInfo>
                     <LikeContainer>
                       <LikeIcon />
-                      {post.likesCount || 0}
+                      {post.likesCount}
                     </LikeContainer>
                   </InfoWrap>
                 </BottomWrap>
               </PostItem>
             ))}
           </PostContainer>
+          <Sentinel ref={lastPostRef} />
         </PostWrap>
       </Layout>
     </>

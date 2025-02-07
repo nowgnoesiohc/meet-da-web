@@ -43,8 +43,8 @@ export const ProfileImage = styled.div<{ isImageAvailable: boolean }>`
   background-color: var(--line-basic);
 
   img {
-    width: 5rem;
-    height: 5rem;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
     display: ${({ isImageAvailable }) => (isImageAvailable ? "block" : "none")};
