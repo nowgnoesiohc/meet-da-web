@@ -437,34 +437,8 @@ export default function MypageNavigation() {
         });
       }
 
-      const newImageUrl = await uploadImage(newFile);
-      if (newImageUrl) {
-        setUserData((prev) => ({ ...prev, profileImage: newImageUrl }));
-        localStorage.setItem("profileImage", newImageUrl);
-        window.dispatchEvent(new Event("storage")); // 다른 컴포넌트에서 감지할 수 있도록 함
-        await updateProfile(file);
-      }
-    }
-  };
-
-  // 파일 업로드 함수 (S3에 업로드)
-  const uploadImage = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await axios.post(
-        `https://api.meet-da.site/s3/upload`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      return response.data.url; // 업로드된 이미지 URL 반환
-    } catch (error) {
-      console.error("Upload failed:", error);
-      return null;
+      // 불필요한 S3 업로드 제거 후 updateProfile만 호출
+      await updateProfile(newFile);
     }
   };
 
@@ -474,18 +448,28 @@ export default function MypageNavigation() {
     if (!userId) return;
 
     const formData = new FormData();
-    formData.append("profileImage", file); // 백엔드가 기대하는 키로 파일 추가
-    formData.append("username", userData.username); // 기존 정보 유지
-    formData.append("description", userData.description); // 기존 정보 유지
+    formData.append("profileImage", file);
+    formData.append("username", userData.username);
+    formData.append("description", userData.description);
 
     try {
       const response = await axios.patch(
         `https://api.meet-da.site/user/${userId}/profile`,
-        formData, // 파일을 직접 보냄
+        formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       console.log("프로필 업데이트 성공:", response.data);
+
+      // 백엔드 응답에서 새로운 이미지 URL을 가져옴
+      const updatedImageUrl = response.data.profileImage;
+
+      // 상태 업데이트
+      setUserData((prev) => ({ ...prev, profileImage: updatedImageUrl }));
+
+      // localStorage 업데이트 및 이벤트 발생
+      localStorage.setItem("profileImage", updatedImageUrl);
+      window.dispatchEvent(new Event("storage")); // 다른 컴포넌트에서 감지할 수 있도록 이벤트 발생
 
       // 최신 데이터 반영
       fetchUserData();
