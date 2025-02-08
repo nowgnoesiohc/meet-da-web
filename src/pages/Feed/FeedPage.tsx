@@ -558,7 +558,7 @@ export default function FeedPage() {
           <SearchBarContainer>
             <SearchInput
               type="text"
-              placeholder="검색어를 입력하세요"
+              placeholder="흥미로운 이야기를 발견해 보세요!"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
             />

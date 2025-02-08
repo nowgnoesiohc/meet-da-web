@@ -1,5 +1,4 @@
 import styled from "styled-components";
-// import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
 import { useEffect, useRef, useState } from "react";
 import { HiPencil } from "react-icons/hi2";
@@ -327,22 +326,26 @@ export default function MypageNavigation() {
     else return userId;
   };
 
-  // 로그인된 유저 정보
+  // fetchUserData를 컴포넌트 내부에서 정의 (useEffect 바깥으로 이동)
   useEffect(() => {
-    async function fetchUserData() {
-      const userId = await getUserId();
-      try {
-        const response = await axios.get(
-          `https://api.meet-da.site/user/${userId}/`
-        );
-        const { username, profileImage, description } = response.data;
-        setUserData({ username, profileImage, description }); // 유저 정보 업데이트
-      } catch (error) {
-        console.error("유저 정보를 불러오는 데 실패했습니다:", error);
-      }
+    fetchUserData(); // 어디서든 호출 가능하도록 useEffect와 fetchUserDate를 분리
+  }, []);
+
+  // 로그인된 유저 정보
+  const fetchUserData = async () => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/`
+      );
+      const { username, profileImage, description } = response.data;
+      setUserData({ username, profileImage, description });
+    } catch (error) {
+      console.error("유저 정보를 불러오는 데 실패했습니다:", error);
     }
-    fetchUserData();
-  }, []); // 새로고침 시 최신 데이터 자동 반영
+  };
 
   const location = useLocation(); // 현재 경로를 가져옴
   const navigate = useNavigate();
@@ -413,36 +416,34 @@ export default function MypageNavigation() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // EditButton 클릭 시 파일 선택창 열기
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   // 파일 선택 핸들러 (업로드 후 setUserData 업데이트)
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const newImageUrl = await uploadImage(file); // S3 업로드 후 URL 받아오기
-      if (newImageUrl) {
-        setUserData((prev) => ({ ...prev, profileImage: newImageUrl })); // 상태 즉시 업데이트
-        await updateProfileImage(newImageUrl); // 백엔드 업데이트
+      // 확장자 변환
+      let newFile = file;
+      if (file.type === "image/jpg") {
+        newFile = new File([file], file.name.replace(".jpg", ".jpeg"), {
+          type: "image/jpeg",
+        });
       }
-    }
-  };
 
-  // 백엔드에 프로필 이미지 업데이트 요청
-  const updateProfileImage = async (imageUrl: string) => {
-    try {
-      const userId = await getUserId();
-      console.log("Updating profile image for user:", userId);
-
-      // 백엔드에서 프로필 업데이트 시 기존 데이터 유지하도록 설정
-      const response = await axios.patch(
-        `https://api.meet-da.site/user/${userId}/profile`,
-        { profileImage: imageUrl }, // profileImage만 보내면 기존 데이터 유지됨
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      console.log("Profile updated successfully:", response.data);
-    } catch (error) {
-      console.error("Failed to update profile image:", error);
+      const newImageUrl = await uploadImage(newFile);
+      if (newImageUrl) {
+        setUserData((prev) => ({ ...prev, profileImage: newImageUrl }));
+        localStorage.setItem("profileImage", newImageUrl);
+        window.dispatchEvent(new Event("storage")); // 다른 컴포넌트에서 감지할 수 있도록 함
+        await updateProfile(file);
+      }
     }
   };
 
@@ -467,10 +468,29 @@ export default function MypageNavigation() {
     }
   };
 
-  // EditButton 클릭 시 파일 선택창 열기
-  const handleButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  // 백엔드에 프로필 이미지 업데이트 요청
+  const updateProfile = async (file: File) => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    const formData = new FormData();
+    formData.append("profileImage", file); // 백엔드가 기대하는 키로 파일 추가
+    formData.append("username", userData.username); // 기존 정보 유지
+    formData.append("description", userData.description); // 기존 정보 유지
+
+    try {
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/profile`,
+        formData, // 파일을 직접 보냄
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("프로필 업데이트 성공:", response.data);
+
+      // 최신 데이터 반영
+      fetchUserData();
+    } catch (error) {
+      console.error("프로필 업데이트 실패:", error);
     }
   };
 

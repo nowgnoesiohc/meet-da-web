@@ -195,6 +195,17 @@ export default function Navigation() {
     }
   };
 
+  useEffect(() => {
+    const updateProfileImage = () => {
+      const newImage = localStorage.getItem("profileImage");
+      if (newImage)
+        setUserData((prev) => ({ ...prev, profileImage: newImage }));
+    };
+
+    window.addEventListener("storage", updateProfileImage);
+    return () => window.removeEventListener("storage", updateProfileImage);
+  }, []);
+
   return (
     <>
       {isLoggedIn ? (
