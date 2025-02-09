@@ -90,7 +90,7 @@ const CheckIcon = styled(FaCheck)`
   font-size: 1.375rem;
 `;
 
-const CheckBox = styled.button<{ isClicked: boolean }>`
+const CheckBox = styled.button<{ $isClicked: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -98,9 +98,9 @@ const CheckBox = styled.button<{ isClicked: boolean }>`
   height: 2.25rem;
   border-radius: 0.375rem;
   border: ${(props) =>
-    props.isClicked ? "none" : "1px solid var(--main-text)"};
+    props.$isClicked ? "none" : "1px solid var(--main-text)"};
   background-color: ${(props) =>
-    props.isClicked ? "var(--hover-orange)" : "transparent"};
+    props.$isClicked ? "var(--hover-orange)" : "transparent"};
   cursor: pointer;
 
   @media (max-width: 781px) {
@@ -241,11 +241,23 @@ const PriceText = styled.div`
   }
 `;
 
-export default function Emoji() {
-  const [isClicked, setIsClicked] = useState(false);
+const themes = [
+  { id: 1, name: "파스텔 팝콘 세트", price: "300P", image: themeSet },
+  { id: 2, name: "클래식 팝콘 세트", price: "350P", image: themeSet },
+  { id: 3, name: "빈티지 팝콘 세트", price: "280P", image: themeSet },
+  { id: 4, name: "모던 팝콘 세트", price: "320P", image: themeSet },
+];
 
-  const checkClick = () => {
-    setIsClicked(!isClicked); // 클릭 시 상태 변경
+export default function Emoji() {
+  const [clickedStates, setClickedStates] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  const checkClick = (id: number) => {
+    setClickedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id], // 해당 id의 상태만 변경
+    }));
   };
 
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -288,10 +300,6 @@ export default function Emoji() {
   //   );
   // };
 
-  // if (loading) {
-  //   return <div>로딩 중...</div>; // 로딩 상태 표시
-  // }
-
   return (
     <>
       <Layout>
@@ -303,91 +311,37 @@ export default function Emoji() {
         </SearchBarContainer>
         <ThemeContainer>
           <ThemeWrapper>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                파스텔 팝콘 세트
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={themeSet} />
-                </ImageBox>
-              </ThemeBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton
-                  $variant="theme"
-                  onClick={() => isModalOpen("deleteModal")}
-                >
-                  구매하기
-                </OrangeLineButton>
-              </PurchaseBox>
-            </ThemeSet>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                파스텔 팝콘 세트
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={themeSet} />
-                </ImageBox>
-              </ThemeBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton $variant="theme">구매하기</OrangeLineButton>
-              </PurchaseBox>
-            </ThemeSet>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                파스텔 팝콘 세트
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={themeSet} />
-                </ImageBox>
-              </ThemeBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton $variant="theme">구매하기</OrangeLineButton>
-              </PurchaseBox>
-            </ThemeSet>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                파스텔 팝콘 세트
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={themeSet} />
-                </ImageBox>
-              </ThemeBox>
-              <PurchaseBox>
-                <PriceBox>
-                  가격
-                  <PriceText>300P</PriceText>
-                </PriceBox>
-                <OrangeLineButton $variant="theme">구매하기</OrangeLineButton>
-              </PurchaseBox>
-            </ThemeSet>
+            {themes.map((theme) => (
+              <ThemeSet key={theme.id}>
+                <ThemeTitle>
+                  <CheckBox
+                    $isClicked={!!clickedStates[theme.id]}
+                    onClick={() => checkClick(theme.id)}
+                  >
+                    {!!clickedStates[theme.id] && <CheckIcon />}
+                    {/* 클릭 시 CheckIcon 표시 */}
+                  </CheckBox>
+                  {theme.name}
+                </ThemeTitle>
+                <ThemeBox>
+                  <ImageBox>
+                    <ThemeImage src={theme.image} />
+                  </ImageBox>
+                </ThemeBox>
+                <PurchaseBox>
+                  <PriceBox>
+                    가격
+                    <PriceText>{theme.price}</PriceText>
+                  </PriceBox>
+                  <OrangeLineButton
+                    $variant="theme"
+                    onClick={() => isModalOpen("deleteModal")}
+                  >
+                    구매하기
+                  </OrangeLineButton>
+                </PurchaseBox>
+              </ThemeSet>
+            ))}
           </ThemeWrapper>
         </ThemeContainer>
       </Layout>

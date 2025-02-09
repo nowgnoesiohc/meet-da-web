@@ -1,7 +1,6 @@
 import styled from "styled-components";
-// import { Link } from "react-router-dom";
 import { ProfileButton } from "../../ui/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiPencil } from "react-icons/hi2";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
@@ -108,11 +107,11 @@ const SideMenuTextStyle = {
 
 const SideMenuText = styled.button<{
   $variant: "clicked" | "unclicked";
-  isClicked: boolean;
+  $isClicked: boolean;
 }>`
   display: flex;
   color: ${(props) =>
-    props.isClicked
+    props.$isClicked
       ? SideMenuTextStyle.clicked.color
       : SideMenuTextStyle.unclicked.color};
   font-size: 1.25rem;
@@ -138,7 +137,7 @@ const SideMenuPointStyle = {
 
 const SideMenuPoint = styled.button<{
   $variant: "clicked" | "unclicked";
-  isClicked: boolean;
+  $isClicked: boolean;
 }>`
   display: flex;
   align-self: center;
@@ -146,7 +145,7 @@ const SideMenuPoint = styled.button<{
   width: 0.75rem;
   border-radius: 50%; /* 완벽한 원 */
   background-color: ${(props) =>
-    props.isClicked
+    props.$isClicked
       ? SideMenuPointStyle.clicked.backgroundColor
       : SideMenuPointStyle.unclicked.backgroundColor};
 `;
@@ -327,22 +326,26 @@ export default function MypageNavigation() {
     else return userId;
   };
 
-  // 로그인된 유저 정보
+  // fetchUserData를 컴포넌트 내부에서 정의 (useEffect 바깥으로 이동)
   useEffect(() => {
-    async function fetchUserData() {
-      const userId = await getUserId();
-      try {
-        const response = await axios.get(
-          `https://api.meet-da.site/user/${userId}/`
-        );
-        const { username, profileImage, description } = response.data;
-        setUserData({ username, profileImage, description });
-      } catch (error) {
-        console.error("유저 정보를 불러오는 데 실패했습니다:", error);
-      }
-    }
-    fetchUserData();
+    fetchUserData(); // 어디서든 호출 가능하도록 useEffect와 fetchUserDate를 분리
   }, []);
+
+  // 로그인된 유저 정보
+  const fetchUserData = async () => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/`
+      );
+      const { username, profileImage, description } = response.data;
+      setUserData({ username, profileImage, description });
+    } catch (error) {
+      console.error("유저 정보를 불러오는 데 실패했습니다:", error);
+    }
+  };
 
   const location = useLocation(); // 현재 경로를 가져옴
   const navigate = useNavigate();
@@ -411,6 +414,70 @@ export default function MypageNavigation() {
   console.log("Token:", token);
   console.log("Posts state:", posts);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // EditButton 클릭 시 파일 선택창 열기
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // 파일 선택 핸들러 (업로드 후 setUserData 업데이트)
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // 확장자 변환
+      let newFile = file;
+      if (file.type === "image/jpg") {
+        newFile = new File([file], file.name.replace(".jpg", ".jpeg"), {
+          type: "image/jpeg",
+        });
+      }
+
+      // 불필요한 S3 업로드 제거 후 updateProfile만 호출
+      await updateProfile(newFile);
+    }
+  };
+
+  // 백엔드에 프로필 이미지 업데이트 요청
+  const updateProfile = async (file: File) => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    const formData = new FormData();
+    formData.append("profileImage", file);
+    formData.append("username", userData.username);
+    formData.append("description", userData.description);
+
+    try {
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/profile`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("프로필 업데이트 성공:", response.data);
+
+      // 백엔드 응답에서 새로운 이미지 URL을 가져옴
+      const updatedImageUrl = response.data.profileImage;
+
+      // 상태 업데이트
+      setUserData((prev) => ({ ...prev, profileImage: updatedImageUrl }));
+
+      // localStorage 업데이트 및 이벤트 발생
+      localStorage.setItem("profileImage", updatedImageUrl);
+      window.dispatchEvent(new Event("storage")); // 다른 컴포넌트에서 감지할 수 있도록 이벤트 발생
+
+      // 최신 데이터 반영
+      fetchUserData();
+    } catch (error) {
+      console.error("프로필 업데이트 실패:", error);
+    }
+  };
+
   return (
     <Layout>
       <NavigationWrapper>
@@ -423,7 +490,14 @@ export default function MypageNavigation() {
               {/* 이미지를 등록하지 않은 경우의 스타일 */}
             </ProfileImagePlaceholder>
           )}
-          <EditButton>
+          {/* 숨겨진 파일 선택 input */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <EditButton onClick={handleButtonClick}>
             <IconStyle />
           </EditButton>
         </ProfileContainer>
@@ -455,12 +529,12 @@ export default function MypageNavigation() {
           {menuItems.map((menu) => (
             <SideMenu key={menu.key}>
               <SideMenuPoint
-                isClicked={activeMenu === menu.key}
+                $isClicked={activeMenu === menu.key}
                 $variant="clicked"
               />
               <Link to={menu.path}>
                 <SideMenuText
-                  isClicked={activeMenu === menu.key}
+                  $isClicked={activeMenu === menu.key}
                   $variant="clicked"
                   onClick={() => setActiveMenu(menu.key)}
                 >

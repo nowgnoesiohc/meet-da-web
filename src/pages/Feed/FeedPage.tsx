@@ -430,7 +430,6 @@ export default function FeedPage() {
 
       if (trimmedKeyword === "") {
         // 검색어가 빈 문자열이면 초기화 후 fetchPosts를 호출하지 않음
-        // 또는 필요에 따라 여기서만 호출
         return;
       }
       searchPosts(trimmedKeyword);
@@ -441,7 +440,7 @@ export default function FeedPage() {
 
   // currentPage, activeTab에 따른 추가 로딩 (페이지네이션)
   useEffect(() => {
-    // debouncedKeyword가 있을 경우에는 페이지네이션용 fetchPosts가 호출되지 않도록 할 수 있음
+    // debouncedKeyword가 있을 경우 fetchPosts가 호출되지 않음
     if (!debouncedKeyword) {
       fetchPosts(currentPage, activeTab.toLowerCase());
     }
@@ -559,7 +558,7 @@ export default function FeedPage() {
           <SearchBarContainer>
             <SearchInput
               type="text"
-              placeholder="검색어를 입력하세요"
+              placeholder="흥미로운 이야기를 발견해 보세요!"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
             />
@@ -606,8 +605,9 @@ export default function FeedPage() {
                       {post.images.map((image, index) => (
                         <SwiperSlide key={index}>
                           <SwiperImage
-                            src={image}
+                            src={`${image}?v=1`}
                             alt={`post-image-${index}`}
+                            loading="lazy"
                           />
                         </SwiperSlide>
                       ))}

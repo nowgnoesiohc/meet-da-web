@@ -149,7 +149,7 @@ const CheckIcon = styled(FaCheck)`
   font-size: 1.375rem;
 `;
 
-const CheckBox = styled.button<{ isClicked: boolean }>`
+const CheckBox = styled.button<{ $isClicked: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -157,9 +157,9 @@ const CheckBox = styled.button<{ isClicked: boolean }>`
   height: 2.25rem;
   border-radius: 0.375rem;
   border: ${(props) =>
-    props.isClicked ? "none" : "1px solid var(--main-text)"};
+    props.$isClicked ? "none" : "1px solid var(--main-text)"};
   background-color: ${(props) =>
-    props.isClicked ? "var(--hover-orange)" : "transparent"};
+    props.$isClicked ? "var(--hover-orange)" : "transparent"};
   cursor: pointer;
 
   @media (max-width: 781px) {
@@ -209,11 +209,21 @@ const ButtonBox = styled.div`
   align-items: center;
 `;
 
-export default function Own() {
-  const [isClicked, setIsClicked] = useState(false);
+const own = [
+  { id: 1, name: "파스텔 팝콘 세트", image: themeSet },
+  { id: 2, name: "레트로산스", image: retrosans },
+];
 
-  const checkClick = () => {
-    setIsClicked(!isClicked); // 클릭 시 상태 변경
+export default function Own() {
+  const [clickedStates, setClickedStates] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  const checkClick = (id: number) => {
+    setClickedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id], // 해당 id의 상태만 변경
+    }));
   };
 
   return (
@@ -227,38 +237,28 @@ export default function Own() {
         </SearchBarContainer>
         <ThemeContainer>
           <ThemeWrapper>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                파스텔 팝콘 세트
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={themeSet} />
-                </ImageBox>
-              </ThemeBox>
-              <ButtonBox>
-                <OrangeLineButton $variant="theme">적용하기</OrangeLineButton>
-              </ButtonBox>
-            </ThemeSet>
-            <ThemeSet>
-              <ThemeTitle>
-                <CheckBox isClicked={isClicked} onClick={checkClick}>
-                  {isClicked && <CheckIcon />} {/* 클릭 시 CheckIcon 표시 */}
-                </CheckBox>
-                레트로산스
-              </ThemeTitle>
-              <ThemeBox>
-                <ImageBox>
-                  <ThemeImage src={retrosans} />
-                </ImageBox>
-              </ThemeBox>
-              <ButtonBox>
-                <OrangeLineButton $variant="theme">적용하기</OrangeLineButton>
-              </ButtonBox>
-            </ThemeSet>
+            {own.map((theme) => (
+              <ThemeSet>
+                <ThemeTitle>
+                  <CheckBox
+                    $isClicked={!!clickedStates[theme.id]}
+                    onClick={() => checkClick(theme.id)}
+                  >
+                    {!!clickedStates[theme.id] && <CheckIcon />}{" "}
+                    {/* 클릭 시 CheckIcon 표시 */}
+                  </CheckBox>
+                  {theme.name}
+                </ThemeTitle>
+                <ThemeBox>
+                  <ImageBox>
+                    <ThemeImage src={theme.image} />
+                  </ImageBox>
+                </ThemeBox>
+                <ButtonBox>
+                  <OrangeLineButton $variant="theme">적용하기</OrangeLineButton>
+                </ButtonBox>
+              </ThemeSet>
+            ))}
           </ThemeWrapper>
         </ThemeContainer>
       </Layout>
