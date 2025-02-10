@@ -1,6 +1,22 @@
 import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
 import { OrangeButton, OrangeLineButton } from "../ui/Button";
+import ReactDOM from "react-dom";
+import { CommonModalProps } from "@/store/ModalTypes";
+
+// 모달 오버레이 추가 (배경)
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
 
 const Wrap = styled.div`
   width: 30.25rem;
@@ -29,6 +45,7 @@ const Title = styled.div`
     color: var(--main-orange);
     margin: 0;
     padding-bottom: 1.875rem;
+    text-align: center;
   }
 
   > p {
@@ -36,6 +53,7 @@ const Title = styled.div`
     font-size: 1.25rem;
     font-weight: var(--font-medium);
     color: var(--main-text);
+    text-align: center;
   }
   > p:last-child {
     font-size: 1.125rem;
@@ -43,6 +61,7 @@ const Title = styled.div`
     color: var(--text-03);
     padding-top: 0.5rem;
     padding-bottom: 2.375rem;
+    text-align: center;
   }
 
   @media (max-width: 390px) {
@@ -71,27 +90,37 @@ const Button = styled.div`
   gap: 1.5rem;
 `;
 
-export default function DeleteModal() {
+export default function DeleteModal({
+  title,
+  content = "",
+  subContent,
+  onConfirm,
+}: CommonModalProps) {
+  console.log("DeleteModal Props:", { title, content, subContent });
+
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const onClickCancel = () => {
-    setIsModalClick();
+    setIsModalClick(null);
   };
 
-  return (
-    <>
-      <Wrap>
+  return ReactDOM.createPortal(
+    <ModalOverlay onClick={() => setIsModalClick(null)}>
+      <Wrap onClick={(e) => e.stopPropagation()}>
         <Title>
-          <h2>파스텔 팝콘 세트</h2>
-          <p>구매 하시겠습니까?</p>
-          <p>300 포인트 차감됩니다.</p> {/* 회원탈퇴 모달에선 제거 */}
+          <h2>{title}</h2>
+          <p>{content}</p>
+          {subContent && <p>{subContent}</p>} {/* 회원탈퇴 모달에선 제거 */}
         </Title>
         <Button>
           <OrangeLineButton $variant="modal" onClick={onClickCancel}>
             취소
           </OrangeLineButton>
-          <OrangeButton $variant="confirm">확인</OrangeButton>
+          <OrangeButton $variant="confirm" onClick={onConfirm}>
+            확인
+          </OrangeButton>
         </Button>
       </Wrap>
-    </>
+    </ModalOverlay>,
+    document.body // 모달을 body에 추가하여 부모의 영향을 받지 않도록 함
   );
 }

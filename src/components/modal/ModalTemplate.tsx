@@ -38,6 +38,7 @@ const ModalContainer = styled.div`
 export default function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const modalData = useIsModalStore((state) => state.modalData);
 
   // 모달 배경 클릭 시 종료
   const ModalClose = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -66,13 +67,25 @@ export default function ModalTemplate() {
             case "deleteIdModal":
               return <DeleteIdModal />;
             case "deleteModal":
-              return <DeleteModal />;
+              return modalData ? (
+                <DeleteModal
+                  title={modalData.title}
+                  content={modalData.content}
+                  onConfirm={modalData.onConfirm}
+                />
+              ) : null;
             case "deleteCompleteModal":
               return <DeleteCompleteModal />;
             case "friendModal":
               return <FriendModal />;
             case "pointModal":
-              return <PointModal />;
+              return modalData ? (
+                <PointModal
+                  title={modalData.title}
+                  content={modalData.content}
+                  onConfirm={modalData.onConfirm}
+                />
+              ) : null;
             default:
               return <p>{useIsModal}</p>;
           }
