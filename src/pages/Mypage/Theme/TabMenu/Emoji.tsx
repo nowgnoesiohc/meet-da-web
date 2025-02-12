@@ -2,8 +2,8 @@ import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
 import themeSet from "/src/assets/theme/themeset.svg";
-import { useState } from "react";
-import { OrangeLineButton } from "@/components/ui/Button";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
@@ -125,6 +125,19 @@ const PurchaseBox = styled.div`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
+  color: var(--main-orange);
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: var(--font-medium);
+
+  @media (max-width: 781px) {
+    font-size: 1.125rem;
+  }
+
+  @media (max-width: 390px) {
+    font-size: 1rem;
+  }
 `;
 
 const ThemeContainer = styled.div`
@@ -207,24 +220,6 @@ const ThemeBox = styled.div`
 const ThemeImage = styled.img`
   width: 100%;
   object-fit: cover;
-  }
-`;
-
-const PriceBox = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  color: var(--main-orange);
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: var(--font-medium);
-
-  @media (max-width: 781px) {
-    font-size: 1.125rem;
-  }
-
-  @media (max-width: 390px) {
-    font-size: 1rem;
-  }
 `;
 
 const PriceText = styled.div`
@@ -242,34 +237,44 @@ const PriceText = styled.div`
 `;
 
 const themes = [
-  { id: 1, name: "파스텔 팝콘 세트", price: "300P", image: themeSet },
-  { id: 2, name: "클래식 팝콘 세트", price: "350P", image: themeSet },
-  { id: 3, name: "빈티지 팝콘 세트", price: "280P", image: themeSet },
-  { id: 4, name: "모던 팝콘 세트", price: "320P", image: themeSet },
+  { id: 1, name: "파스텔 팝콘 세트", price: 300, image: themeSet },
+  { id: 2, name: "클래식 팝콘 세트", price: 350, image: themeSet },
+  { id: 3, name: "빈티지 팝콘 세트", price: 280, image: themeSet },
+  { id: 4, name: "모던 팝콘 세트", price: 320, image: themeSet },
 ];
 
 export default function Emoji() {
   const [clickedStates, setClickedStates] = useState<{
     [key: number]: boolean;
   }>({});
+  const { handleSelectedThemes, selectedThemes } = useOutletContext<{
+    handleSelectedThemes: (themes: { name: string; price: number }[]) => void;
+    selectedThemes: { name: string; price: number }[];
+  }>();
+  const isModal = useIsModalStore((state) => state.isModal);
 
-  const checkClick = (id: number) => {
-    setClickedStates((prev) => ({
-      ...prev,
-      [id]: !prev[id], // 해당 id의 상태만 변경
-    }));
-  };
-
-  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
-  const isModalOpen = (type?: string) => {
-    console.log(type);
-
-    if (type) {
-      setIsModalClick(type);
-    } else {
-      setIsModalClick();
+  // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
+  useEffect(() => {
+    if (isModal === null) {
+      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
+      setClickedStates({});
     }
+  }, [isModal]);
+
+  // 개별 체크박스 클릭 (Theme 상태 업데이트)
+  const checkClick = (id: number, theme: { name: string; price: number }) => {
+    setClickedStates((prev) => {
+      const newState = { ...prev, [id]: !prev[id] };
+      const isSelected = newState[id];
+
+      const updatedThemes = isSelected
+        ? [...selectedThemes, theme] // 체크 시 추가
+        : selectedThemes.filter((t) => t.name !== theme.name); // 체크 해제 시 제거
+
+      handleSelectedThemes(updatedThemes);
+
+      return newState;
+    });
   };
 
   // 백엔드 연결 시 코드 미리 작성
@@ -316,7 +321,7 @@ export default function Emoji() {
                 <ThemeTitle>
                   <CheckBox
                     $isClicked={!!clickedStates[theme.id]}
-                    onClick={() => checkClick(theme.id)}
+                    onClick={() => checkClick(theme.id, theme)}
                   >
                     {!!clickedStates[theme.id] && <CheckIcon />}
                     {/* 클릭 시 CheckIcon 표시 */}
@@ -329,16 +334,8 @@ export default function Emoji() {
                   </ImageBox>
                 </ThemeBox>
                 <PurchaseBox>
-                  <PriceBox>
-                    가격
-                    <PriceText>{theme.price}</PriceText>
-                  </PriceBox>
-                  <OrangeLineButton
-                    $variant="theme"
-                    onClick={() => isModalOpen("deleteModal")}
-                  >
-                    구매하기
-                  </OrangeLineButton>
+                  가격
+                  <PriceText>{theme.price} P</PriceText>
                 </PurchaseBox>
               </ThemeSet>
             ))}

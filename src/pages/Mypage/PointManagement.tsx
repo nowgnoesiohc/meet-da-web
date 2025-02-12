@@ -458,29 +458,51 @@ export default function PointManagement() {
   }, []);
 
   // 검색 함수
+  // const performSearch = useCallback(() => {
+  //   const keyword = searchKeyword.trim().toLowerCase();
+  //   if (keyword === "") {
+  //     setFilteredData(pointHistory);
+  //   } else {
+  //     const filtered = pointHistory.filter((item) =>
+  //       item.description.toLowerCase().includes(keyword)
+  //     );
+  //     setFilteredData(filtered);
+  //   }
+  //   setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 초기화
+  //   setIsSearching(false); // 검색 종료 상태로 변경
+  // }, [searchKeyword, pointHistory]);
   const performSearch = useCallback(() => {
     const keyword = searchKeyword.trim().toLowerCase();
+
     if (keyword === "") {
-      setFilteredData(pointHistory);
+      // 검색어가 없을 때 데이터가 깜빡이는 현상을 방지
+      setFilteredData([...pointHistory]);
     } else {
       const filtered = pointHistory.filter((item) =>
         item.description.toLowerCase().includes(keyword)
       );
       setFilteredData(filtered);
     }
-    setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 초기화
-    setIsSearching(false); // 검색 종료 상태로 변경
+    setCurrentPage(1); // 검색 시 첫 페이지로 이동
+    setIsSearching(false);
   }, [searchKeyword, pointHistory]);
 
   // 디바운싱
   useEffect(() => {
     if (isSearching) {
-      const timer = setTimeout(() => {
-        performSearch();
-      }, 1000);
-      return () => clearTimeout(timer); // 타이머 정리
+      if (searchKeyword.trim() === "") {
+        // 검색어가 비어있으면 즉시 원래 데이터로 복원
+        setFilteredData([...pointHistory]);
+        setIsSearching(false); // 검색 상태 해제
+      } else {
+        // 검색어가 있을 때만 디바운싱 적용
+        const timer = setTimeout(() => {
+          performSearch();
+        }, 1000);
+        return () => clearTimeout(timer); // 타이머 정리
+      }
     }
-  }, [isSearching, performSearch]);
+  }, [isSearching, searchKeyword, performSearch, pointHistory]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(event.target.value); // 검색어 업데이트
@@ -539,9 +561,7 @@ export default function PointManagement() {
                   <PointList $variant={item.points > 0 ? "save" : "use"}>
                     {item.points > 0
                       ? `+ ${new Intl.NumberFormat().format(item.points)} P`
-                      : `- ${new Intl.NumberFormat().format(
-                          Math.abs(item.points)
-                        )} P`}
+                      : `- ${new Intl.NumberFormat().format(Math.abs(item.points))} P`}
                   </PointList>
                   <DateList>
                     {new Date(item.date).toLocaleDateString()}
@@ -549,59 +569,67 @@ export default function PointManagement() {
                 </EachList>
               ))
             ) : (
-              <NotFound>검색 결과가 없습니다.</NotFound>
+              <NotFound>
+                {searchKeyword
+                  ? "검색 결과가 없습니다."
+                  : "포인트 사용내역이 없습니다."}
+              </NotFound>
             )}
           </ListWrap>
-          {/* 페이지네이션 UI */}
-          <PageNation>
-            <Context.Provider value={contextValue}>
-              {contextHolder}
 
-              <PaginationButton
-                disabled={currentPage === 1}
-                onClick={() => {
-                  if (currentPage === 1) {
-                    api.warning({
-                      message: "첫 페이지입니다.",
-                      description: "더 이상 이전 페이지로 이동할 수 없습니다.",
-                      placement: "topRight",
-                    });
-                  } else {
-                    setCurrentPage(currentPage - 1);
-                  }
-                }}
-              >
-                <BeforeIcon />
-              </PaginationButton>
-
-              {Array.from({ length: totalPages }, (_, index) => (
-                <PageNumber
-                  key={index + 1}
-                  selected={currentPage === index + 1}
-                  onClick={() => setCurrentPage(index + 1)}
+          {/* 페이지네이션 UI: 데이터가 있을 때만 표시 */}
+          {totalPages > 0 && (
+            <PageNation>
+              <Context.Provider value={contextValue}>
+                {contextHolder}
+                <PaginationButton
+                  disabled={currentPage === 1}
+                  onClick={() => {
+                    if (currentPage === 1) {
+                      api.warning({
+                        message: "첫 페이지입니다.",
+                        description:
+                          "더 이상 이전 페이지로 이동할 수 없습니다.",
+                        placement: "topRight",
+                      });
+                    } else {
+                      setCurrentPage(currentPage - 1);
+                    }
+                  }}
                 >
-                  {index + 1}
-                </PageNumber>
-              ))}
+                  <BeforeIcon />
+                </PaginationButton>
 
-              <PaginationButton
-                disabled={currentPage === totalPages}
-                onClick={() => {
-                  if (currentPage === totalPages) {
-                    api.warning({
-                      message: "마지막 페이지입니다.",
-                      description: "더 이상 다음 페이지로 이동할 수 없습니다.",
-                      placement: "topRight",
-                    });
-                  } else {
-                    setCurrentPage(currentPage + 1);
-                  }
-                }}
-              >
-                <AfterIcon />
-              </PaginationButton>
-            </Context.Provider>
-          </PageNation>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <PageNumber
+                    key={index + 1}
+                    selected={currentPage === index + 1}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </PageNumber>
+                ))}
+
+                <PaginationButton
+                  disabled={currentPage === totalPages}
+                  onClick={() => {
+                    if (currentPage === totalPages) {
+                      api.warning({
+                        message: "마지막 페이지입니다.",
+                        description:
+                          "더 이상 다음 페이지로 이동할 수 없습니다.",
+                        placement: "topRight",
+                      });
+                    } else {
+                      setCurrentPage(currentPage + 1);
+                    }
+                  }}
+                >
+                  <AfterIcon />
+                </PaginationButton>
+              </Context.Provider>
+            </PageNation>
+          )}
         </ListContainer>
       </Layout>
     </>

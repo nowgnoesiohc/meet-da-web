@@ -3,8 +3,10 @@ import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
 import themeSet from "/src/assets/theme/themeset.svg";
 import retrosans from "/src/assets/theme/retrosans.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
+import { useOutletContext } from "react-router-dom";
 
 const Layout = styled.div`
   display: flex;
@@ -218,12 +220,34 @@ export default function Own() {
   const [clickedStates, setClickedStates] = useState<{
     [key: number]: boolean;
   }>({});
+  const { handleSelectedThemes, selectedThemes } = useOutletContext<{
+    handleSelectedThemes: (themes: { name: string }[]) => void;
+    selectedThemes: { name: string }[];
+  }>();
+  const isModal = useIsModalStore((state) => state.isModal);
 
-  const checkClick = (id: number) => {
-    setClickedStates((prev) => ({
-      ...prev,
-      [id]: !prev[id], // 해당 id의 상태만 변경
-    }));
+  // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
+  useEffect(() => {
+    if (isModal === null) {
+      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
+      setClickedStates({});
+    }
+  }, [isModal]);
+
+  // 개별 체크박스 클릭 (Theme 상태 업데이트)
+  const checkClick = (id: number, theme: { name: string }) => {
+    setClickedStates((prev) => {
+      const newState = { ...prev, [id]: !prev[id] };
+      const isSelected = newState[id];
+
+      const updatedThemes = isSelected
+        ? [...selectedThemes, theme] // 체크 시 추가
+        : selectedThemes.filter((t) => t.name !== theme.name); // 체크 해제 시 제거
+
+      handleSelectedThemes(updatedThemes);
+
+      return newState;
+    });
   };
 
   return (
@@ -237,21 +261,21 @@ export default function Own() {
         </SearchBarContainer>
         <ThemeContainer>
           <ThemeWrapper>
-            {own.map((theme) => (
+            {own.map((own) => (
               <ThemeSet>
                 <ThemeTitle>
                   <CheckBox
-                    $isClicked={!!clickedStates[theme.id]}
-                    onClick={() => checkClick(theme.id)}
+                    $isClicked={!!clickedStates[own.id]}
+                    onClick={() => checkClick(own.id, own)}
                   >
-                    {!!clickedStates[theme.id] && <CheckIcon />}{" "}
+                    {!!clickedStates[own.id] && <CheckIcon />}
                     {/* 클릭 시 CheckIcon 표시 */}
                   </CheckBox>
-                  {theme.name}
+                  {own.name}
                 </ThemeTitle>
                 <ThemeBox>
                   <ImageBox>
-                    <ThemeImage src={theme.image} />
+                    <ThemeImage src={own.image} />
                   </ImageBox>
                 </ThemeBox>
                 <ButtonBox>

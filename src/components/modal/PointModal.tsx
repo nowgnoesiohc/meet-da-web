@@ -2,6 +2,22 @@ import styled from "styled-components";
 import CheckImg from "../../assets/images/signUp.svg";
 import { OrangeButton } from "../ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
+import { CommonModalProps } from "@/store/ModalTypes";
+import ReactDOM from "react-dom";
+import { useEffect, useState } from "react";
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
 
 const Point = styled.div`
   width: 36.5rem;
@@ -24,15 +40,21 @@ const Point = styled.div`
 `;
 
 const Title = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   > p {
     margin: 0;
     font-size: 1.5rem;
     padding-top: 1.25rem;
+    text-align: center;
   }
   > p:last-child {
     font-size: 1.125rem;
     color: var(--text-03);
     padding: 0;
+    text-align: center;
   }
 
   > h2 {
@@ -40,6 +62,7 @@ const Title = styled.div`
     font-size: 2.25rem;
     color: var(--main-orange);
     padding: 1.25rem 0;
+    text-align: center;
   }
 
   @media (max-width: 390px) {
@@ -70,32 +93,50 @@ const Image = styled.img`
   width: 8.75rem;
   height: 7.125rem;
 
+
   @media (max-width: 781px) {
-    width: 7.5rem;
+  width: 7.5rem;
   height: 5.125rem;
 `;
 
-export default function PointModal() {
+export default function PointModal({
+  title,
+  content = "",
+  subContent,
+  onConfirm,
+}: CommonModalProps) {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const onClickCheck = () => {
-    setIsModalClick();
-  };
+  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
 
-  return (
-    <>
-      <Point>
+  // 모달 컨테이너가 없으면 생성하는 로직
+  useEffect(() => {
+    let existingRoot = document.getElementById("point-modal-root");
+    if (!existingRoot) {
+      existingRoot = document.createElement("div");
+      existingRoot.id = "point-modal-root";
+      document.body.appendChild(existingRoot);
+    }
+    setModalRoot(existingRoot);
+  }, []);
+
+  if (!modalRoot) return null; // modalRoot가 없으면 렌더링하지 않음
+
+  return ReactDOM.createPortal(
+    <ModalOverlay onClick={() => setIsModalClick(null)}>
+      <Point onClick={(e) => e.stopPropagation()}>
         <Title>
           <Image src={CheckImg} alt="체크 이미지" />
-          <p>오늘의 무드 기록 완료!</p>
-          <h2>10 P</h2>
-          <p>포인트가 적립되었습니다.</p>
+          <p>{title}</p>
+          <h2>{content}</h2>
+          {subContent && <p>{subContent}</p>} {/* 회원탈퇴 모달에선 제거 */}
         </Title>
         <Button>
-          <OrangeButton $variant="confirm" onClick={onClickCheck}>
+          <OrangeButton $variant="confirm" onClick={onConfirm}>
             확인
           </OrangeButton>
         </Button>
       </Point>
-    </>
+    </ModalOverlay>,
+    modalRoot // 동적으로 생성된 컨테이너에 렌더링
   );
 }

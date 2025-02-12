@@ -3,8 +3,8 @@ import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
 import retrosans from "/src/assets/theme/retrosans.svg";
 import cabinet from "/src/assets/theme/cabinet.svg";
-import { useState } from "react";
-import { OrangeLineButton } from "@/components/ui/Button";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
 
 const Layout = styled.div`
@@ -208,10 +208,6 @@ const PurchaseBox = styled.div`
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-`;
-
-const PriceBox = styled.div`
-  display: flex;
   gap: 0.5rem;
   color: var(--main-orange);
   text-align: center;
@@ -242,32 +238,42 @@ const PriceText = styled.div`
 `;
 
 const fonts = [
-  { id: 1, name: "레트로산스", price: "300P", image: retrosans },
-  { id: 2, name: "캐비닛 그로테스크", price: "280P", image: cabinet },
+  { id: 1, name: "레트로산스", price: 300, image: retrosans },
+  { id: 2, name: "캐비닛 그로테스크", price: 280, image: cabinet },
 ];
 
 export default function Font() {
   const [clickedStates, setClickedStates] = useState<{
     [key: number]: boolean;
   }>({});
+  const { handleSelectedThemes, selectedThemes } = useOutletContext<{
+    handleSelectedThemes: (themes: { name: string; price: number }[]) => void;
+    selectedThemes: { name: string; price: number }[];
+  }>();
+  const isModal = useIsModalStore((state) => state.isModal);
 
-  const checkClick = (id: number) => {
-    setClickedStates((prev) => ({
-      ...prev,
-      [id]: !prev[id], // 해당 id의 상태만 변경
-    }));
-  };
-
-  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
-  const isModalOpen = (type?: string) => {
-    console.log(type);
-
-    if (type) {
-      setIsModalClick(type);
-    } else {
-      setIsModalClick();
+  // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
+  useEffect(() => {
+    if (isModal === null) {
+      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
+      setClickedStates({});
     }
+  }, [isModal]);
+
+  // 개별 체크박스 클릭 (Theme 상태 업데이트)
+  const checkClick = (id: number, theme: { name: string; price: number }) => {
+    setClickedStates((prev) => {
+      const newState = { ...prev, [id]: !prev[id] };
+      const isSelected = newState[id];
+
+      const updatedThemes = isSelected
+        ? [...selectedThemes, theme] // 체크 시 추가
+        : selectedThemes.filter((t) => t.name !== theme.name); // 체크 해제 시 제거
+
+      handleSelectedThemes(updatedThemes);
+
+      return newState;
+    });
   };
 
   return (
@@ -286,7 +292,7 @@ export default function Font() {
                 <FontTitle>
                   <CheckBox
                     $isClicked={!!clickedStates[fonts.id]}
-                    onClick={() => checkClick(fonts.id)}
+                    onClick={() => checkClick(fonts.id, fonts)}
                   >
                     {!!clickedStates[fonts.id] && <CheckIcon />}
                     {/* 클릭 시 CheckIcon 표시 */}
@@ -299,16 +305,8 @@ export default function Font() {
                   </ImageBox>
                 </FontBox>
                 <PurchaseBox>
-                  <PriceBox>
-                    가격
-                    <PriceText>{fonts.price}</PriceText>
-                  </PriceBox>
-                  <OrangeLineButton
-                    $variant="theme"
-                    onClick={() => isModalOpen("deleteModal")}
-                  >
-                    구매하기
-                  </OrangeLineButton>
+                  가격
+                  <PriceText>{fonts.price} P</PriceText>
                 </PurchaseBox>
               </FontSet>
             ))}
