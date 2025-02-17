@@ -447,9 +447,16 @@ export default function PointManagement() {
         );
         const { username, profileImage, description, points, pointHistory } =
           response.data;
+
+        // 최신 -> 과거순으로 정렬
+        const sortedHistory = pointHistory.sort(
+          (a: PointHistoryItem, b: PointHistoryItem) =>
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
         setUserData({ username, profileImage, description, points });
-        setPointHistory(pointHistory);
-        setFilteredData(pointHistory); // 초기 데이터 설정
+        setPointHistory(sortedHistory);
+        setFilteredData(sortedHistory); // 초기 데이터 설정
       } catch (error) {
         console.error("유저 정보를 불러오는 데 실패했습니다:", error);
       }
@@ -458,29 +465,23 @@ export default function PointManagement() {
   }, []);
 
   // 검색 함수
-  // const performSearch = useCallback(() => {
-  //   const keyword = searchKeyword.trim().toLowerCase();
-  //   if (keyword === "") {
-  //     setFilteredData(pointHistory);
-  //   } else {
-  //     const filtered = pointHistory.filter((item) =>
-  //       item.description.toLowerCase().includes(keyword)
-  //     );
-  //     setFilteredData(filtered);
-  //   }
-  //   setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 초기화
-  //   setIsSearching(false); // 검색 종료 상태로 변경
-  // }, [searchKeyword, pointHistory]);
   const performSearch = useCallback(() => {
     const keyword = searchKeyword.trim().toLowerCase();
 
     if (keyword === "") {
-      // 검색어가 없을 때 데이터가 깜빡이는 현상을 방지
-      setFilteredData([...pointHistory]);
-    } else {
-      const filtered = pointHistory.filter((item) =>
-        item.description.toLowerCase().includes(keyword)
+      // 검색어가 없을 때도 최신순 정렬 유지
+      setFilteredData(
+        [...pointHistory].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        )
       );
+    } else {
+      const filtered = pointHistory
+        .filter((item) => item.description.toLowerCase().includes(keyword))
+        .sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        ); // 검색 결과도 최신순 정렬
+
       setFilteredData(filtered);
     }
     setCurrentPage(1); // 검색 시 첫 페이지로 이동

@@ -17,6 +17,9 @@ import {
   DiaryButton,
   ReplyButton,
 } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
+import PointModal from "@/components/modal/PointModal";
+import { jwtDecode } from "jwt-decode";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -619,6 +622,55 @@ export default function BoardDetail() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isModal, setIsModalClick } = useIsModalStore();
+
+  useEffect(() => {
+    const storedBoardId = sessionStorage.getItem("showPointModal");
+
+    if (storedBoardId && storedBoardId === boardId) {
+      console.log("sessionStorage에서 모달 상태 감지");
+      setIsModalClick("pointModal");
+      sessionStorage.removeItem("showPointModal"); // 한 번만 실행되도록 삭제
+    }
+  }, [boardId]); // boardId가 변경될 때만 실행
+
+  // 유저 ID 가져오기
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    try {
+      const userId = jwtDecode(token).sub;
+      return userId || null;
+    } catch {
+      return null;
+    }
+  };
+
+  // 포인트 적립 API 요청 함수
+  const handlePointUpdate = async () => {
+    try {
+      const userId = await getUserId(); // 안정적으로 userId 가져오기
+      if (!userId) throw new Error("사용자 ID를 찾을 수 없습니다.");
+
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/points`,
+        {
+          delta: 50,
+          description: "다이어리 작성",
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("포인트 적립 성공:", response.data);
+      } else {
+        console.error("포인트 적립 실패:", response.data);
+      }
+    } catch (error) {
+      console.error("포인트 적립 요청 중 오류 발생:", error);
+    }
+
+    setIsModalClick(null); // 모달 닫기
+  };
 
   const toggleBookmark = async () => {
     const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
@@ -836,6 +888,16 @@ export default function BoardDetail() {
           </ListArray>
         </Reply>
       </CommentList>
+
+      {isModal === "pointModal" && (
+        <PointModal
+          isOpen={true}
+          title="다이어리 작성 완료!"
+          content={"50 P"}
+          subContent="포인트가 적립되었습니다."
+          onConfirm={handlePointUpdate}
+        />
+      )}
     </Wrap>
   );
 }

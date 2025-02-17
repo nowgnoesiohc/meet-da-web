@@ -2,6 +2,8 @@ import DeleteModal from "@/components/modal/DeleteModal";
 import PointModal from "@/components/modal/PointModal";
 import { DiarySettingButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -160,6 +162,57 @@ export default function Theme() {
     console.log("현재 isModal 상태:", isModal);
   }, [isModal]);
 
+  // 유저 ID 가져오기
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    try {
+      const userId = jwtDecode(token).sub;
+      return userId || null;
+    } catch {
+      return null;
+    }
+  };
+
+  // 포인트 차감 API 연결
+  const handlePurchase = async () => {
+    try {
+      const userId = await getUserId();
+      if (!userId) throw new Error("사용자 ID를 찾을 수 없습니다.");
+
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/points`,
+        {
+          delta: -totalPrice, // 포인트 차감
+          description: truncatedNames,
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("포인트 차감 성공:", response.data);
+
+        // 모달 데이터 업데이트
+        setModalData({
+          name: truncatedNames || "상품 선택 오류",
+          price: totalPrice,
+        });
+
+        // 구매 완료 후 선택한 상품 초기화
+        setSelectedThemes([]);
+        setIsModalClick(null); // `bulkPurchaseModal` 닫기
+
+        // PointModal 표시
+        setTimeout(() => {
+          setIsModalClick("pointModal");
+        }, 100);
+      } else {
+        console.error("포인트 차감 실패:", response.data);
+      }
+    } catch (error) {
+      console.error("포인트 차감 요청 중 오류 발생:", error);
+    }
+  };
+
   return (
     <>
       <Layout>
@@ -190,6 +243,7 @@ export default function Theme() {
             </DiarySettingButton>
           </ButtonWrapper>
         )}
+
         {/* Own 탭일 때는 삭제하기 버튼 표시 */}
         {["Own"].includes(activeTab) && (
           <ButtonWrapper>
@@ -245,23 +299,7 @@ export default function Theme() {
               ? ` ${totalPrice} 포인트가 차감됩니다.`
               : `총 ${totalPrice} 포인트가 차감됩니다.`
           }
-          onConfirm={() => {
-            console.log(
-              `${selectedNames} 구매 완료! 총 ${totalPrice} 포인트 차감`
-            );
-
-            setModalData({
-              name: truncatedNames || "상품 선택 오류", // 선택한 상품명 유지
-              price: totalPrice, // 총 포인트 유지
-            });
-
-            setSelectedThemes([]); // 선택한 상품 초기화
-            setIsModalClick(null); // bulkPurchaseModal 닫기
-
-            setTimeout(() => {
-              setIsModalClick("pointModal");
-            }, 100);
-          }}
+          onConfirm={handlePurchase} // 구매 API 요청 실행
         />
       )}
 
@@ -270,7 +308,7 @@ export default function Theme() {
         <PointModal
           isOpen={isModal === "pointModal"}
           title={modalData.name}
-          content={` - ${modalData.price} P`}
+          content={`- ${modalData.price} P`} // 차감된 포인트 표시
           subContent="구매 완료되었습니다!"
           onConfirm={() => setIsModalClick(null)} // 확인 클릭 시 모달 닫기
         />

@@ -106,7 +106,9 @@ export default function PointModal({
   onConfirm,
 }: CommonModalProps) {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
+  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(
+    document.getElementById("point-modal-root") || null
+  );
 
   // 모달 컨테이너가 없으면 생성하는 로직
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function PointModal({
     setModalRoot(existingRoot);
   }, []);
 
-  if (!modalRoot) return null; // modalRoot가 없으면 렌더링하지 않음
+  if (!modalRoot) return <></>; // modalRoot가 없으면 렌더링하지 않음 (<></>로 렌더링 안전성 확보)
 
   return ReactDOM.createPortal(
     <ModalOverlay onClick={() => setIsModalClick(null)}>
