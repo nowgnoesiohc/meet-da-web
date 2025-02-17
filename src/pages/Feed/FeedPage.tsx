@@ -384,7 +384,7 @@ export default function FeedPage() {
   // 게시글 데이터 요청 함수 (무한스크롤 & 정렬 반영)
   const fetchPosts = useCallback(
     async (page: number, sort: string) => {
-      if (!hasMore || isFetching) return;
+      if (isFetching) return;
 
       setIsFetching(true);
       try {
@@ -393,27 +393,21 @@ export default function FeedPage() {
         );
 
         if (response.data.length > 0) {
-          setPosts((prev) => {
-            const existingIds = new Set(prev.map((post) => post.id));
-            const newPosts = response.data.filter(
-              (post) => !existingIds.has(post.id)
-            );
-            return [...prev, ...newPosts];
-          });
-
-          if (response.data.length < POINTS_PER_PAGE) {
-            setHasMore(false);
-          }
+          setPosts((prev) =>
+            page === 1 ? response.data : [...prev, ...response.data]
+          );
+          setHasMore(response.data.length === POINTS_PER_PAGE);
         } else {
           setHasMore(false);
         }
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
+        setHasMore(false);
       } finally {
         setIsFetching(false);
       }
     },
-    [hasMore, isFetching]
+    [isFetching]
   );
 
   // 초기 로딩 전용 useEffect (컴포넌트 마운트 시 한 번만 호출)
@@ -425,26 +419,21 @@ export default function FeedPage() {
   // 검색어 디바운싱 useEffect (검색어 변경에 따른 호출)
   useEffect(() => {
     const handler = setTimeout(() => {
-      const trimmedKeyword = searchKeyword.trim().toLowerCase();
-      setDebouncedKeyword(trimmedKeyword);
-
-      if (trimmedKeyword === "") {
-        // 검색어가 빈 문자열이면 초기화 후 fetchPosts를 호출하지 않음
-        return;
-      }
-      searchPosts(trimmedKeyword);
+      setDebouncedKeyword(searchKeyword.trim().toLowerCase());
+      setCurrentPage(1); // 검색어 변경 시 페이지 초기화
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [searchKeyword, activeTab]);
+  }, [searchKeyword]);
 
   // currentPage, activeTab에 따른 추가 로딩 (페이지네이션)
   useEffect(() => {
-    // debouncedKeyword가 있을 경우 fetchPosts가 호출되지 않음
-    if (!debouncedKeyword) {
+    if (debouncedKeyword) {
+      searchPosts(debouncedKeyword, currentPage);
+    } else {
       fetchPosts(currentPage, activeTab.toLowerCase());
     }
-  }, [currentPage, activeTab, debouncedKeyword]);
+  }, [currentPage, debouncedKeyword, activeTab]);
 
   // 무한스크롤 감지
   const lastPostRef = useCallback(
@@ -479,41 +468,46 @@ export default function FeedPage() {
   }, [isFetching, hasMore]);
 
   // 검색 API 요청 함수
-  const searchPosts = useCallback(
-    async (keyword: string) => {
-      if (!keyword) {
-        setPosts([]); // 검색어 초기화 시 posts를 빈 배열로 설정
-        fetchPosts(1, activeTab.toLowerCase());
+  const searchPosts = useCallback(async (keyword: string, page: number) => {
+    if (!keyword) {
+      setCurrentPage(1);
+      setHasMore(true);
+      setPosts([]);
+      fetchPosts(1, activeTab.toLowerCase()); // 검색어 삭제 시 초기 화면 표시
+      return;
+    }
+
+    setIsFetching(true);
+    try {
+      const response = await axios.get<Post[]>(
+        `${BASE_URL}/board/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=latest`
+      );
+
+      if (!response.data || !Array.isArray(response.data)) {
+        setPosts([]); // 검색 결과가 없을 경우 빈 화면 표시
+        setHasMore(false);
+        setIsFetching(false);
         return;
       }
 
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/board/search?query=${keyword}`
-        );
+      // 최신순 정렬 적용
+      response.data.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
-        // 응답이 없거나 배열이 아니면 빈 배열로 설정
-        if (!response.data || !Array.isArray(response.data)) {
-          setPosts([]);
-          return;
-        }
-
-        setPosts(
-          response.data
-            .slice(0, POINTS_PER_PAGE)
-            .sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
-            ) // 최신순 정렬
-        );
-      } catch (error) {
-        console.error("검색 중 오류 발생:", error);
-        setPosts([]); // 검색 실패 시 빈 배열 설정
-      }
-    },
-    [activeTab]
-  );
+      setPosts((prev) =>
+        page === 1 ? response.data : [...prev, ...response.data]
+      );
+      setHasMore(response.data.length === POINTS_PER_PAGE);
+    } catch (error) {
+      console.error("검색 중 오류 발생:", error);
+      setPosts([]); // 검색 실패 시 빈 화면 유지
+      setHasMore(false);
+    } finally {
+      setIsFetching(false);
+    }
+  }, []);
 
   // 유저 ID 가져오기
   const getUserId = async (): Promise<string | null> => {
