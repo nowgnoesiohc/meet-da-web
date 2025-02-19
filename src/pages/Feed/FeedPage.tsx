@@ -168,7 +168,7 @@ const PostItem = styled.div.withConfig({
 
   @media (max-width: 390px) {
     width: 11rem;
-    height: 16rem;
+    height: 18rem;
     padding-bottom: 0.5rem;
   }
 `;
@@ -371,6 +371,13 @@ export default function FeedPage() {
   const navigate = useNavigate();
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [isSearching, setIsSearching] = useState(false); // 검색 여부 상태 추가
+
+  useEffect(() => {
+    if (!isSearching && currentPage > 1 && !isFetching) {
+      fetchPosts(currentPage, activeTab.toLowerCase()); // 검색이 아닐 때만 실행
+    }
+  }, [currentPage, isSearching, activeTab]);
 
   // 정렬 변경 핸들러
   const handleSortChange = (sortKey: "Latest" | "Popular") => {
@@ -392,14 +399,23 @@ export default function FeedPage() {
           `${BASE_URL}/board/all-posts?page=${page}&sort=${sort}`
         );
 
-        if (response.data.length > 0) {
-          setPosts((prev) =>
-            page === 1 ? response.data : [...prev, ...response.data]
+        const updatedPosts: Post[] = response.data.map((post) => ({
+          ...post,
+          author: post.author || { username: "알 수 없음", profileImage: "" }, // 기본값 설정
+        }));
+
+        setPosts((prev) => {
+          if (page === 1) return updatedPosts; // 1페이지면 덮어쓰기
+
+          // 기존 데이터에서 중복 제거 후 추가
+          const newPosts = updatedPosts.filter(
+            (newPost) => !prev.some((prevPost) => prevPost.id === newPost.id)
           );
-          setHasMore(response.data.length === POINTS_PER_PAGE);
-        } else {
-          setHasMore(false);
-        }
+
+          return [...prev, ...newPosts];
+        });
+
+        setHasMore(updatedPosts.length > 0);
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
         setHasMore(false);
@@ -407,14 +423,20 @@ export default function FeedPage() {
         setIsFetching(false);
       }
     },
-    [isFetching]
+    [isFetching] // isFetching 의존성 배열에 포함
   );
 
   // 초기 로딩 전용 useEffect (컴포넌트 마운트 시 한 번만 호출)
   useEffect(() => {
-    // 컴포넌트가 마운트될 때만 한 번 실행 (빈 검색어인 경우)
     fetchPosts(1, activeTab.toLowerCase());
-  }, []);
+  }, [activeTab]);
+
+  // 페이지네이션: currentPage가 변경될 때 실행 (단, 1페이지는 중복 요청 방지)
+  useEffect(() => {
+    if (currentPage > 1 && !isFetching) {
+      fetchPosts(currentPage, activeTab.toLowerCase());
+    }
+  }, [currentPage, activeTab]);
 
   // 검색어 디바운싱 useEffect (검색어 변경에 따른 호출)
   useEffect(() => {
@@ -429,11 +451,12 @@ export default function FeedPage() {
   // currentPage, activeTab에 따른 추가 로딩 (페이지네이션)
   useEffect(() => {
     if (debouncedKeyword) {
-      searchPosts(debouncedKeyword, currentPage);
+      searchPosts(debouncedKeyword, 1); // 검색 시 1페이지부터 실행
     } else {
+      setIsSearching(false); // 검색이 종료되었을 때만 전체 데이터 로드
       fetchPosts(currentPage, activeTab.toLowerCase());
     }
-  }, [currentPage, debouncedKeyword, activeTab]);
+  }, [debouncedKeyword, activeTab]);
 
   // 무한스크롤 감지
   const lastPostRef = useCallback(
@@ -443,7 +466,10 @@ export default function FeedPage() {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) {
-          setCurrentPage((prev) => prev + 1);
+          setCurrentPage((prev) => {
+            console.log(`페이지 증가: ${prev + 1}`); // 디버깅용
+            return prev + 1;
+          });
         }
       });
 
@@ -469,40 +495,60 @@ export default function FeedPage() {
 
   // 검색 API 요청 함수
   const searchPosts = useCallback(async (keyword: string, page: number) => {
-    if (!keyword) {
+    if (!keyword.trim()) {
+      setIsSearching(false); // 검색 종료 상태로 변경
       setCurrentPage(1);
       setHasMore(true);
       setPosts([]);
-      fetchPosts(1, activeTab.toLowerCase()); // 검색어 삭제 시 초기 화면 표시
+      fetchPosts(1, activeTab.toLowerCase()); // 검색어 없을 때만 전체 데이터 로드
       return;
     }
 
+    setIsSearching(true); // 검색 중 상태로 설정
     setIsFetching(true);
+
     try {
-      const response = await axios.get<Post[]>(
+      const response = await axios.get<{ boards: Post[]; total: number }>(
         `${BASE_URL}/board/search?query=${encodeURIComponent(keyword)}&page=${page}&sort=latest`
       );
 
-      if (!response.data || !Array.isArray(response.data)) {
-        setPosts([]); // 검색 결과가 없을 경우 빈 화면 표시
+      console.log("검색 API 응답 데이터:", response.data);
+
+      if (
+        !response.data ||
+        !Array.isArray(response.data.boards) ||
+        response.data.boards.length === 0
+      ) {
+        console.log("검색 결과 없음");
+        setPosts([]); // 기존 데이터 삭제
         setHasMore(false);
         setIsFetching(false);
         return;
       }
 
-      // 최신순 정렬 적용
-      response.data.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      const updatedPosts = response.data.boards.map((post) => ({
+        ...post,
+        author: post.author || { username: "알 수 없음", profileImage: "" },
+        likesCount: post.likesCount || 0,
+      }));
+
+      // 검색어 정확도 필터링 추가
+      const filteredPosts = updatedPosts.filter(
+        (post) => post.title.includes(keyword) || post.content.includes(keyword)
       );
 
-      setPosts((prev) =>
-        page === 1 ? response.data : [...prev, ...response.data]
-      );
-      setHasMore(response.data.length === POINTS_PER_PAGE);
+      console.log("검색 필터링 후 데이터:", filteredPosts);
+
+      if (page === 1) {
+        setPosts(filteredPosts); // 기존 데이터 삭제 후 검색 결과만 표시
+      } else {
+        setPosts((prev) => [...prev, ...filteredPosts]);
+      }
+
+      setHasMore(filteredPosts.length === POINTS_PER_PAGE);
     } catch (error) {
       console.error("검색 중 오류 발생:", error);
-      setPosts([]); // 검색 실패 시 빈 화면 유지
+      setPosts([]);
       setHasMore(false);
     } finally {
       setIsFetching(false);
@@ -623,7 +669,7 @@ export default function FeedPage() {
                   </PostInfoWrap>
                   <InfoWrap>
                     <UserInfo>
-                      {post.author.profileImage ? (
+                      {post.author?.profileImage ? (
                         <UserImage
                           src={post.author.profileImage}
                           alt="Profile"
@@ -631,7 +677,7 @@ export default function FeedPage() {
                       ) : (
                         <ProfileImagePlaceholder />
                       )}
-                      {truncateText(post.author.username, 18)}
+                      {truncateText(post.author?.username || "알 수 없음", 18)}
                     </UserInfo>
                     <LikeContainer>
                       <LikeIcon />
