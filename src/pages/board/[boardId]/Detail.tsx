@@ -15,8 +15,12 @@ import { BsArrowReturnRight } from "react-icons/bs";
 import {
   CommentButton,
   DiaryButton,
+  FriendButton,
   ReplyButton,
 } from "@/components/ui/Button";
+import { useIsModalStore } from "@/store/ModalStore";
+import PointModal from "@/components/modal/PointModal";
+import { jwtDecode } from "jwt-decode";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -363,7 +367,7 @@ const ProfileWrap = styled.div`
   height: 3.5rem;
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  justify-content: space-between;
 `;
 
 const Profile = styled.div`
@@ -378,11 +382,23 @@ const Profile = styled.div`
   }
 `;
 
-const ProfileImage = styled.div`
+const ProfileImage = styled.img`
   width: 5rem;
   height: 5rem;
   border-radius: 6.25rem;
-  /* background-color: var(--line-basic); */
+
+  @media (max-width: 390px) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+`;
+
+const ProfileImagePlaceholder = styled.div`
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--line-basic);
 
   @media (max-width: 390px) {
     width: 2.5rem;
@@ -489,10 +505,12 @@ const IconButton = styled.div`
   height: 1.125rem;
   cursor: pointer;
 `;
+
 const EditIcon = styled(AiOutlineEdit)`
   font-size: 1.125rem;
   color: var(--text-03);
 `;
+
 const DeleteIcon = styled(AiOutlineDelete)`
   font-size: 1.125rem;
   color: var(--text-03);
@@ -580,6 +598,7 @@ const TextAreaWrap = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
+
 const ArrowIcon = styled(BsArrowReturnRight)`
   position: absolute;
   top: 0.62%;
@@ -591,6 +610,13 @@ const ArrowIcon = styled(BsArrowReturnRight)`
     left: -1%;
   }
 `;
+
+const UserInfoWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+`;
+
 interface Post {
   id: string;
   title: string;
@@ -606,6 +632,7 @@ interface Post {
 }
 
 interface Author {
+  id: string;
   username: string;
   profileImage: string;
   description: string;
@@ -618,7 +645,179 @@ export default function BoardDetail() {
   const { boardId } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isAuthor, setIsAuthor] = useState(false);
   const navigate = useNavigate();
+  const { isModal, setIsModalClick } = useIsModalStore();
+
+  useEffect(() => {
+    const storedBoardId = sessionStorage.getItem("showPointModal");
+
+    if (storedBoardId && storedBoardId === boardId) {
+      console.log("sessionStorage에서 모달 상태 감지");
+      setIsModalClick("pointModal");
+      sessionStorage.removeItem("showPointModal"); // 한 번만 실행되도록 삭제
+    }
+  }, [boardId]); // boardId가 변경될 때만 실행
+
+  // 친구 추가
+  const fetchFollowStatus = async () => {
+    if (!post) return;
+
+    try {
+      const userId = await getUserId();
+      if (!userId) return;
+
+      setIsAuthor(userId === post.author.id); // 내가 작성한 글인지 확인
+
+      console.log(`팔로잉 조회 요청: /user/${userId}/following`);
+
+      // API 응답 전체 확인
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/following`
+      );
+
+      console.log("API 응답 전체 데이터:", response.data);
+
+      if (!response.data) {
+        console.error("API 응답이 없습니다.");
+        return;
+      }
+
+      // 데이터가 올바른 배열인지 확인
+      if (!response.data.following || !Array.isArray(response.data.following)) {
+        console.error("팔로잉 목록이 없습니다.");
+        console.log("예상했던 배열이 아님, API 응답 구조 확인 필요.");
+        return;
+      }
+
+      const followingList = response.data.following;
+
+      console.log(
+        "팔로잉 리스트 데이터 타입:",
+        typeof followingList,
+        Array.isArray(followingList)
+      );
+      console.log("팔로잉 리스트 내용:", followingList);
+
+      // '_id' 속성으로 비교하도록 수정
+      const isUserFollowing = followingList.some(
+        (follow) => follow._id === post.author.id
+      );
+
+      console.log(`팔로우 상태 확인: ${isUserFollowing}`);
+      setIsFollowing(isUserFollowing);
+    } catch (error) {
+      console.error("팔로우 상태 가져오기 실패:", error);
+    }
+  };
+
+  // 상태 변경 후 최신 데이터 가져오도록 useEffect 트리거
+  useEffect(() => {
+    fetchFollowStatus();
+  }, [post, isFollowing]);
+
+  const handleFollowToggle = async () => {
+    if (!post) return;
+
+    try {
+      const userId = await getUserId();
+      if (!userId) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      const targetId = post.author.id;
+      if (!targetId) {
+        console.error("타겟 ID가 존재하지 않습니다.");
+        return;
+      }
+
+      if (isFollowing) {
+        console.log(
+          `팔로우 취소 요청: DELETE /user/follow/${userId}/${targetId}`
+        );
+
+        const response = await axios.delete(
+          `https://api.meet-da.site/user/follow/${userId}/${targetId}`
+        );
+
+        console.log("팔로우 취소 응답:", response.data);
+        if (response.status === 200) {
+          console.log("팔로우 취소 성공! 버튼 상태 변경");
+          setIsFollowing(false);
+          setTimeout(fetchFollowStatus, 1000); // 1초 후 최신 상태 확인
+        }
+      } else {
+        console.log(`팔로우 요청: POST /user/follow/${userId}/${targetId}`);
+
+        const response = await axios.post(
+          `https://api.meet-da.site/user/follow/${userId}/${targetId}`,
+          {}
+        );
+
+        console.log("팔로우 응답:", response.data);
+        if (response.status === 200) {
+          console.log("팔로우 성공! 버튼 상태 변경");
+          setIsFollowing(true);
+          setTimeout(fetchFollowStatus, 1000); // 1초 후 최신 상태 확인
+        }
+      }
+    } catch (error) {
+      console.error("팔로우 상태 변경 실패:", error);
+      alert("팔로우 상태를 변경하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  useEffect(() => {
+    const checkIfAuthor = async () => {
+      const userId = await getUserId();
+      if (userId && post) {
+        setIsAuthor(userId === post.author.id);
+        console.log(`게시글 작성자 여부 확인: ${isAuthor}`);
+      }
+    };
+
+    checkIfAuthor();
+  }, [post]);
+
+  // 유저 ID 가져오기
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    try {
+      const userId = jwtDecode(token).sub;
+      return userId || null;
+    } catch {
+      return null;
+    }
+  };
+
+  // 포인트 적립 API 요청 함수
+  const handlePointUpdate = async () => {
+    try {
+      const userId = await getUserId(); // 안정적으로 userId 가져오기
+      if (!userId) throw new Error("사용자 ID를 찾을 수 없습니다.");
+
+      const response = await axios.patch(
+        `https://api.meet-da.site/user/${userId}/points`,
+        {
+          delta: 50,
+          description: "다이어리 작성",
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("포인트 적립 성공:", response.data);
+      } else {
+        console.error("포인트 적립 실패:", response.data);
+      }
+    } catch (error) {
+      console.error("포인트 적립 요청 중 오류 발생:", error);
+    }
+
+    setIsModalClick(null); // 모달 닫기
+  };
 
   const toggleBookmark = async () => {
     const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
@@ -719,6 +918,19 @@ export default function BoardDetail() {
     navigate(`/board/edit/${boardId}`);
   };
 
+  // visibility 값을 한글로 변환하는 객체
+  const visibilityMap: { [key: string]: string } = {
+    PUBLIC: "전체 공개",
+    FRIENDS_ONLY: "서로 믿음 공개",
+    PRIVATE: "비공개",
+  };
+
+  // visibility 값이 매핑에 없을 경우 대비 기본값 설정
+  const visibilityText = visibilityMap[post.visibility] || "알 수 없음";
+
+  const defaultProfileImage = ProfileImagePlaceholder; // 기본 이미지
+  const profileImageSrc = post.author.profileImage || defaultProfileImage;
+
   return (
     <Wrap>
       <Title>
@@ -741,7 +953,7 @@ export default function BoardDetail() {
             <Div>·</Div>
             <Div>{post.createdAt.substring(0, 10)}</Div>
             <Div>·</Div>
-            <Div1>{post.visibility}</Div1>
+            <Div1>{visibilityText}</Div1>
           </FrameGroup>
         </FrameWrapper>
         <IconWrap>
@@ -778,13 +990,34 @@ export default function BoardDetail() {
         </DiaryButton>
       </Button>
       <ProfileWrap>
-        <ProfileImage>{post.author.profileImage}</ProfileImage>
-        <Profile>
-          <p>{post.author.username}</p>
-          <span>{post.author.description}</span>
-        </Profile>
+        <UserInfoWrap>
+          <ProfileImage
+            src={profileImageSrc}
+            alt={`${post.author.username}의 프로필 이미지`}
+            onError={(e) => {
+              e.currentTarget.src = defaultProfileImage;
+            }}
+          />
+          <Profile>
+            <p>{post.author.username}</p>
+            <span>
+              {post.author.description !== ""
+                ? post.author.description
+                : "믿-다에서 서로를 믿어보세요"}
+            </span>
+          </Profile>
+        </UserInfoWrap>
+
+        {post && !isAuthor && (
+          <FriendButton
+            $variant={isFollowing ? "diaryUnfollow" : "diaryFollow"}
+            onClick={handleFollowToggle}
+          >
+            {isFollowing ? "헤어지기" : "만나기"}
+          </FriendButton>
+        )}
       </ProfileWrap>
-      <Line></Line>
+      <Line />
       <CommentCount>2개의 댓글</CommentCount>
       <TextArea placeholder="댓글을 작성하세요." />
       <CommentButtonWrap>
@@ -793,7 +1026,13 @@ export default function BoardDetail() {
       <CommentList>
         <ListArray>
           <ProfileWrap>
-            <ProfileImage>{post.author.profileImage}</ProfileImage>
+            <ProfileImage
+              src={profileImageSrc}
+              alt={`${post.author.username}의 프로필 이미지`}
+              onError={(e) => {
+                e.currentTarget.src = defaultProfileImage;
+              }}
+            />
             <Profile>
               <p>믿음소망사과</p>
               <span>방금 전</span>
@@ -823,7 +1062,13 @@ export default function BoardDetail() {
           <Line></Line>
           <ListArray>
             <ProfileWrap>
-              <ProfileImage>{post.author.profileImage}</ProfileImage>
+              <ProfileImage
+                src={profileImageSrc}
+                alt={`${post.author.username}의 프로필 이미지`}
+                onError={(e) => {
+                  e.currentTarget.src = defaultProfileImage;
+                }}
+              />
               <Profile>
                 <p>믿음소망사과</p>
                 <span>방금 전</span>
@@ -836,6 +1081,16 @@ export default function BoardDetail() {
           </ListArray>
         </Reply>
       </CommentList>
+
+      {isModal === "pointModal" && (
+        <PointModal
+          isOpen={true}
+          title="다이어리 작성 완료!"
+          content={"50 P"}
+          subContent="포인트가 적립되었습니다."
+          onConfirm={handlePointUpdate}
+        />
+      )}
     </Wrap>
   );
 }

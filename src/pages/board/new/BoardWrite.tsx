@@ -259,8 +259,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   const [content, setContent] = useState("");
   const quillRef = useRef<ReactQuill | null>(null);
 
-  const [title, setTitle] = useState("테스트 제목입니다."); // 제목 상태 (임시제목)
-  console.log(setTitle);
+  const [title, setTitle] = useState<string | null>(null); // 초기값을 null로 설정
 
   // 글자 수
   const [text, setText] = useState(0);
@@ -497,12 +496,11 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
       alert("사용자 정보를 가져올 수 없습니다.");
       return;
     }
-    console.log(userInfo);
 
     const postData = {
-      title: title,
-      content: content,
-      images: [], // 이미지 배열
+      title,
+      content,
+      images: [],
       visibility: selected,
       author: userInfo.id,
       authorName: userInfo.username,
@@ -511,29 +509,29 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
 
     try {
       if (isEdit) {
-        // 수정 요청
-        // const response = await axios.patch(`https://api.meet-da.site/board/${boardId}`, postData);
-        console.log(content);
         const response = await axios.patch(
           `https://api.meet-da.site/board/${boardId}`,
-          { content: content, visibility: selected }
+          { content, visibility: selected }
         );
 
         if (response.status === 200) {
-          console.log("게시글 수정 성공", response.data);
-          const boardId = response.data._id;
+          console.log("게시글 수정 성공:", response.data);
           navigate(`/board/${boardId}`);
         }
       } else {
-        // 작성 요청
         const response = await axios.post(
           "https://api.meet-da.site/board",
           postData
         );
 
         if (response.status === 201) {
-          console.log("게시글 작성 성공", response.data);
+          console.log("게시글 작성 성공:", response.data);
           const boardId = response.data._id;
+
+          // sessionStorage에 상태 저장 (navigate 후에도 유지)
+          sessionStorage.setItem("showPointModal", boardId); // boardId를 저장하여 검증 가능
+
+          // navigate 실행
           navigate(`/board/${boardId}`);
         }
       }
@@ -543,11 +541,30 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     }
   };
 
+  // 랜덤 제목 불러오기
+  useEffect(() => {
+    const fetchRandomTitle = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.meet-da.site/questions/daily"
+        );
+        setTitle(response.data.title);
+      } catch (error) {
+        console.error("랜덤 제목 가져오기 실패", error);
+        setTitle("제목을 불러오지 못했습니다."); // 에러 발생 시 기본값
+      }
+    };
+
+    if (!isEdit) {
+      fetchRandomTitle();
+    }
+  }, [isEdit]);
+
   return (
     <Wrap>
       <h2>{currentDate}</h2>
       <TitleWrap>
-        <p>{title}</p>
+        <p>{title ?? "불러오는 중..."}</p>
         <div ref={menuRef}>
           <DropdownContainer onClick={toggleDropdown}>
             <SelectMenu>{descriptions[selected]}</SelectMenu>
