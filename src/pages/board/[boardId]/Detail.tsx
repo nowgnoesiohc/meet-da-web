@@ -4,14 +4,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { AiOutlineEdit } from "react-icons/ai";
 import { AiOutlineDelete } from "react-icons/ai";
-import { AiOutlineComment } from "react-icons/ai";
 import { AiOutlineUpload } from "react-icons/ai";
 import { IoIosHeart } from "react-icons/io";
 import { IoIosHeartEmpty } from "react-icons/io";
 import { FaBookmark } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa";
 import { BsArrowReturnRight } from "react-icons/bs";
-
 import {
   CommentButton,
   DiaryButton,
@@ -21,6 +19,11 @@ import {
 import { useIsModalStore } from "@/store/ModalStore";
 import PointModal from "@/components/modal/PointModal";
 import { jwtDecode } from "jwt-decode";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Thumbs } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
+import { IoChatbubblesOutline } from "react-icons/io5";
+import { IoChatbubbles } from "react-icons/io5";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -160,8 +163,8 @@ const BookmarkHoverIcon = styled(FaBookmark)`
     height: 0.75rem;
 
     div {
-      width: 12px;
-      height: 12px;
+      width: 0.75rem;
+      height: 0.75rem;
     }
   }
 `;
@@ -182,8 +185,8 @@ const UploadIcon = styled(AiOutlineUpload)`
     height: 0.75rem;
 
     div {
-      width: 12px;
-      height: 12px;
+      width: 0.75rem;
+      height: 0.75rem;
     }
   }
 `;
@@ -199,8 +202,8 @@ const IconWrap = styled.div`
     float: right;
 
     button {
-      width: 12px;
-      height: 12px;
+      width: 0.75rem;
+      height: 0.75rem;
     }
   }
 `;
@@ -224,87 +227,6 @@ const FrameParentRoot = styled.div`
   }
 `;
 
-// 이미지
-const MainImage = styled.img`
-  width: 42.875rem;
-  position: relative;
-  border-radius: 0.5rem;
-  height: 27.875rem;
-  object-fit: cover;
-
-  @media (max-width: 390px) {
-    width: 20rem;
-    height: 10rem;
-  }
-`;
-const SubImageWrap = styled.div`
-  width: 17.25rem;
-  max-height: 27.875rem;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 1rem;
-
-  @media (max-width: 390px) {
-    height: 10rem;
-  }
-`;
-const SubImage = styled.img`
-  align-self: stretch;
-  position: relative;
-  border-radius: 0.5rem;
-  max-width: 100%;
-  overflow: hidden;
-  height: 11.75rem;
-  flex-shrink: 0;
-  object-fit: cover;
-  background-color: #333;
-
-  @media (max-width: 390px) {
-    height: 3.5rem;
-  }
-`;
-const SubImageOpacity = styled.img`
-  align-self: stretch;
-  position: relative;
-  border-radius: 0.5rem;
-  max-width: 100%;
-  overflow: hidden;
-  height: 11.75rem;
-  flex-shrink: 0;
-  object-fit: cover;
-  opacity: 0.5;
-  background-color: #333;
-
-  @media (max-width: 390px) {
-    height: 3.5rem;
-  }
-`;
-const ImageWrap = styled.div`
-  width: 100%;
-  position: relative;
-  height: 27.875rem;
-  overflow: hidden;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 2rem;
-  margin-top: 3.75rem;
-
-  @media (max-width: 390px) {
-    height: 10rem;
-  }
-`;
-
-const Text = styled.div`
-  margin-top: 3.75rem;
-  width: 62.125rem;
-  font-size: 1.125rem;
-  line-height: 2.5rem;
-`;
 const LikeWrap = styled.div`
   margin-top: 3.75rem;
   width: 100%;
@@ -316,18 +238,17 @@ const LikeWrap = styled.div`
   flex-direction: row;
   gap: 0.625rem;
 
-  div {
+  button {
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.25rem;
 
     > span {
       position: relative;
       line-height: 1.5rem;
-      font-size: 1.25rem;
-      margin-left: 0.625rem;
-      padding-top: 0.25rem;
+      font-size: 1.2rem;
     }
   }
 `;
@@ -335,7 +256,7 @@ const HeartIcon = styled(IoIosHeartEmpty)`
   font-size: 1.5rem;
   color: var(--main-orange);
 `;
-const HeratHoverIcon = styled(IoIosHeart)`
+const HeartHoverIcon = styled(IoIosHeart)`
   font-size: 1.5rem;
   color: var(--main-orange);
 `;
@@ -346,7 +267,7 @@ const Button = styled.div`
   margin: 0 auto;
   display: flex;
   gap: 2rem;
-  margin-top: 60px;
+  margin-top: 3.75rem;
   margin-bottom: 6.125rem;
 
   > button {
@@ -409,8 +330,7 @@ const ProfileImagePlaceholder = styled.div`
 const Line = styled.div`
   width: 100%;
   border-top: 0.0625rem solid var(--line-basic);
-  margin-top: 6.875rem;
-  margin-bottom: 5.125rem;
+  margin: 60px 0px;
 
   @media (max-width: 390px) {
     margin-top: 3.75rem;
@@ -431,6 +351,11 @@ const TextArea = styled.textarea`
   border: 0.0625rem solid var(--search-placeholder);
   resize: none;
 
+  &:focus {
+    outline: none;
+    border: 0.0625rem solid var(--search-placeholder);
+  }
+
   &::placeholder {
     color: var(--text-03);
   }
@@ -441,7 +366,7 @@ const CommentButtonWrap = styled.div`
   height: 3.25rem;
   display: flex;
   flex-direction: row-reverse;
-  margin-top: 1.5rem;
+  margin: 1.5rem 0px 120px;
 
   @media (max-width: 390px) {
     margin-top: 0.75rem;
@@ -449,7 +374,7 @@ const CommentButtonWrap = styled.div`
 `;
 
 const CommentList = styled.div`
-  margin-top: 9.875rem;
+  margin-top: 80px;
 
   ${ProfileWrap} {
     display: block;
@@ -457,7 +382,7 @@ const CommentList = styled.div`
     ${ProfileImage} {
       width: 3.375rem;
       height: 3.375rem;
-      background-color: #f28a8a;
+      background-color: var(--line-basic);
       position: absolute;
       top: 0;
       left: 0;
@@ -495,6 +420,7 @@ const CommentList = styled.div`
 const ListArray = styled.div`
   position: relative;
   display: flex;
+  flex-direction: column;
 `;
 
 const IconButton = styled.div`
@@ -518,18 +444,20 @@ const DeleteIcon = styled(AiOutlineDelete)`
 
 const CommentWrite = styled.div`
   display: flex;
-  /* align-items:center; */
+  align-items: center;
   height: 2.375rem;
-  margin-top: 1.125rem;
-  margin-bottom: 1.375rem;
+  margin: 1rem 0;
+
+  p {
+    margin: 0 !important;
+  }
 `;
 
 const ReplyButtonWrap = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.2rem;
   height: 1.5rem;
-  margin-bottom: 1.25rem;
 
   > button {
     height: 1.125rem;
@@ -543,8 +471,7 @@ const Reply = styled.div`
   background-color: var(--bg-02);
   padding: 1.875rem 1.875rem 1.25rem 1.875rem;
   float: right;
-  margin-bottom: 11rem;
-  /* margin:0 auto; */
+  margin: 20px 0px 0px 40px;
 
   ${Line} {
     margin: 1.5rem 0;
@@ -588,7 +515,17 @@ const Reply = styled.div`
   }
 `;
 
-const ReplyIcon = styled(AiOutlineComment)`
+const ReplyComment = styled.div`
+  background-color: var(--bg-02);
+  padding: 1.875rem 1.875rem 1.25rem 1.875rem;
+`;
+
+const ReplyIcon = styled(IoChatbubblesOutline)`
+  font-size: 1.125rem;
+  color: var(--comment-button);
+`;
+
+const ClickedReplyIcon = styled(IoChatbubbles)`
   font-size: 1.125rem;
   color: var(--comment-button);
 `;
@@ -617,6 +554,122 @@ const UserInfoWrap = styled.div`
   gap: 1.25rem;
 `;
 
+// Swiper 컨테이너 (이미지 및 썸네일 포함)
+const SwiperContainer = styled.div<{ isSingleImage: boolean }>`
+  display: flex;
+  justify-content: ${({ isSingleImage }) =>
+    isSingleImage ? "center" : "space-between"};
+  align-items: center;
+  margin: 3.75rem 0;
+`;
+
+// 메인 Swiper (이미지 1개일 경우 width 100%)
+const StyledSwiper = styled(Swiper)<{ isSingleImage: boolean }>`
+  width: ${({ isSingleImage }) => (isSingleImage ? "100%" : "45rem")};
+  height: 30rem;
+  border-radius: 0.625rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    display: none !important;
+  }
+
+  .swiper-pagination-bullet {
+    background: var(--main-text);
+    opacity: 0.5;
+  }
+
+  .swiper-pagination-bullet-active {
+    background: var(--accent-color);
+    opacity: 1;
+  }
+
+  @media (max-width: 390px) {
+    width: ${({ isSingleImage }) => (isSingleImage ? "100%" : "20rem")};
+    height: 10rem;
+  }
+`;
+
+// 메인 Swiper 내부 이미지 슬라이드
+const StyledSwiperSlide = styled(SwiperSlide)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.625rem;
+`;
+
+const SwiperImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.625rem;
+`;
+
+// 세로 정렬 Swiper
+const ThumbnailSwiper = styled(Swiper)`
+  display: flex;
+  flex-direction: column;
+  width: 15rem;
+  height: 30rem;
+  gap: 0.625rem;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: var(--white) transparent;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+
+  .swiper-wrapper {
+    flex-direction: column !important;
+    gap: 1.25rem;
+  }
+
+  .swiper-slide {
+    width: 100% !important;
+    margin-right: 0px !important;
+  }
+`;
+
+const ThumbnailSlide = styled(SwiperSlide)`
+  width: 11.25rem;
+  height: 8.5rem;
+  cursor: pointer;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.swiper-slide-thumb-active {
+    opacity: 1;
+    border: 2px solid var(--accent-color);
+  }
+`;
+
+const ThumbnailImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.625rem;
+`;
+
+const PostText = styled.div`
+  width: 62.125rem;
+  font-size: 1.125rem;
+  line-height: 2rem;
+  text-align: justify;
+  margin: 2rem auto;
+`;
+
+const CommentInfoWrap = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`;
+
 interface Post {
   id: string;
   title: string;
@@ -638,10 +691,22 @@ interface Author {
   description: string;
 }
 
+interface Comment {
+  _id: string;
+  content: string;
+  author: {
+    username: string;
+    profileImage: string;
+  };
+  createdAt: string;
+  parentCommentId?: string | null; // 대댓글인지 여부 확인
+  replies?: Comment[]; // 대댓글 리스트 추가
+}
+
 export default function BoardDetail() {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  // const [isBookmarkHover, setIsBookmarkHover] = useState(false);
-  const [isLikeHover, setIsLikeHover] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const { boardId } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
@@ -649,6 +714,16 @@ export default function BoardDetail() {
   const [isAuthor, setIsAuthor] = useState(false);
   const navigate = useNavigate();
   const { isModal, setIsModalClick } = useIsModalStore();
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState<string>("");
 
   useEffect(() => {
     const storedBoardId = sessionStorage.getItem("showPointModal");
@@ -819,75 +894,120 @@ export default function BoardDetail() {
     setIsModalClick(null); // 모달 닫기
   };
 
-  const toggleBookmark = async () => {
-    const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
-    const userId = localStorage.getItem("userId");
+  const fetchPost = async () => {
     try {
-      const response = await axios.post(
-        `https://api.meet-da.site/board/toggle-bookmark`,
-        {
-          boardId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // 인증 헤더 추가
-          },
-        }
-      );
-
-      console.log("API 응답:", response.data); // 응답 데이터 확인
-
-      if (response.status === 200) {
-        const updatedBookmarks = response.data.bookmarks;
-        const isUserBookmarked = updatedBookmarks.includes(userId || "");
-
-        console.log("북마크 상태 변경 전:", isBookmarked);
-        setIsBookmarked(isUserBookmarked); // 상태 업데이트
-        console.log("북마크 상태 변경 후:", isUserBookmarked);
+      setLoading(true);
+      const userId = await getUserId();
+      if (!userId) {
+        console.error("유저 ID를 가져올 수 없음");
+        return;
       }
+
+      const response = await axios.get(
+        `https://api.meet-da.site/board/${boardId}`
+      );
+      const postData = response.data;
+
+      setPost(postData);
+
+      // 유저 ID를 기반으로 정확한 북마크 및 좋아요 상태 설정
+      setIsBookmarked(postData.bookmarks.includes(userId));
+      setIsLiked(postData.likes.includes(userId));
+      setLikeCount(postData.likes.length);
     } catch (error) {
-      console.error("북마크 설정 실패:", error);
-      alert("북마크 설정 중 오류가 발생했습니다.");
+      console.error("게시글 데이터 가져오기 실패:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await axios.get<Post>(
-          `https://api.meet-da.site/board/${boardId}`
-        );
-
-        // console.log("API 응답:", response.data); // 데이터 구조 확인
-
-        if (response.data) {
-          setPost(response.data);
-
-          const userId = localStorage.getItem("userId");
-          const isUserBookmark = response.data.bookmarks.includes(userId || "");
-          setIsBookmarked(isUserBookmark);
-        } else {
-          console.error("데이터가 없습니다");
-        }
-        setLoading(false);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 404) {
-            console.error("게시글을 찾을 수 없습니다");
-          } else {
-            console.error("서버 에러:", error.response?.data);
-            console.error("서버 상태 코드:", error.response?.status);
-          }
-        } else {
-          console.error("게시글 가져오기 실패:", error);
-        }
-        setLoading(false);
+    const fetchUserAndPost = async () => {
+      const userId = await getUserId();
+      if (userId) {
+        fetchPost();
       }
     };
-    fetchPost();
+    fetchUserAndPost();
   }, [boardId]);
 
+  const toggleBookmark = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      setIsBookmarked((prev) => !prev);
+
+      const response = await axios.post(
+        `https://api.meet-da.site/board/toggle-bookmark`,
+        { boardId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("북마크 API 응답:", response.data);
+      setIsBookmarked(response.data.message === "Bookmark added");
+    } catch (error) {
+      console.error("북마크 설정 실패:", error);
+    }
+  };
+
+  const toggleLike = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      setIsLiked((prev) => !prev);
+      setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+
+      const response = await axios.post(
+        `https://api.meet-da.site/board/toggle-like`,
+        { boardId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("좋아요 API 응답:", response.data);
+      setIsLiked(response.data.message === "Like added");
+      setLikeCount(
+        response.data.message === "Like added" ? likeCount + 1 : likeCount - 1
+      );
+    } catch (error) {
+      console.error("좋아요 설정 실패:", error);
+    }
+  };
+
+  const handleEdit = async () => {
+    const userId = await getUserId();
+    if (!userId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (userId !== post?.author.id) {
+      alert("작성자만 수정할 수 있습니다.");
+      return;
+    }
+
+    navigate(`/board/edit/${boardId}`);
+  };
+
   const handleDelete = async () => {
+    const userId = await getUserId();
+    if (!userId) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    if (userId !== post?.author.id) {
+      alert("작성자만 삭제할 수 있습니다.");
+      return;
+    }
+
     if (window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
       try {
         const response = await axios.delete(
@@ -895,7 +1015,7 @@ export default function BoardDetail() {
         );
         if (response.status === 200) {
           console.log("게시글 삭제 성공");
-          navigate("/"); // 삭제 후 홈 페이지로 리다이렉트
+          navigate("/"); // 삭제 후 홈 페이지로 이동
         } else {
           console.error("게시글 삭제 실패", response.data);
         }
@@ -906,6 +1026,172 @@ export default function BoardDetail() {
     }
   };
 
+  useEffect(() => {
+    if (boardId) {
+      fetchComments();
+    }
+  }, [boardId]);
+
+  const fetchComments = async () => {
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/comment/${boardId}`
+      );
+
+      if (!response.data || response.data.length === 0) {
+        console.warn("댓글이 없습니다.");
+        setComments([]); // ✅ 댓글이 없는 경우에도 빈 배열로 설정하여 UI 업데이트
+        return;
+      }
+
+      const commentsWithReplies = await Promise.all(
+        response.data.map(async (comment: Comment) => {
+          const replies = await fetchReplies(comment._id);
+          return {
+            ...comment,
+            author: {
+              username: comment.author?.username || "익명",
+              profileImage: comment.author?.profileImage || defaultProfileImage,
+            },
+            createdAt: comment.createdAt || new Date().toISOString(),
+            replies,
+          };
+        })
+      );
+
+      setComments(commentsWithReplies);
+    } catch (error) {
+      console.error("댓글 조회 실패:", error);
+    }
+  };
+
+  const postComment = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      const userId = await getUserId();
+      if (!userId) {
+        alert("사용자 정보를 가져올 수 없습니다.");
+        return;
+      }
+
+      const parentCommentId = replyingTo; // ✅ 대댓글이면 부모 댓글의 ID가 들어감
+
+      const response = await axios.post(
+        `https://api.meet-da.site/comment`,
+        {
+          boardId,
+          author: userId,
+          content: newComment,
+          parentCommentId: parentCommentId || null, // ✅ 일반 댓글이면 null
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("댓글 생성 응답:", response.data);
+
+      setNewComment("");
+      setReplyingTo(null); // ✅ 댓글 작성 후 parentCommentId 초기화
+      fetchComments(); // ✅ UI 즉시 업데이트
+    } catch (error) {
+      console.error("댓글 작성 실패:", error);
+    }
+  };
+
+  const toggleReplyBox = (commentId: string) => {
+    setReplyingTo(replyingTo === commentId ? null : commentId); // ✅ 부모 댓글의 _id 저장
+    setActiveReplyId((prev) => (prev === commentId ? null : commentId)); // 클릭한 댓글만 Reply 표시
+  };
+
+  const editComment = async (
+    commentId: string,
+    currentContent: string,
+    authorId: string
+  ) => {
+    const userId = await getUserId();
+    if (!userId || userId !== authorId) {
+      alert("본인이 작성한 댓글만 수정할 수 있습니다.");
+      return;
+    }
+
+    setEditingCommentId(commentId);
+    setEditContent(currentContent);
+  };
+
+  const saveEditedComment = async (commentId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return alert("로그인이 필요합니다.");
+
+      await axios.patch(
+        `https://api.meet-da.site/comment/${commentId}`,
+        { content: editContent },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, content: editContent }
+            : comment
+        )
+      );
+
+      setEditingCommentId(null);
+    } catch (error) {
+      console.error("댓글 수정 실패:", error);
+    }
+  };
+
+  const deleteComment = async (commentId: string, authorId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return alert("로그인이 필요합니다.");
+
+      const userId = await getUserId();
+      if (!userId || userId !== authorId) {
+        alert("본인이 작성한 댓글만 삭제할 수 있습니다.");
+        return;
+      }
+
+      if (!window.confirm("정말로 이 댓글을 삭제하시겠습니까?")) return;
+
+      await axios.delete(`https://api.meet-da.site/comment/${commentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment._id !== commentId)
+      );
+    } catch (error) {
+      console.error("댓글 삭제 실패:", error);
+    }
+  };
+
+  const fetchReplies = async (commentId: string) => {
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/comment/replies/${commentId}`
+      );
+
+      return response.data.map((reply: Comment) => ({
+        ...reply,
+        author: {
+          username: reply.author?.username || "익명",
+          profileImage: reply.author?.profileImage || defaultProfileImage,
+        },
+        createdAt: reply.createdAt || new Date().toISOString(),
+      }));
+    } catch (error) {
+      console.error("대댓글 조회 실패:", error);
+      return [];
+    }
+  };
+
   if (loading) {
     return <p>로딩 중...</p>; // 로딩 중일 때 표시할 내용
   }
@@ -913,10 +1199,6 @@ export default function BoardDetail() {
   if (!post) {
     return <p>게시글을 찾을 수 없습니다.</p>;
   }
-
-  const handleEdit = () => {
-    navigate(`/board/edit/${boardId}`);
-  };
 
   // visibility 값을 한글로 변환하는 객체
   const visibilityMap: { [key: string]: string } = {
@@ -930,6 +1212,10 @@ export default function BoardDetail() {
 
   const defaultProfileImage = ProfileImagePlaceholder; // 기본 이미지
   const profileImageSrc = post.author.profileImage || defaultProfileImage;
+
+  const totalComments = comments.reduce((count, comment) => {
+    return count + 1 + (comment.replies ? comment.replies.length : 0);
+  }, 0);
 
   return (
     <Wrap>
@@ -958,28 +1244,61 @@ export default function BoardDetail() {
         </FrameWrapper>
         <IconWrap>
           <button onClick={toggleBookmark}>
-            {isBookmarked ? <BookmarkIcon /> : <BookmarkHoverIcon />}
+            {isBookmarked ? <BookmarkHoverIcon /> : <BookmarkIcon />}
           </button>
           <UploadIcon />
         </IconWrap>
       </FrameParentRoot>
-      <ImageWrap>
-        <MainImage alt="" />
-        <SubImageWrap>
-          <SubImage alt="" />
-          <SubImageOpacity alt="" />
-          <SubImageOpacity alt="" />
-        </SubImageWrap>
-      </ImageWrap>
-      <Text dangerouslySetInnerHTML={{ __html: post.content }}></Text>
+      {post.images.length > 0 ? (
+        <>
+          <SwiperContainer isSingleImage={post.images.length === 1}>
+            {/* 메인 Swiper */}
+            <StyledSwiper
+              isSingleImage={post.images.length === 1}
+              modules={[FreeMode, Thumbs]}
+              thumbs={{ swiper: thumbsSwiper }}
+              slidesPerView={1}
+            >
+              {post.images.map((image, index) => (
+                <StyledSwiperSlide key={index}>
+                  <SwiperImage src={image} alt={`게시글 이미지 ${index + 1}`} />
+                </StyledSwiperSlide>
+              ))}
+            </StyledSwiper>
+
+            {/* 이미지 2개 이상일 때만 표시 */}
+            {post.images.length > 1 && (
+              <ThumbnailSwiper
+                onSwiper={setThumbsSwiper}
+                spaceBetween={10}
+                slidesPerView={4}
+                freeMode
+                watchSlidesProgress
+                mousewheel={true} /* 스크롤 가능 */
+                modules={[FreeMode, Thumbs]}
+              >
+                {post.images.map((image, index) => (
+                  <ThumbnailSlide key={index}>
+                    <ThumbnailImage src={image} alt={`썸네일 ${index + 1}`} />
+                  </ThumbnailSlide>
+                ))}
+              </ThumbnailSwiper>
+            )}
+          </SwiperContainer>
+
+          <PostText
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          ></PostText>
+        </>
+      ) : (
+        <PostText dangerouslySetInnerHTML={{ __html: post.content }}></PostText>
+      )}
+
       <LikeWrap>
-        <div
-          onMouseEnter={() => setIsLikeHover(true)}
-          onMouseLeave={() => setIsLikeHover(false)}
-        >
-          {isLikeHover ? <HeratHoverIcon /> : <HeartIcon />}
-          <span>21</span>
-        </div>
+        <button onClick={toggleLike}>
+          {isLiked ? <HeartHoverIcon /> : <HeartIcon />}
+          <span>{likeCount}</span>
+        </button>
       </LikeWrap>
       <Button>
         <DiaryButton $variant="delete" onClick={handleDelete}>
@@ -1018,68 +1337,147 @@ export default function BoardDetail() {
         )}
       </ProfileWrap>
       <Line />
-      <CommentCount>2개의 댓글</CommentCount>
-      <TextArea placeholder="댓글을 작성하세요." />
-      <CommentButtonWrap>
-        <CommentButton>댓글 작성</CommentButton>
-      </CommentButtonWrap>
       <CommentList>
-        <ListArray>
-          <ProfileWrap>
-            <ProfileImage
-              src={profileImageSrc}
-              alt={`${post.author.username}의 프로필 이미지`}
-              onError={(e) => {
-                e.currentTarget.src = defaultProfileImage;
-              }}
-            />
-            <Profile>
-              <p>믿음소망사과</p>
-              <span>방금 전</span>
-            </Profile>
-          </ProfileWrap>
-          <IconButton>
-            <EditIcon />
-            <DeleteIcon />
-          </IconButton>
-        </ListArray>
-        <CommentWrite>
-          <p>댓글을 작성해봅시다.</p>
-        </CommentWrite>
-        <ReplyButtonWrap>
-          <ReplyIcon />
-          <button>답글달기</button>
-        </ReplyButtonWrap>
-        <Reply>
-          <TextAreaWrap>
-            <ArrowIcon />
-            <TextArea placeholder="댓글을 작성하세요." />
-          </TextAreaWrap>
-          <Button>
-            <button>취소</button>
-            <ReplyButton $variant="comment">댓글 작성</ReplyButton>
-          </Button>
-          <Line></Line>
-          <ListArray>
-            <ProfileWrap>
-              <ProfileImage
-                src={profileImageSrc}
-                alt={`${post.author.username}의 프로필 이미지`}
-                onError={(e) => {
-                  e.currentTarget.src = defaultProfileImage;
-                }}
-              />
-              <Profile>
-                <p>믿음소망사과</p>
-                <span>방금 전</span>
-              </Profile>
-            </ProfileWrap>
-            <IconButton>
-              <EditIcon />
-              <DeleteIcon />
-            </IconButton>
-          </ListArray>
-        </Reply>
+        <CommentCount>{totalComments}개의 댓글</CommentCount>
+        <TextArea
+          placeholder="댓글을 작성하세요."
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+        />
+        <CommentButtonWrap>
+          <CommentButton onClick={postComment}>댓글 작성</CommentButton>
+        </CommentButtonWrap>
+        {comments.map((comment, index) => {
+          const isLastComment = index === comments.length - 1; // 마지막 댓글인지 확인
+
+          return (
+            <ListArray key={comment._id}>
+              <CommentInfoWrap>
+                <ProfileWrap>
+                  <ProfileImage
+                    src={
+                      comment.author.profileImage &&
+                      comment.author.profileImage !== ""
+                        ? comment.author.profileImage
+                        : defaultProfileImage
+                    }
+                    alt={`${comment.author.username}의 프로필 이미지`}
+                    onError={(e) => {
+                      e.currentTarget.src = defaultProfileImage;
+                    }}
+                    style={{
+                      backgroundColor: "transparent", // ✅ 배경색을 하얀색이 아닌 투명하게 설정
+                      display: "block", // ✅ 이미지가 사라지지 않도록 강제 설정
+                    }}
+                  />
+
+                  <Profile>
+                    <p>{comment.author.username}</p>
+                    <span>{new Date(comment.createdAt).toLocaleString()}</span>
+                  </Profile>
+                </ProfileWrap>
+                <IconButton>
+                  <EditIcon
+                    onClick={() =>
+                      editComment(
+                        comment._id,
+                        comment.content,
+                        comment.author.username
+                      )
+                    }
+                  />
+                  <DeleteIcon
+                    onClick={() =>
+                      deleteComment(comment._id, comment.author.username)
+                    }
+                  />
+                </IconButton>
+              </CommentInfoWrap>
+              <CommentWrite>
+                {editingCommentId === comment._id ? (
+                  <>
+                    {/* ✅ 댓글 작성 UI와 동일한 형태로 수정 */}
+                    <TextArea
+                      placeholder="댓글을 작성하세요."
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                    />
+                    <CommentButtonWrap>
+                      <CommentButton
+                        onClick={() => saveEditedComment(comment._id)}
+                      >
+                        수정 완료
+                      </CommentButton>
+                      <button onClick={() => setEditingCommentId(null)}>
+                        취소
+                      </button>
+                    </CommentButtonWrap>
+                  </>
+                ) : (
+                  <p>{comment.content}</p>
+                )}
+              </CommentWrite>
+
+              <ReplyButtonWrap>
+                {activeReplyId === comment._id ? (
+                  <ClickedReplyIcon />
+                ) : (
+                  <ReplyIcon />
+                )}
+                <button onClick={() => toggleReplyBox(comment._id)}>
+                  답글 달기
+                </button>
+              </ReplyButtonWrap>
+              {activeReplyId !== comment._id && !isLastComment && <Line />}
+              {activeReplyId === comment._id && (
+                <>
+                  <Reply>
+                    <TextAreaWrap>
+                      <ArrowIcon />
+                      <TextArea placeholder="답글을 작성하세요." />
+                    </TextAreaWrap>
+                    <Button>
+                      <button onClick={() => setActiveReplyId(null)}>
+                        취소
+                      </button>
+                      <ReplyButton $variant="comment" onClick={postComment}>
+                        댓글 작성
+                      </ReplyButton>
+                    </Button>
+                    {/* 대댓글 렌더링 */}
+                    {comment.replies &&
+                      comment.replies.map((reply) => (
+                        <ReplyComment key={reply._id}>
+                          <ProfileWrap>
+                            <ProfileImage
+                              src={
+                                reply.author.profileImage || defaultProfileImage
+                              }
+                              alt={`${reply.author.username}의 프로필 이미지`}
+                              onError={(e) => {
+                                e.currentTarget.src = defaultProfileImage;
+                              }}
+                              style={{
+                                opacity: loadedImages[comment._id] ? 1 : 0,
+                              }} // 로딩 완료 후 표시 (깜빡임 방지)
+                            />
+                            <Profile>
+                              <p>{reply.author.username}</p>
+                              <span>
+                                {new Date(reply.createdAt).toLocaleString()}
+                              </span>
+                            </Profile>
+                          </ProfileWrap>
+                          <p>{reply.content}</p>
+                        </ReplyComment>
+                      ))}
+                  </Reply>
+                  {!isLastComment && <Line />}
+                </>
+              )}
+            </ListArray>
+          );
+        })}
       </CommentList>
 
       {isModal === "pointModal" && (
