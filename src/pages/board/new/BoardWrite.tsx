@@ -258,6 +258,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   // 웹에디터 이미지 관련
   const [content, setContent] = useState("");
   const quillRef = useRef<ReactQuill | null>(null);
+  const [images, setImages] = useState<string[]>([]); // 이미지 URL 배열
 
   const [title, setTitle] = useState<string | null>(null); // 초기값을 null로 설정
 
@@ -284,14 +285,15 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   };
 
   // 이미지 업로드 핸들러
-  const handleImageUpload = () => {
+  // 이미지 업로드 핸들러
+  const handleImageUpload = async () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
     input.click();
 
     input.onchange = async () => {
-      const file = input.files?.[0]; // ?
+      const file = input.files?.[0];
       if (file) {
         // 파일 크기 제한 (예: 5MB)
         if (file.size > 5 * 1024 * 1024) {
@@ -299,18 +301,43 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
           return;
         }
 
-        // FileReader로 이미지 읽기
-        const reader = new FileReader();
-        reader.onload = (e) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await axios.post(
+            "https://api.meet-da.site/s3/upload", // S3 업로드 URL
+            formData,
+            { headers: { "Content-Type": "multipart/form-data" } }
+          );
+
+          if (!response.data.url) {
+            throw new Error(
+              "S3 업로드는 성공했지만 URL이 반환되지 않았습니다."
+            );
+          }
+
+          const imageUrl = response.data.url; // S3에서 반환된 이미지 URL
+
+          // 이미지를 `images` 배열에만 추가
+          setImages((prevImages) => [...prevImages, imageUrl]);
+
+          // `content`에는 이미지를 삽입하지 않음 (이미지 URL을 삽입하지 않음)
           const quill = quillRef.current?.getEditor();
           const range = quill?.getSelection(true);
-          quill?.insertEmbed(range!.index, "image", e.target?.result); // ?
-          quill?.setSelection(range!.index + 1);
-        };
-        reader.readAsDataURL(file);
+          if (quill && range) {
+            // 이미지를 화면에 삽입 (이미지 URL을 `content`에 삽입하지 않음)
+            quill.insertEmbed(range.index, "image", imageUrl); // 화면상에 이미지만 삽입
+            quill.setSelection(range.index + 1); // 커서 이동
+          }
+        } catch (error) {
+          console.error("이미지 업로드 실패:", error);
+        }
       }
     };
   };
+
+  console.log("현재 images 배열:", images);
 
   // 커스텀 툴바 모듈
   const modules = useMemo(

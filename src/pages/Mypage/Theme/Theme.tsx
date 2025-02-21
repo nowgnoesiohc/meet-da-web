@@ -7,6 +7,9 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { themeSetImageMap } from "@/assets/common/themeImages";
+import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
+import { themeFonts } from "@/assets/common/themeFonts";
 
 const Layout = styled.div`
   display: flex;
@@ -82,8 +85,17 @@ const Content = styled.div`
 `;
 
 export default function Theme() {
+  const [ownThemes, setOwnThemes] = useState<
+    { id: number; name: string; image: string }[]
+  >([]);
+  const [ownFonts, setOwnFonts] = useState<{ name: string; image: string }[]>(
+    []
+  );
   const navigate = useNavigate();
   const location = useLocation();
+
+  console.log(ownThemes);
+  console.log(ownFonts);
 
   // 선택한 상품 상태 관리
   const [selectedThemes, setSelectedThemes] = useState<
@@ -128,7 +140,9 @@ export default function Theme() {
   };
 
   // 선택된 상품 정보 받아오기 (자식 -> 부모)
-  const handleSelectedThemes = (themes: { name: string; price: number }[]) => {
+  const handleSelectedThemes = (
+    themes: { id: number; name: string; price: number }[]
+  ) => {
     setSelectedThemes(themes);
   };
 
@@ -174,7 +188,7 @@ export default function Theme() {
     }
   };
 
-  // 포인트 차감 API 연결
+  // 구매 핸들러 (포인트 차감 API 연결)
   const handlePurchase = async () => {
     try {
       const userId = await getUserId();
@@ -183,7 +197,7 @@ export default function Theme() {
       const response = await axios.patch(
         `https://api.meet-da.site/user/${userId}/points`,
         {
-          delta: -totalPrice, // 포인트 차감
+          delta: -totalPrice,
           description: truncatedNames,
         }
       );
@@ -191,15 +205,67 @@ export default function Theme() {
       if (response.status === 200) {
         console.log("포인트 차감 성공:", response.data);
 
+        // 기존 보유 테마 및 폰트 불러오기
+        const storedThemes = JSON.parse(
+          localStorage.getItem("ownedThemes") || "[]"
+        );
+        const storedFonts = JSON.parse(
+          localStorage.getItem("ownedFonts") || "[]"
+        );
+
+        // 선택한 항목 구분 (테마/폰트)
+        const selectedFonts = selectedThemes.filter((item) =>
+          Object.keys(themeFonts).includes(item.name)
+        );
+        const selectedThemesList = selectedThemes.filter((item) =>
+          Object.keys(themeSetImageMap).includes(item.name)
+        );
+
+        // 새로운 폰트 추가 (즉시 적용 X)
+        const newFonts = selectedFonts.filter(
+          (font) =>
+            !storedFonts.some((t: { name: string }) => t.name === font.name)
+        );
+
+        // 새로운 테마 추가
+        const newThemes = selectedThemesList.filter(
+          (theme) =>
+            !storedThemes.some((t: { name: string }) => t.name === theme.name)
+        );
+
+        // 보유 폰트 업데이트
+        if (newFonts.length > 0) {
+          const updatedFonts = [...storedFonts, ...newFonts];
+          localStorage.setItem("ownedFonts", JSON.stringify(updatedFonts));
+        }
+
+        // 보유 테마 업데이트
+        if (newThemes.length > 0) {
+          const updatedThemes = [
+            ...storedThemes,
+            ...newThemes.map((theme, index) => ({
+              id: index,
+              name: theme.name,
+              image: themeSetImageMap[theme.name] || "",
+            })),
+          ];
+          localStorage.setItem("ownedThemes", JSON.stringify(updatedThemes));
+        }
+
+        // 강제 리렌더링 유도
+        setTimeout(() => {
+          window.dispatchEvent(new Event("storage"));
+        }, 200);
+
         // 모달 데이터 업데이트
         setModalData({
           name: truncatedNames || "상품 선택 오류",
           price: totalPrice,
         });
 
-        // 구매 완료 후 선택한 상품 초기화
+        // 구매 완료 후 선택한 상품 초기화 & 모달 닫기
         setSelectedThemes([]);
-        setIsModalClick(null); // `bulkPurchaseModal` 닫기
+        setIsModalClick(null);
 
         // PointModal 표시
         setTimeout(() => {
@@ -277,9 +343,56 @@ export default function Theme() {
           }
           subContent="삭제한 테마와 사용된 포인트는 복구되지 않습니다."
           onConfirm={() => {
-            console.log(`${selectedNames} 삭제됨`);
+            console.log("삭제 모달 확인 버튼 클릭됨");
+
+            // 삭제할 항목이 없는 경우 조기 종료 (오류 방지)
+            if (selectedThemes.length === 0) {
+              console.warn("삭제할 상품이 없습니다.");
+              return;
+            }
+
+            // 선택한 테마 초기화 (삭제 전에 실행)
+            console.log("삭제 전 selectedThemes:", selectedThemes);
             setSelectedThemes([]);
+            console.log("삭제 후 selectedThemes:", selectedThemes);
+
+            // 기존 보유 목록 불러오기
+            const storedThemes = JSON.parse(
+              localStorage.getItem("ownedThemes") || "[]"
+            );
+            const storedFonts = JSON.parse(
+              localStorage.getItem("ownedFonts") || "[]"
+            );
+
+            // 삭제된 테마/폰트를 제외한 새로운 목록 생성
+            const updatedThemes = storedThemes.filter(
+              (theme: { name: string }) =>
+                !selectedThemes.some((t) => t.name === theme.name)
+            );
+
+            const updatedFonts = storedFonts.filter(
+              (font: { name: string }) =>
+                !selectedThemes.some((t) => t.name === font.name)
+            );
+
+            // 상태 업데이트
+            setOwnThemes([...updatedThemes]); // 강제 리렌더링
+            setOwnFonts([...updatedFonts]);
+
+            // 로컬스토리지 업데이트
+            localStorage.setItem("ownedThemes", JSON.stringify(updatedThemes));
+            localStorage.setItem("ownedFonts", JSON.stringify(updatedFonts));
+
+            // 스토리지 이벤트 발생 (다른 컴포넌트에 즉시 반영)
+            window.dispatchEvent(new Event("storage"));
+            console.log("storage 이벤트 발생");
+
+            // 기존 모달 닫기
             setIsModalClick(null);
+
+            setTimeout(() => {
+              setIsModalClick("deleteCompleteModal");
+            }, 150);
           }}
         />
       )}
@@ -311,6 +424,14 @@ export default function Theme() {
           content={`- ${modalData.price} P`} // 차감된 포인트 표시
           subContent="구매 완료되었습니다!"
           onConfirm={() => setIsModalClick(null)} // 확인 클릭 시 모달 닫기
+        />
+      )}
+
+      {/* 삭제 후 모달 표시 */}
+      {isModal === "deleteCompleteModal" && (
+        <DeleteThemeCompleteModal
+          title="테마 삭제"
+          content="테마가 정상적으로 삭제되었습니다."
         />
       )}
     </>

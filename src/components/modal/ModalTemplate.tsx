@@ -4,7 +4,6 @@ import FindPasswordModal from "./FindPasswordModal";
 import React from "react";
 import NoticeModal from "./NoticeModal";
 import SignUpModal from "./SignUpModal";
-import ThemaBuyCompleteModal from "./ThemeBuyCompleteModal";
 import ChangePasswordModal from "./ChangePasswordModal";
 import FriendModal from "./FriendModal";
 import MoodTrackerModal from "./MoodTrackerModal";
@@ -12,6 +11,7 @@ import PointModal from "./PointModal";
 import DeleteCompleteModal from "./DeleteCompleteModal";
 import DeleteModal from "./DeleteModal";
 import DeleteIdModal from "./DeleteIdModal";
+import DeleteThemeCompleteModal from "./DeleteThemeCompleteModal";
 
 const ModalWrap = styled.div`
   position: fixed;
@@ -60,8 +60,6 @@ export default function ModalTemplate() {
               return <NoticeModal />;
             case "signUpModal":
               return <SignUpModal />;
-            case "themaCompleteModal":
-              return <ThemaBuyCompleteModal />;
             case "changePasswordModal":
               return <ChangePasswordModal />;
             case "deleteIdModal":
@@ -76,6 +74,13 @@ export default function ModalTemplate() {
               ) : null;
             case "deleteCompleteModal":
               return <DeleteCompleteModal />;
+            case "deleteThemeCompleteModal":
+              return modalData ? (
+                <DeleteThemeCompleteModal
+                  title={modalData.title}
+                  content={modalData.content}
+                />
+              ) : null;
             case "friendModal":
               return <FriendModal />;
             case "pointModal":

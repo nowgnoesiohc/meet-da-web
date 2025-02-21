@@ -399,10 +399,17 @@ export default function FeedPage() {
           `${BASE_URL}/board/all-posts?page=${page}&sort=${sort}`
         );
 
-        const updatedPosts: Post[] = response.data.map((post) => ({
+        let updatedPosts: Post[] = response.data.map((post) => ({
           ...post,
-          author: post.author || { username: "알 수 없음", profileImage: "" }, // 기본값 설정
+          author: post.author || { username: "알 수 없음", profileImage: "" },
         }));
+
+        // 인기순 -> 클라이언트에서도 정렬 적용
+        if (sort === "popular") {
+          updatedPosts = updatedPosts.sort(
+            (a, b) => b.likesCount - a.likesCount
+          );
+        }
 
         setPosts((prev) => {
           if (page === 1) return updatedPosts; // 1페이지면 덮어쓰기
@@ -423,7 +430,7 @@ export default function FeedPage() {
         setIsFetching(false);
       }
     },
-    [isFetching] // isFetching 의존성 배열에 포함
+    [isFetching]
   );
 
   // 초기 로딩 전용 useEffect (컴포넌트 마운트 시 한 번만 호출)

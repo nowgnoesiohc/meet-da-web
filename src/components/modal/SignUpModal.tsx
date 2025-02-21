@@ -68,14 +68,23 @@ const Button = styled.div`
 
 export default function SignUpModal() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
   const handleClose = () => {
     setIsModalClick(undefined);
   };
+
   const navigate = useNavigate();
+
   const handleLogin = () => {
     handleClose();
     navigate("/auth/login");
   };
+
+  const handleMoveToHome = () => {
+    handleClose();
+    navigate("/");
+  };
+
   return (
     <>
       <Wrap>
@@ -87,7 +96,9 @@ export default function SignUpModal() {
           <p>로그인 후 믿다를 이용해보세요!</p>
         </Title>
         <Button>
-          <OrangeLineButton $variant="moveToHome">🏠</OrangeLineButton>
+          <OrangeLineButton $variant="moveToHome" onClick={handleMoveToHome}>
+            🏠
+          </OrangeLineButton>
           <OrangeButton $variant="signupToLogin" onClick={handleLogin}>
             로그인
           </OrangeButton>

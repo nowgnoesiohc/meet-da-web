@@ -1,4 +1,12 @@
+import { fontFiles, themeFonts } from "@/assets/common/themeFonts";
 import { createGlobalStyle } from "styled-components";
+
+// 기본 폰트
+const defaultFont = "'Pretendard', sans-serif";
+
+// 구매한 폰트 가져오기
+const appliedFont = localStorage.getItem("appliedFont") || defaultFont;
+const appliedFontFile = fontFiles[appliedFont];
 
 const GlobalStyles = createGlobalStyle`
 
@@ -61,37 +69,29 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  /* 기본 폰트 설정 */
   @font-face {
     font-family: 'Pretendard';
-    src: url('/fonts/Pretendard-Regular.woff2?v=2') format('woff2'),
-         url('/fonts/Pretendard-Regular.ttf') format('truetype');
-    font-weight: 400;
+    src: url('/assets/fonts/Pretendard.ttf') format('truetype');
+    font-weight: normal;
     font-style: normal;
   }
 
-  @font-face {
-    font-family: 'Pretendard';
-    src: url('/fonts/Pretendard-Medium.woff2') format('woff2'),
-         url('/fonts/Pretendard-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
+  ${
+    appliedFont !== defaultFont && appliedFontFile
+      ? `
+      @font-face {
+        font-family: '${appliedFont}';
+        src: url('${appliedFontFile}') format('truetype');
+      }
+    `
+      : ""
   }
 
-  @font-face {
-    font-family: 'Pretendard';
-    src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2'),
-         url('/fonts/Pretendard-SemiBold.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
+  * {
+    font-family: ${themeFonts[appliedFont] || defaultFont} !important;
   }
 
-  @font-face {
-    font-family: 'Pretendard';
-    src: url('/fonts/Pretendard-Bold.woff2') format('woff2'),
-         url('/fonts/Pretendard-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
   
  html {
     font-family: 'Pretendard', sans-serif;

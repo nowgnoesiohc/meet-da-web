@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useIsModalStore } from "@/store/ModalStore";
 // import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { OrangeButton } from "@/components/ui/Button";
 import { AiOutlineClose } from "react-icons/ai";
 // import { useIsModalStore } from "../../store/ModalStore";
@@ -36,12 +36,14 @@ const LoginWrap = styled.div`
   }
 `;
 
-const LoginLogo = styled.div`
-  width: 34.5rem; /* 552px */
-  height: 10.75rem; /* 172px */
+const LoginLogo = styled(Link)<StyledProps>`
+  display: block;
+  width: 34.5rem;
+  height: 10.75rem;
   background-image: url(${loginLogo});
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
 
   @media (max-width: 390px) {
     background-size: contain;
@@ -275,11 +277,7 @@ export default function Login() {
       });
       if (response.status === 201) {
         console.log("로그인 성공", response.data);
-        localStorage.setItem(
-          "accessToken",
-          //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJzdWIiOiI2Nzg0ODMzNzU1ZjY0YWViNTQ2NTQ4ZTYiLCJpYXQiOjE3MzY3Mzc2NDAsImV4cCI6MTczNjc0MTI0MH0.lKiLsYQV85-KQpEVbp0aLu4syiOLwGWE9420zQCGaRo"
-          response.data.accessToken
-        );
+        localStorage.setItem("accessToken", response.data.accessToken);
         navigate("/");
       }
     } catch (error: unknown) {
@@ -300,7 +298,7 @@ export default function Login() {
 
   return (
     <LoginWrap>
-      <LoginLogo></LoginLogo>
+      <LoginLogo to="/" />
       <Join>
         <Span>회원이 아니신가요?</Span>
         <Span onClick={handleSignUp}>회원가입하기</Span>
