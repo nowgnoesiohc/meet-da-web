@@ -8,6 +8,8 @@ import { useIsModalStore } from "../../store/ModalStore";
 import { RecordButton } from "../ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -149,24 +151,85 @@ const ButtonWrap = styled.div`
   }
 `;
 
-export default function MoodTrackerModal() {
-  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+interface MoodTrackerModalProps {
+  title?: string;
+  content?: string;
+  onConfirm?: () => void;
+}
+
+export default function MoodTrackerModal({
+  content,
+  title,
+  onConfirm,
+}: MoodTrackerModalProps) {
+  const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const [selectedMood, setSelectedMood] = useState<string | null>(
+    title ?? null
+  );
+  const [memo, setMemo] = useState<string>(content ?? "");
 
   const moods = [
-    { id: "기쁨", src: happy },
-    { id: "슬픔", src: sad },
-    { id: "평범", src: normal },
-    { id: "피곤", src: tired },
-    { id: "화남", src: angry },
+    { id: "joy", label: "기쁨", src: happy },
+    { id: "sadness", label: "슬픔", src: sad },
+    { id: "neutral", label: "평범", src: normal },
+    { id: "tired", label: "피곤", src: tired },
+    { id: "anger", label: "화남", src: angry },
   ];
+
+  const getKSTDate = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 9); // UTC+9로 시간 보정
+    return now.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+  };
 
   const handleMoodClick = (id: string) => {
     setSelectedMood((prev) => (prev === id ? null : id)); // 같은 버튼 클릭 시 취소
   };
 
-  const CloseButton = () => {
-    useSetIsModalClick();
+  const handleSubmit = async () => {
+    try {
+      // AccessToken에서 userId 추출
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("No access token found");
+
+      const userId = jwtDecode(token).sub;
+      const date = getKSTDate();
+      // console.log(userId);
+
+      // const selectedMoodValue = moods.find(
+      //   (mood) => mood.id === selectedMood
+      // )?.value;
+
+      // console.log(selectedMoodValue, date, memo);
+      // API 요청 데이터
+      if (!selectedMood && title) {
+        // 기분 삭제 요청
+        const response = await axios.delete(
+          `https://api.meet-da.site/user/${userId}/mood/`,
+          {
+            data: { date }, // data 속성으로 전달
+          }
+        );
+        console.log("무드가 삭제되었습니다.", response.data.moodEntries);
+      } else if (selectedMood) {
+        // 기분 저장 요청
+        const response = await axios.post(
+          `https://api.meet-da.site/user/${userId}/mood/`,
+          {
+            mood: selectedMood,
+            date,
+            memo,
+          }
+        );
+        console.log("무드가 등록되었습니다.", response.data.moodEntries);
+      }
+
+      if (onConfirm) onConfirm(); // 모달 닫히기 전에 부모 컴포넌트에서 데이터 갱신
+      setIsModalClick();
+    } catch (error) {
+      console.error("Failed to submit mood:", error);
+      alert("기분 등록에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -188,13 +251,20 @@ export default function MoodTrackerModal() {
           ))}
         </MoodWrap>
         <TextAreaWrap>
-          <Textarea maxLength={100} showCount />
+          <Textarea
+            maxLength={100}
+            showCount
+            value={memo ?? ""}
+            onChange={(e) => setMemo(e.target.value)}
+          />
         </TextAreaWrap>
         <ButtonWrap>
-          <RecordButton $variant="moodCancel" onClick={CloseButton}>
+          <RecordButton $variant="moodCancel" onClick={() => setIsModalClick()}>
             취소
           </RecordButton>
-          <RecordButton $variant="moodSubmit">등록</RecordButton>
+          <RecordButton $variant="moodSubmit" onClick={handleSubmit}>
+            등록
+          </RecordButton>
         </ButtonWrap>
       </Wrap>
     </>

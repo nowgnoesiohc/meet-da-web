@@ -119,6 +119,9 @@ export default function MainPage() {
 
   const handleDateClick = (date: Date, type: string) => {
     // const moodData = moodMap[changeToFormattedDate(date)];
+    const formattedDate = changeToFormattedDate(date);
+    const moodData = moodMap[formattedDate]; // 해당 날짜의 기분 데이터 가져오기
+
     console.log(moodMap);
     console.log("date", date);
     console.log("changeTo", changeToFormattedDate(date));
@@ -131,8 +134,17 @@ export default function MainPage() {
       //   mood: moodMap[changeToFormattedDate(date)].mood,
       //   memo: moodMap[changeToFormattedDate(date)].memo,
       // });
+      console.log("✅ 오늘 날짜 클릭됨:", date);
+      console.log("✅ 상태에 저장할 데이터:", moodData);
 
-      setIsModalClick(type);
+      setIsModalClick(type, {
+        title: moodData?.mood || "", // 기존 기분이 있다면 전달, 없으면 빈 값
+        content: moodData?.memo || "", // 기존 메모가 있다면 전달, 없으면 빈 값
+        onConfirm: () => {
+          console.log("✅ onConfirm 실행됨");
+          fetchMoodData(); // 기분 데이터 갱신
+        },
+      });
       setSelectedPastDate(null);
       return; // 이후 코드 실행 방지
     }
