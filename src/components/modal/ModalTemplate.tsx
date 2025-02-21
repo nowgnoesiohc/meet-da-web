@@ -55,7 +55,13 @@ export default function ModalTemplate() {
             case "findPasswordModal":
               return <FindPasswordModal />;
             case "moodTrackerModal":
-              return <MoodTrackerModal />;
+              return modalData ? (
+                <MoodTrackerModal
+                  title={modalData.title}
+                  content={modalData.content}
+                  onConfirm={modalData.onConfirm}
+                />
+              ) : null;
             case "noticeModal":
               return <NoticeModal />;
             case "signUpModal":
