@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
-import retrosans from "/src/assets/theme/retrosans.svg";
-import cabinet from "/src/assets/theme/cabinet.svg";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
+import axios from "axios";
+import { themeFonts, fontImageMap } from "@/assets/common/themeFonts";
 
 const Layout = styled.div`
   display: flex;
@@ -237,11 +237,6 @@ const PriceText = styled.div`
   }
 `;
 
-const fonts = [
-  { id: 1, name: "레트로산스", price: 300, image: retrosans },
-  { id: 2, name: "캐비닛 그로테스크", price: 280, image: cabinet },
-];
-
 export default function Font() {
   const [clickedStates, setClickedStates] = useState<{
     [key: number]: boolean;
@@ -250,7 +245,28 @@ export default function Font() {
     handleSelectedThemes: (themes: { name: string; price: number }[]) => void;
     selectedThemes: { name: string; price: number }[];
   }>();
+
   const isModal = useIsModalStore((state) => state.isModal);
+  const [fonts, setFonts] = useState<
+    { id: number; name: string; price: number }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get(`https://api.meet-da.site/store?type=FONT`)
+      .then((res) => {
+        setFonts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("폰트 데이터 불러오기 실패:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  console.log(loading);
+  console.log(themeFonts);
 
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
@@ -301,7 +317,10 @@ export default function Font() {
                 </FontTitle>
                 <FontBox>
                   <ImageBox>
-                    <FontImage src={fonts.image} />
+                    <FontImage
+                      src={fontImageMap[fonts.name]}
+                      alt={fonts.name}
+                    />
                   </ImageBox>
                 </FontBox>
                 <PurchaseBox>

@@ -1,6 +1,20 @@
 import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
 import { OrangeButton } from "../ui/Button";
+import ReactDOM from "react-dom";
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
 
 const DeleteThmeaWrap = styled.div`
   width: 30.25rem;
@@ -24,6 +38,8 @@ const Title = styled.div`
     color: var(--main-orange);
     margin: 0;
     padding-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
   }
 
   > p {
@@ -32,6 +48,8 @@ const Title = styled.div`
     font-weight: var(--font-medium);
     color: var(--main-text);
     padding-bottom: 3.75rem;
+    display: flex;
+    justify-content: center;
   }
 
   @media (max-width: 390px) {
@@ -54,25 +72,32 @@ const Button = styled.div`
   gap: 1.5rem;
 `;
 
-export default function DeleteThemeCompleteModal() {
+export default function DeleteThemeCompleteModal({
+  title,
+  content,
+}: {
+  title: string;
+  content: string;
+}) {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const onClickCheck = () => {
-    setIsModalClick();
-  };
 
-  return (
-    <>
-      <DeleteThmeaWrap>
+  return ReactDOM.createPortal(
+    <ModalOverlay onClick={() => setIsModalClick(null)}>
+      <DeleteThmeaWrap onClick={(e) => e.stopPropagation()}>
         <Title>
-          <h2>테마 삭제 완료</h2>
-          <p>테마 삭제가 정상적으로 처리되었습니다.</p>
+          <h2>{title} 완료</h2>
+          <p>{content}</p>
         </Title>
         <Button>
-          <OrangeButton $variant="confirm" onClick={onClickCheck}>
+          <OrangeButton
+            $variant="confirm"
+            onClick={() => setIsModalClick(null)}
+          >
             확인
           </OrangeButton>
         </Button>
       </DeleteThmeaWrap>
-    </>
+    </ModalOverlay>,
+    document.body
   );
 }

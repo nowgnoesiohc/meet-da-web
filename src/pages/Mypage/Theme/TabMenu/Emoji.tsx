@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import { IoSearch } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
-import themeSet from "/src/assets/theme/themeset.svg";
+import { themeSetImageMap } from "@/assets/common/themeImages";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useIsModalStore } from "@/store/ModalStore";
+import axios from "axios";
 
 const Layout = styled.div`
   display: flex;
@@ -236,13 +237,6 @@ const PriceText = styled.div`
   }
 `;
 
-const themes = [
-  { id: 1, name: "파스텔 팝콘 세트", price: 300, image: themeSet },
-  { id: 2, name: "클래식 팝콘 세트", price: 350, image: themeSet },
-  { id: 3, name: "빈티지 팝콘 세트", price: 280, image: themeSet },
-  { id: 4, name: "모던 팝콘 세트", price: 320, image: themeSet },
-];
-
 export default function Emoji() {
   const [clickedStates, setClickedStates] = useState<{
     [key: number]: boolean;
@@ -252,6 +246,29 @@ export default function Emoji() {
     selectedThemes: { name: string; price: number }[];
   }>();
   const isModal = useIsModalStore((state) => state.isModal);
+  const [themes, setThemes] = useState<
+    { _id: number; name: string; price: number }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get(`https://api.meet-da.site/store?type=THEME`)
+      .then((res) => {
+        setThemes((prevThemes) => {
+          if (JSON.stringify(prevThemes) === JSON.stringify(res.data))
+            return prevThemes;
+          return res.data;
+        });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("테마 데이터 불러오기 실패:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  console.log(loading);
 
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
@@ -262,10 +279,10 @@ export default function Emoji() {
   }, [isModal]);
 
   // 개별 체크박스 클릭 (Theme 상태 업데이트)
-  const checkClick = (id: number, theme: { name: string; price: number }) => {
+  const checkClick = (_id: number, theme: { name: string; price: number }) => {
     setClickedStates((prev) => {
-      const newState = { ...prev, [id]: !prev[id] };
-      const isSelected = newState[id];
+      const newState = { ...prev, [_id]: !prev[_id] };
+      const isSelected = newState[_id];
 
       const updatedThemes = isSelected
         ? [...selectedThemes, theme] // 체크 시 추가
@@ -276,34 +293,6 @@ export default function Emoji() {
       return newState;
     });
   };
-
-  // 백엔드 연결 시 코드 미리 작성
-  // const [themes, setThemes] = useState([]); // 테마 데이터를 저장할 상태
-  // const [clickedStates, setClickedStates] = useState<boolean[]>([]); // 각 ThemeSet의 클릭 상태
-  // const [loading, setLoading] = useState(true); // 로딩 상태
-
-  // 백엔드에서 데이터 fetch
-  // useEffect(() => {
-  //   const fetchThemes = async () => {
-  //     try {
-  //       const response = await fetch("/api/themes"); // API 엔드포인트를 적절히 수정
-  //       const data = await response.json();
-  //       setThemes(data); // 테마 데이터 저장
-  //       setClickedStates(new Array(data.length).fill(false)); // 테마 개수만큼 클릭 상태 초기화
-  //       setLoading(false); // 로딩 완료
-  //     } catch (error) {
-  //       console.error("데이터를 가져오는 중 오류 발생:", error);
-  //     }
-  //   };
-
-  //   fetchThemes();
-  // }, []);
-
-  // const toggleClick = (index: number) => {
-  //   setClickedStates((prev) =>
-  //     prev.map((clicked, i) => (i === index ? !clicked : clicked))
-  //   );
-  // };
 
   return (
     <>
@@ -317,20 +306,23 @@ export default function Emoji() {
         <ThemeContainer>
           <ThemeWrapper>
             {themes.map((theme) => (
-              <ThemeSet key={theme.id}>
+              <ThemeSet key={theme._id}>
                 <ThemeTitle>
                   <CheckBox
-                    $isClicked={!!clickedStates[theme.id]}
-                    onClick={() => checkClick(theme.id, theme)}
+                    $isClicked={!!clickedStates[theme._id]}
+                    onClick={() => checkClick(theme._id, theme)}
                   >
-                    {!!clickedStates[theme.id] && <CheckIcon />}
+                    {!!clickedStates[theme._id] && <CheckIcon />}
                     {/* 클릭 시 CheckIcon 표시 */}
                   </CheckBox>
                   {theme.name}
                 </ThemeTitle>
                 <ThemeBox>
                   <ImageBox>
-                    <ThemeImage src={theme.image} />
+                    <ThemeImage
+                      src={themeSetImageMap[theme.name]}
+                      alt={theme.name}
+                    />
                   </ImageBox>
                 </ThemeBox>
                 <PurchaseBox>

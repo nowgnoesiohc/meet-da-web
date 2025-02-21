@@ -7,6 +7,9 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { themeSetImageMap } from "@/assets/common/themeImages";
+import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
+import { themeFonts } from "@/assets/common/themeFonts";
 
 const Layout = styled.div`
   display: flex;
@@ -128,7 +131,9 @@ export default function Theme() {
   };
 
   // 선택된 상품 정보 받아오기 (자식 -> 부모)
-  const handleSelectedThemes = (themes: { name: string; price: number }[]) => {
+  const handleSelectedThemes = (
+    themes: { id: number; name: string; price: number }[]
+  ) => {
     setSelectedThemes(themes);
   };
 
@@ -174,7 +179,7 @@ export default function Theme() {
     }
   };
 
-  // 포인트 차감 API 연결
+  // 구매 핸들러 (포인트 차감 API 연결)
   const handlePurchase = async () => {
     try {
       const userId = await getUserId();
@@ -183,7 +188,7 @@ export default function Theme() {
       const response = await axios.patch(
         `https://api.meet-da.site/user/${userId}/points`,
         {
-          delta: -totalPrice, // 포인트 차감
+          delta: -totalPrice,
           description: truncatedNames,
         }
       );
@@ -191,15 +196,67 @@ export default function Theme() {
       if (response.status === 200) {
         console.log("포인트 차감 성공:", response.data);
 
+        // 기존 보유 테마 및 폰트 불러오기
+        const storedThemes = JSON.parse(
+          localStorage.getItem("ownedThemes") || "[]"
+        );
+        const storedFonts = JSON.parse(
+          localStorage.getItem("ownedFonts") || "[]"
+        );
+
+        // 선택한 항목 구분 (테마/폰트)
+        const selectedFonts = selectedThemes.filter((item) =>
+          Object.keys(themeFonts).includes(item.name)
+        );
+        const selectedThemesList = selectedThemes.filter((item) =>
+          Object.keys(themeSetImageMap).includes(item.name)
+        );
+
+        // 새로운 폰트 추가 (즉시 적용 X)
+        const newFonts = selectedFonts.filter(
+          (font) =>
+            !storedFonts.some((t: { name: string }) => t.name === font.name)
+        );
+
+        // 새로운 테마 추가
+        const newThemes = selectedThemesList.filter(
+          (theme) =>
+            !storedThemes.some((t: { name: string }) => t.name === theme.name)
+        );
+
+        // 보유 폰트 업데이트
+        if (newFonts.length > 0) {
+          const updatedFonts = [...storedFonts, ...newFonts];
+          localStorage.setItem("ownedFonts", JSON.stringify(updatedFonts));
+        }
+
+        // 보유 테마 업데이트
+        if (newThemes.length > 0) {
+          const updatedThemes = [
+            ...storedThemes,
+            ...newThemes.map((theme, index) => ({
+              id: index,
+              name: theme.name,
+              image: themeSetImageMap[theme.name] || "",
+            })),
+          ];
+          localStorage.setItem("ownedThemes", JSON.stringify(updatedThemes));
+        }
+
+        // 강제 리렌더링 유도
+        setTimeout(() => {
+          window.dispatchEvent(new Event("storage"));
+        }, 200);
+
         // 모달 데이터 업데이트
         setModalData({
           name: truncatedNames || "상품 선택 오류",
           price: totalPrice,
         });
 
-        // 구매 완료 후 선택한 상품 초기화
+        // 구매 완료 후 선택한 상품 초기화 & 모달 닫기
         setSelectedThemes([]);
-        setIsModalClick(null); // `bulkPurchaseModal` 닫기
+        setIsModalClick(null);
 
         // PointModal 표시
         setTimeout(() => {
@@ -278,8 +335,33 @@ export default function Theme() {
           subContent="삭제한 테마와 사용된 포인트는 복구되지 않습니다."
           onConfirm={() => {
             console.log(`${selectedNames} 삭제됨`);
+
+            // 기존 보유 테마 가져오기
+            const storedThemes = JSON.parse(
+              localStorage.getItem("ownedThemes") || "[]"
+            );
+
+            // 삭제된 테마를 제외한 새로운 목록 생성
+            const updatedThemes = storedThemes.filter(
+              (theme: { name: string }) =>
+                !selectedThemes.some((t) => t.name === theme.name)
+            );
+
+            console.log("업데이트된 보유 테마 목록:", updatedThemes);
+
+            // 로컬스토리지 업데이트
+            localStorage.setItem("ownedThemes", JSON.stringify(updatedThemes));
+
+            // 삭제 내역 Own.tsx에 즉시 반영
+            window.dispatchEvent(new Event("storage"));
+
+            // 선택한 테마 초기화
             setSelectedThemes([]);
-            setIsModalClick(null);
+
+            // deleteModal 닫고 deleteCompleteModal 열기
+            setTimeout(() => {
+              setIsModalClick("deleteCompleteModal");
+            }, 100);
           }}
         />
       )}
@@ -311,6 +393,14 @@ export default function Theme() {
           content={`- ${modalData.price} P`} // 차감된 포인트 표시
           subContent="구매 완료되었습니다!"
           onConfirm={() => setIsModalClick(null)} // 확인 클릭 시 모달 닫기
+        />
+      )}
+
+      {/* 삭제 후 모달 표시 */}
+      {isModal === "deleteCompleteModal" && (
+        <DeleteThemeCompleteModal
+          title="테마 삭제"
+          content="테마가 정상적으로 삭제되었습니다."
         />
       )}
     </>

@@ -293,7 +293,7 @@ const Join: React.FC<AuthType> = () => {
     <>
       {/* <Navigation /> */}
       <LoginWrap>
-        <LoginLogo to="/Page1" />
+        <LoginLogo to="/" />
         <JoinTitle>
           <Span>이미 회원이신가요?</Span>
           <LoginButton $variant="login" onClick={handleLoing}>

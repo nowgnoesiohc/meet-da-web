@@ -330,7 +330,7 @@ const ProfileImagePlaceholder = styled.div`
 const Line = styled.div`
   width: 100%;
   border-top: 0.0625rem solid var(--line-basic);
-  margin: 60px 0px;
+  margin: 3.75rem 0rem;
 
   @media (max-width: 390px) {
     margin-top: 3.75rem;
@@ -366,7 +366,7 @@ const CommentButtonWrap = styled.div`
   height: 3.25rem;
   display: flex;
   flex-direction: row-reverse;
-  margin: 1.5rem 0px 120px;
+  margin: 1.5rem 0rem 7.5rem;
 
   @media (max-width: 390px) {
     margin-top: 0.75rem;
@@ -374,7 +374,7 @@ const CommentButtonWrap = styled.div`
 `;
 
 const CommentList = styled.div`
-  margin-top: 80px;
+  margin-top: 5rem;
 
   ${ProfileWrap} {
     display: block;
@@ -471,7 +471,7 @@ const Reply = styled.div`
   background-color: var(--bg-02);
   padding: 1.875rem 1.875rem 1.25rem 1.875rem;
   float: right;
-  margin: 20px 0px 0px 40px;
+  margin: 1.25rem 0rem 0rem 2.5rem;
 
   ${Line} {
     margin: 1.5rem 0;
@@ -630,7 +630,7 @@ const ThumbnailSwiper = styled(Swiper)`
 
   .swiper-slide {
     width: 100% !important;
-    margin-right: 0px !important;
+    margin-right: 0rem !important;
   }
 `;
 
@@ -1079,7 +1079,7 @@ export default function BoardDetail() {
         return;
       }
 
-      const parentCommentId = replyingTo; // ✅ 대댓글이면 부모 댓글의 ID가 들어감
+      const parentCommentId = replyingTo; // 대댓글이면 부모 댓글의 ID가 들어감
 
       const response = await axios.post(
         `https://api.meet-da.site/comment`,
@@ -1087,7 +1087,7 @@ export default function BoardDetail() {
           boardId,
           author: userId,
           content: newComment,
-          parentCommentId: parentCommentId || null, // ✅ 일반 댓글이면 null
+          parentCommentId: parentCommentId || null, // 일반 댓글이면 null
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -1095,15 +1095,15 @@ export default function BoardDetail() {
       console.log("댓글 생성 응답:", response.data);
 
       setNewComment("");
-      setReplyingTo(null); // ✅ 댓글 작성 후 parentCommentId 초기화
-      fetchComments(); // ✅ UI 즉시 업데이트
+      setReplyingTo(null); // 댓글 작성 후 parentCommentId 초기화
+      fetchComments(); // UI 즉시 업데이트
     } catch (error) {
       console.error("댓글 작성 실패:", error);
     }
   };
 
   const toggleReplyBox = (commentId: string) => {
-    setReplyingTo(replyingTo === commentId ? null : commentId); // ✅ 부모 댓글의 _id 저장
+    setReplyingTo(replyingTo === commentId ? null : commentId); // 부모 댓글의 _id 저장
     setActiveReplyId((prev) => (prev === commentId ? null : commentId)); // 클릭한 댓글만 Reply 표시
   };
 
