@@ -178,6 +178,8 @@ export default function Navigation() {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("appliedFont");
+    document.documentElement.style.setProperty("--applied-font", "Pretendard"); // 즉시 적용
     setIsLoggedIn(false);
     navigate("/auth/login");
   };

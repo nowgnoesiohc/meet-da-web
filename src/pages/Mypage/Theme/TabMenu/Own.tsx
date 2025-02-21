@@ -1,223 +1,35 @@
-import styled from "styled-components";
-import { IoSearch } from "react-icons/io5";
-import { FaCheck } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { OrangeLineButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
 import { useOutletContext } from "react-router-dom";
 import { moodIconMap } from "@/assets/common/themeImages";
 import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
-
-const Layout = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.875rem;
-  padding: 0rem 1.25rem 0rem 5rem;
-  align-items: center;
-  height: 100vh;
-
-  @media (max-width: 781px) {
-    padding: 0rem 1.25rem 0rem 3.125rem;
-    height: 100%;
-  }
-
-  @media (max-width: 390px) {
-    gap: 1.625rem;
-    height: 100%;
-    padding-left: 0rem;
-  }
-`;
-
-const SearchBarContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 3.75rem;
-  padding: 0.75rem 2.5rem;
-  border-radius: 0.625rem;
-  border: 1px solid var(--main-text);
-
-  @media (max-width: 781px) {
-    padding: 0.625rem 1.875rem;
-    height: 3.125rem;
-  }
-
-  @media (max-width: 390px) {
-    padding: 0.5rem 1.25rem;
-    height: 2.5rem;
-  }
-`;
-
-const SearchInput = styled.input`
-  border: none;
-  background: transparent;
-  outline: none;
-  flex: 1;
-  font-size: 1.25rem;
-  font-weight: var(--font-regular);
-
-  &::placeholder {
-    color: var(--sub-text);
-    font-weight: var(--font-regular);
-  }
-
-  @media (max-width: 781px) {
-    font-size: 1.125rem;
-  }
-
-  @media (max-width: 390px) {
-    font-size: 1rem;
-  }
-`;
-
-const SearchButton = styled.button`
-  display: flex;
-`;
-
-const SearchIcon = styled(IoSearch)`
-  color: var(--search-placeholder);
-  font-size: 1.5rem;
-`;
-
-const ThemeContainer = styled.div`
-  display: flex;
-  width: 100%;
-  padding: 3.75rem 4.25rem 2.5rem;
-  margin-bottom: 3.75rem;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3.75rem;
-  border-radius: 0.625rem;
-  background: var(--white);
-  box-shadow: 0.25rem 0.25rem 0.75rem 0rem rgba(0, 0, 0, 0.25);
-
-  @media (max-width: 781px) {
-    padding: 2.5rem 3.125rem 1.875rem;
-    gap: 2.5rem;
-  }
-
-  @media (max-width: 390px) {
-    padding: 1.25rem 1.25rem 1.25rem;
-    gap: 1.25rem;
-  }
-`;
-
-const ThemeWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 기본 1줄에 4개 */
-  row-gap: 2.5rem;
-  column-gap: 3.75rem;
-  width: 100%;
-
-  @media (max-width: 781px) {
-    grid-template-columns: 1fr; /* 1줄에 1개 */
-    row-gap: 1.875rem;
-    width: auto;
-  }
-
-  @media (max-width: 390px) {
-    row-gap: 1.25rem;
-    width: auto;
-  }
-`;
-
-const ThemeSet = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 0.75rem;
-`;
-
-const ThemeTitle = styled.div`
-  display: flex;
-  gap: 1.25rem;
-  color: var(--black);
-  font-size: 1.25rem;
-  font-weight: var(--font-medium);
-  align-items: center;
-
-  @media (max-width: 781px) {
-    font-size: 1.125rem;
-  }
-
-  @media (max-width: 390px) {
-    font-size: 1rem;
-  }
-`;
-
-const CheckIcon = styled(FaCheck)`
-  color: var(--main-orange);
-  font-size: 1.375rem;
-`;
-
-const CheckBox = styled.button<{ $isClicked: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 0.375rem;
-  border: ${(props) =>
-    props.$isClicked ? "none" : "1px solid var(--main-text)"};
-  background-color: ${(props) =>
-    props.$isClicked ? "var(--hover-orange)" : "transparent"};
-  cursor: pointer;
-
-  @media (max-width: 781px) {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-
-  @media (max-width: 390px) {
-    width: 1.875rem;
-    height: 1.875rem;
-  }
-`;
-
-const ThemeBox = styled.div`
-  display: inline-flex;
-  padding: 1.25rem 1.625rem;
-  flex-direction: column;
-  align-items: center;
-  border-radius: 0.625rem;
-  border: 1px solid var(--main-text);
-
-  @media (max-width: 781px) {
-    padding: 1rem 1.25rem;
-  }
-
-  @media (max-width: 390px) {
-    padding: 0.75rem 1rem;
-  }
-`;
-
-const ImageBox = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.25rem;
-`;
-
-const ThemeImage = styled.img`
-  width: 100%;
-  object-fit: cover;
-  }
-`;
-
-const ButtonBox = styled.div`
-  display: inline-flex;
-  justify-content: end;
-  align-items: center;
-`;
-
-const NoTheme = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--main-text);
-  font-size: 1.25rem;
-`;
+import usePagination, {
+  AfterIcon,
+  BeforeIcon,
+  PageNation,
+  PageNumber,
+  PaginationButton,
+} from "./usePagination";
+import {
+  ButtonBox,
+  CheckBox,
+  CheckIcon,
+  ImageBox,
+  Layout,
+  NoTheme,
+  SearchBarContainer,
+  SearchButton,
+  SearchIcon,
+  SearchInput,
+  ThemeBox,
+  ThemeContainer,
+  ThemeImage,
+  ThemeSet,
+  ThemeTitle,
+  ThemeWrapper,
+} from "./Own.styles";
+import { fontImageMap } from "@/assets/common/themeFonts";
 
 export default function Own() {
   const [ownThemes, setOwnThemes] = useState<
@@ -288,8 +100,14 @@ export default function Own() {
       } else {
         try {
           const parsedFonts = JSON.parse(storedFonts);
-          console.log("보유 폰트 불러오기 성공:", parsedFonts);
-          setOwnFonts(parsedFonts);
+
+          const updatedFonts = parsedFonts.map((font: { name: string }) => ({
+            ...font,
+            image: fontImageMap[font.name] || "", // 이미지가 없으면 빈 문자열
+          }));
+
+          console.log("보유 폰트 불러오기 성공:", updatedFonts);
+          setOwnFonts(updatedFonts);
         } catch (error) {
           console.error("로컬스토리지 폰트 파싱 오류:", error);
           setOwnFonts([]);
@@ -308,8 +126,11 @@ export default function Own() {
     };
   }, []);
 
-  const applyItem = (item: { name: string; image?: string }) => {
-    if (ownThemes.some((theme) => theme.name === item.name)) {
+  const applyItem = (
+    item: { name: string; image?: string },
+    isTheme: boolean
+  ) => {
+    if (isTheme) {
       // 테마 적용
       handleAppliedTheme({
         name: item.name,
@@ -333,6 +154,15 @@ export default function Own() {
       // 폰트 적용
       setAppliedFont(item.name);
       localStorage.setItem("appliedFont", item.name);
+
+      // 브라우저에 강제 적용 (CSS 변수 업데이트)
+      document.documentElement.style.setProperty("--applied-font", item.name);
+      document.body.style.fontFamily = `${item.name}, sans-serif`;
+
+      // 강제 리렌더링 (일부 브라우저에서 필요할 수 있음)
+      setTimeout(() => {
+        document.body.style.fontFamily = `${item.name}, sans-serif`;
+      }, 50);
 
       // 적용 완료 모달
       setModalData({
@@ -373,6 +203,15 @@ export default function Own() {
     });
   };
 
+  const {
+    currentData,
+    currentPage,
+    totalPages,
+    goToPreviousPage,
+    goToNextPage,
+    setCurrentPage,
+  } = usePagination([...ownThemes, ...ownFonts], 6);
+
   return (
     <>
       <Layout>
@@ -383,66 +222,69 @@ export default function Own() {
           </SearchButton>
         </SearchBarContainer>
         <ThemeContainer>
-          {ownThemes.length > 0 || ownFonts.length > 0 ? (
+          {currentData.length > 0 ? (
             <ThemeWrapper>
-              {/* ✅ 보유한 테마 목록 렌더링 */}
-              {ownThemes.map((theme) => (
-                <ThemeSet key={theme.id}>
-                  <ThemeTitle>
-                    <CheckBox
-                      $isClicked={!!clickedStates[theme.id]}
-                      onClick={() => checkClick(theme.id, theme)}
-                    >
-                      {!!clickedStates[theme.id] && <CheckIcon />}
-                    </CheckBox>
-                    {theme.name}
-                  </ThemeTitle>
-                  <ThemeBox>
-                    <ImageBox>
-                      <ThemeImage src={theme.image} />
-                    </ImageBox>
-                  </ThemeBox>
-                  <ButtonBox>
-                    <OrangeLineButton
-                      $variant="theme"
-                      onClick={() => applyItem(theme)}
-                    >
-                      적용하기
-                    </OrangeLineButton>
-                  </ButtonBox>
-                </ThemeSet>
-              ))}
-
-              {/* 보유한 폰트 목록 렌더링 */}
-              {ownFonts.map((font, index) => (
-                <ThemeSet key={index}>
-                  <ThemeTitle>
-                    <CheckBox
-                      $isClicked={!!clickedStates[index]}
-                      onClick={() => checkClick(index, font)}
-                    >
-                      {!!clickedStates[index] && <CheckIcon />}
-                    </CheckBox>
-                    {font.name}
-                  </ThemeTitle>
-                  <ThemeBox>
-                    <ImageBox>
-                      <ThemeImage src={font.image} />
-                    </ImageBox>
-                  </ThemeBox>
-                  <ButtonBox>
-                    <OrangeLineButton
-                      $variant="theme"
-                      onClick={() => applyItem(font)}
-                    >
-                      적용하기
-                    </OrangeLineButton>
-                  </ButtonBox>
-                </ThemeSet>
-              ))}
+              {/* 보유한 테마 목록 렌더링 */}
+              {currentData.map((item, index) => {
+                const isTheme = ownThemes.some(
+                  (theme) => theme.name === item.name
+                );
+                return (
+                  <ThemeSet key={index}>
+                    <ThemeTitle>
+                      <CheckBox
+                        $isClicked={!!clickedStates[index]}
+                        onClick={() => checkClick(index, item)}
+                      >
+                        {!!clickedStates[index] && <CheckIcon />}
+                      </CheckBox>
+                      {item.name}
+                    </ThemeTitle>
+                    <ThemeBox>
+                      <ImageBox>
+                        <ThemeImage src={item.image} />
+                      </ImageBox>
+                    </ThemeBox>
+                    <ButtonBox>
+                      <OrangeLineButton
+                        $variant="theme"
+                        onClick={() => applyItem(item, isTheme)}
+                      >
+                        적용하기
+                      </OrangeLineButton>
+                    </ButtonBox>
+                  </ThemeSet>
+                );
+              })}
             </ThemeWrapper>
           ) : (
             <NoTheme>보유한 상품이 존재하지 않습니다.</NoTheme>
+          )}
+
+          {totalPages > 1 && (
+            <PageNation>
+              <PaginationButton
+                disabled={currentPage === 1}
+                onClick={goToPreviousPage}
+              >
+                <BeforeIcon />
+              </PaginationButton>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <PageNumber
+                  key={index}
+                  selected={currentPage === index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                >
+                  {index + 1}
+                </PageNumber>
+              ))}
+              <PaginationButton
+                disabled={currentPage === totalPages}
+                onClick={goToNextPage}
+              >
+                <AfterIcon />
+              </PaginationButton>
+            </PageNation>
           )}
         </ThemeContainer>
       </Layout>

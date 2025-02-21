@@ -88,8 +88,8 @@ const GlobalStyles = createGlobalStyle`
       : ""
   }
 
-  body {
-    font-family: ${themeFonts[appliedFont] || defaultFont};
+  * {
+    font-family: ${themeFonts[appliedFont] || defaultFont} !important;
   }
 
   

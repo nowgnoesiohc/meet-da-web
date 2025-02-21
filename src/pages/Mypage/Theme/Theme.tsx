@@ -85,8 +85,17 @@ const Content = styled.div`
 `;
 
 export default function Theme() {
+  const [ownThemes, setOwnThemes] = useState<
+    { id: number; name: string; image: string }[]
+  >([]);
+  const [ownFonts, setOwnFonts] = useState<{ name: string; image: string }[]>(
+    []
+  );
   const navigate = useNavigate();
   const location = useLocation();
+
+  console.log(ownThemes);
+  console.log(ownFonts);
 
   // 선택한 상품 상태 관리
   const [selectedThemes, setSelectedThemes] = useState<
@@ -334,34 +343,56 @@ export default function Theme() {
           }
           subContent="삭제한 테마와 사용된 포인트는 복구되지 않습니다."
           onConfirm={() => {
-            console.log(`${selectedNames} 삭제됨`);
+            console.log("삭제 모달 확인 버튼 클릭됨");
 
-            // 기존 보유 테마 가져오기
+            // 삭제할 항목이 없는 경우 조기 종료 (오류 방지)
+            if (selectedThemes.length === 0) {
+              console.warn("삭제할 상품이 없습니다.");
+              return;
+            }
+
+            // 선택한 테마 초기화 (삭제 전에 실행)
+            console.log("삭제 전 selectedThemes:", selectedThemes);
+            setSelectedThemes([]);
+            console.log("삭제 후 selectedThemes:", selectedThemes);
+
+            // 기존 보유 목록 불러오기
             const storedThemes = JSON.parse(
               localStorage.getItem("ownedThemes") || "[]"
             );
+            const storedFonts = JSON.parse(
+              localStorage.getItem("ownedFonts") || "[]"
+            );
 
-            // 삭제된 테마를 제외한 새로운 목록 생성
+            // 삭제된 테마/폰트를 제외한 새로운 목록 생성
             const updatedThemes = storedThemes.filter(
               (theme: { name: string }) =>
                 !selectedThemes.some((t) => t.name === theme.name)
             );
 
-            console.log("업데이트된 보유 테마 목록:", updatedThemes);
+            const updatedFonts = storedFonts.filter(
+              (font: { name: string }) =>
+                !selectedThemes.some((t) => t.name === font.name)
+            );
+
+            // 상태 업데이트
+            setOwnThemes([...updatedThemes]); // 강제 리렌더링
+            setOwnFonts([...updatedFonts]);
 
             // 로컬스토리지 업데이트
             localStorage.setItem("ownedThemes", JSON.stringify(updatedThemes));
+            localStorage.setItem("ownedFonts", JSON.stringify(updatedFonts));
 
-            // 삭제 내역 Own.tsx에 즉시 반영
+            // 스토리지 이벤트 발생 (다른 컴포넌트에 즉시 반영)
             window.dispatchEvent(new Event("storage"));
+            console.log("storage 이벤트 발생");
 
-            // 선택한 테마 초기화
-            setSelectedThemes([]);
+            // 기존 모달 닫기
+            setIsModalClick(null);
 
-            // deleteModal 닫고 deleteCompleteModal 열기
             setTimeout(() => {
               setIsModalClick("deleteCompleteModal");
-            }, 100);
+            }, 150);
           }}
         />
       )}
