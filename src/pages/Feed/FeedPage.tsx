@@ -403,13 +403,13 @@ export default function FeedPage() {
         : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
 
       if (appliedTheme.name && appliedTheme.moodImages) {
-        console.log(`🟢 적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
+        console.log(`적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
         setMoodIcons(appliedTheme.moodImages);
       }
     };
 
-    loadAppliedTheme(); // ✅ 초기 실행
-    window.addEventListener("storage", loadAppliedTheme); // ✅ 스토리지 변경 감지
+    loadAppliedTheme(); // 초기 실행
+    window.addEventListener("storage", loadAppliedTheme); // 스토리지 변경 감지
 
     return () => {
       window.removeEventListener("storage", loadAppliedTheme);
@@ -461,18 +461,14 @@ export default function FeedPage() {
 
   const fetchPosts = useCallback(
     async (page: number, sort: string) => {
-      if (isFetching || fetchedPages.has(page)) return; // 중복 요청 방지
+      if (isFetching || fetchedPages.has(page)) return;
 
-      fetchedPages.add(page); // 요청한 페이지 기록
+      fetchedPages.add(page);
       setIsFetching(true);
 
       try {
-        const userId = await getUserId(); // ✅ 현재 로그인한 사용자 ID 가져오기
-        if (!userId) {
-          console.error("유저 ID를 가져올 수 없음");
-          setIsFetching(false);
-          return;
-        }
+        const userId = await getUserId(); // ✅ userId 가져오기
+        console.log(`현재 사용자 ID: ${userId || "로그인 안됨"}`);
 
         const response = await axios.get<Post[]>(
           `${BASE_URL}/board/all-posts?page=${page}&sort=${sort}`
@@ -480,10 +476,9 @@ export default function FeedPage() {
 
         const updatedPosts: Post[] = response.data.map((post) => ({
           ...post,
-          author: post.author || { id: "unknown" }, // 기본값 설정
+          author: post.author || { id: "unknown" },
         }));
 
-        // ✅ 각 게시글의 개별 상세 정보를 가져와서 추가 데이터 (무드 정보 포함) 불러오기
         const postsWithDetails = await Promise.all(
           updatedPosts.map(async (post) => {
             try {
@@ -492,7 +487,6 @@ export default function FeedPage() {
               );
               const postDetail = postDetailResponse.data;
 
-              // ✅ 작성일 기준으로 무드 가져오기
               const authorMood = await fetchMoodByDate(
                 postDetail.author.id,
                 postDetail.createdAt
@@ -502,37 +496,35 @@ export default function FeedPage() {
                 ...postDetail,
                 author: {
                   ...postDetail.author,
-                  mood: authorMood || "hurt", // 무드 정보 추가
+                  mood: authorMood || "hurt",
                 },
               };
             } catch (error) {
               console.error(
-                `게시글 상세 정보 불러오기 실패 (게시글 ID: ${post.id})`,
+                `게시글 상세 정보 로딩 실패 (ID: ${post.id})`,
                 error
               );
-              return post; // 실패 시 원본 데이터 유지
+              return post;
             }
           })
         );
 
-        // ✅ 비공개 게시글 필터링: 작성자가 아닌 경우 제외
-        const filteredPosts = postsWithDetails.filter(
-          (post) => post.visibility !== "PRIVATE" || post.author.id === userId
-        );
-
-        // 기존 데이터와 중복된 게시글이 추가되지 않도록 필터링
-        const uniquePosts = filteredPosts.filter(
-          (newPost) => !posts.some((prevPost) => prevPost.id === newPost.id)
-        );
+        // 비공개 게시글 필터링: 로그아웃 상태에서도 공개 게시글은 보이도록 수정
+        const filteredPosts = postsWithDetails.filter((post) => {
+          return (
+            post.visibility !== "PRIVATE" ||
+            (userId && post.author.id === userId)
+          );
+        });
 
         setPosts((prev) =>
-          page === 1 ? uniquePosts : [...prev, ...uniquePosts]
+          page === 1 ? filteredPosts : [...prev, ...filteredPosts]
         );
 
-        setHasMore(uniquePosts.length > 0);
+        setHasMore(filteredPosts.length > 0);
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
-        setHasMore(false);
+        setHasMore(false); // 🚨 실패 시 더 이상 요청 안 하도록 설정
       } finally {
         setIsFetching(false);
       }
@@ -709,16 +701,16 @@ export default function FeedPage() {
     const diffDay = Math.floor(diffHour / 12); // 일 단위 변환
 
     if (diffDay >= 1) {
-      // ✅ 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
+      // 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
       return `${commentDate.getFullYear()}.${String(commentDate.getMonth() + 1).padStart(2, "0")}.${String(commentDate.getDate()).padStart(2, "0")}`;
     } else if (diffHour >= 1) {
-      // ✅ 1시간 이상 경과한 경우
+      // 1시간 이상 경과한 경우
       return `${diffHour}시간 전`;
     } else if (diffMin >= 1) {
-      // ✅ 1분 이상 경과한 경우
+      // 1분 이상 경과한 경우
       return `${diffMin}분 전`;
     } else {
-      // ✅ 1분 이내
+      // 1분 이내
       return "방금 전";
     }
   };

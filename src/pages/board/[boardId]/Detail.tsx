@@ -781,13 +781,13 @@ export default function BoardDetail() {
         : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
 
       if (appliedTheme.name && appliedTheme.moodImages) {
-        console.log(`🟢 적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
+        console.log(`적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
         setMoodIcons(appliedTheme.moodImages);
       }
     };
 
-    loadAppliedTheme(); // ✅ 초기 실행
-    window.addEventListener("storage", loadAppliedTheme); // ✅ 스토리지 변경 감지
+    loadAppliedTheme(); // 초기 실행
+    window.addEventListener("storage", loadAppliedTheme); // 스토리지 변경 감지
 
     return () => {
       window.removeEventListener("storage", loadAppliedTheme);
@@ -996,10 +996,10 @@ export default function BoardDetail() {
   const fetchPost = async () => {
     try {
       setLoading(true);
-      const userId = await getUserId(); // ✅ 현재 로그인한 사용자 ID 가져오기
+      const userId = await getUserId(); // 현재 로그인한 사용자 ID 가져오기
       if (!userId) {
         console.error("유저 ID를 가져올 수 없음");
-        navigate("/"); // ✅ 로그인 안 한 사용자는 차단
+        navigate("/"); // 로그인 안 한 사용자는 차단
         return;
       }
 
@@ -1008,10 +1008,10 @@ export default function BoardDetail() {
       );
       const postData = response.data;
 
-      // ✅ 비공개 게시글인데 작성자가 아니면 접근 차단
+      // 비공개 게시글인데 작성자가 아니면 접근 차단
       if (postData.visibility === "PRIVATE" && postData.author.id !== userId) {
         alert("비공개 게시글은 작성자만 볼 수 있습니다.");
-        navigate("/"); // ✅ 홈으로 리디렉트
+        navigate("/"); // 홈으로 리디렉트
         return;
       }
 
@@ -1171,7 +1171,7 @@ export default function BoardDetail() {
           return {
             ...comment,
             author: {
-              id: comment.author?.id ?? null, // ✅ 빈 값("") 대신 null 사용
+              id: comment.author?.id ?? null,
               username: comment.author?.username || "익명",
               profileImage: comment.author?.profileImage || defaultProfileImage,
             },
@@ -1212,7 +1212,7 @@ export default function BoardDetail() {
       const payload = {
         boardId,
         author: userId,
-        content: replyingTo ? newReplyComment : newComment, // ✅ 대댓글이면 newReplyComment 사용
+        content: replyingTo ? newReplyComment : newComment, // 대댓글이면 newReplyComment 사용
         parentCommentId: replyingTo ? replyingTo : null,
       };
 
@@ -1227,9 +1227,9 @@ export default function BoardDetail() {
       console.log("댓글 생성 응답:", response.data);
 
       if (replyingTo) {
-        setNewReplyComment(""); // ✅ 대댓글 입력 후 초기화
+        setNewReplyComment(""); // 대댓글 입력 후 초기화
       } else {
-        setNewComment(""); // ✅ 일반 댓글 입력 후 초기화
+        setNewComment(""); // 일반 댓글 입력 후 초기화
       }
 
       fetchComments();
@@ -1260,7 +1260,7 @@ export default function BoardDetail() {
     console.log("댓글 작성자 authorId:", authorId, "타입:", typeof authorId);
 
     if (!userId || userId.trim() !== authorId.trim()) {
-      // ✅ 문자열 공백 제거 후 비교
+      // 문자열 공백 제거 후 비교
       alert("본인이 작성한 댓글만 수정할 수 있습니다.");
       return;
     }
@@ -1297,7 +1297,6 @@ export default function BoardDetail() {
   const deleteComment = async (commentId: string, authorId: string) => {
     const userId = await getUserId();
     if (!userId || userId !== authorId) {
-      // ✅ `author.username` → `author.id` 변경
       alert("본인이 작성한 댓글만 삭제할 수 있습니다.");
       return;
     }
@@ -1313,7 +1312,7 @@ export default function BoardDetail() {
     );
   };
 
-  const [newReplyComment, setNewReplyComment] = useState(""); // ✅ 대댓글 입력 상태 추가
+  const [newReplyComment, setNewReplyComment] = useState(""); // 대댓글 입력 상태 추가
 
   const fetchReplies = async (commentId: string) => {
     try {
@@ -1334,7 +1333,7 @@ export default function BoardDetail() {
         .sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ); // ✅ 최신순 정렬
+        ); // 최신순 정렬
     } catch (error) {
       console.error("대댓글 조회 실패:", error);
       return [];
@@ -1359,16 +1358,16 @@ export default function BoardDetail() {
     const diffDay = Math.floor(diffHour / 12); // 일 단위 변환
 
     if (diffDay >= 1) {
-      // ✅ 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
+      // 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
       return `${commentDate.getFullYear()}.${String(commentDate.getMonth() + 1).padStart(2, "0")}.${String(commentDate.getDate()).padStart(2, "0")}`;
     } else if (diffHour >= 1) {
-      // ✅ 1시간 이상 경과한 경우
+      // 1시간 이상 경과한 경우
       return `${diffHour}시간 전`;
     } else if (diffMin >= 1) {
-      // ✅ 1분 이상 경과한 경우
+      // 1분 이상 경과한 경우
       return `${diffMin}분 전`;
     } else {
-      // ✅ 1분 이내
+      // 1분 이내
       return "방금 전";
     }
   };
@@ -1555,17 +1554,17 @@ export default function BoardDetail() {
                 <IconButton>
                   <EditIcon
                     onClick={() => {
-                      console.log("댓글 객체:", comment); // ✅ 전체 댓글 객체 확인
+                      console.log("댓글 객체:", comment); // 전체 댓글 객체 확인
                       console.log(
                         "댓글 작성자 ID (comment.author.id):",
                         comment.author?.id
-                      ); // ✅ 값 존재 여부 확인
+                      ); // 값 존재 여부 확인
 
                       editComment(
                         comment._id,
                         comment.content,
                         comment.author?.id || "undefined"
-                      ); // ✅ 값이 없을 경우 기본값 전달
+                      ); // 값이 없을 경우 기본값 전달
                     }}
                   />
                   <DeleteIcon
@@ -1637,7 +1636,7 @@ export default function BoardDetail() {
                     {comment.replies &&
                       comment.replies.map((reply, replyIndex) => {
                         const isLastReply =
-                          replyIndex === comment.replies.length - 1; // ✅ 마지막 대댓글 여부 확인
+                          replyIndex === comment.replies.length - 1; // 마지막 대댓글 여부 확인
 
                         return (
                           <React.Fragment key={reply._id}>
@@ -1683,7 +1682,7 @@ export default function BoardDetail() {
                               </CommentInfoWrap>
                               <p>{reply.content}</p>
                             </ReplyComment>
-                            {/* ✅ 마지막 대댓글이 아닐 경우만 Line 추가 */}
+                            {/* 마지막 대댓글이 아닐 경우만 Line 추가 */}
                             {!isLastReply && <Line />}
                           </React.Fragment>
                         );
