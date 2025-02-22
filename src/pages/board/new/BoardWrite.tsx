@@ -7,6 +7,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { RecordButton } from "@/components/ui/Button";
 import { jwtDecode } from "jwt-decode";
+import { themeImages } from "@/assets/common/themeImages";
 
 interface DropdownItemProps {
   isSelected: boolean;
@@ -200,12 +201,12 @@ const WriteEmotion = styled.div`
   height: 5.75rem;
   background-color: #f5f1e7;
   border-radius: 1.25rem;
+  padding: 0 2.5rem;
+  font-size: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  > p {
-    line-height: 5.75rem;
-    padding: 0 2.5rem;
-    font-size: 1.25rem;
-  }
   @media (max-width: 390px) {
     height: 4.5rem;
     p {
@@ -240,6 +241,13 @@ const ButtonWrap = styled.div`
   }
 `;
 
+const MoodIcon = styled.img`
+  width: 3rem;
+  height: 3rem;
+  position: relative;
+  object-fit: cover;
+`;
+
 interface BoarWriteProps {
   isEdit: boolean;
 }
@@ -262,18 +270,39 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
 
   const [title, setTitle] = useState<string | null>(null); // 초기값을 null로 설정
 
+  const [moodIcons, setMoodIcons] = useState(themeImages);
+
+  useEffect(() => {
+    const loadAppliedTheme = () => {
+      const userId = localStorage.getItem("userId");
+      const appliedTheme = userId
+        ? JSON.parse(localStorage.getItem(`appliedTheme_${userId}`) || "{}")
+        : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
+
+      if (appliedTheme.name && appliedTheme.moodImages) {
+        console.log(`🟢 적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
+        setMoodIcons(appliedTheme.moodImages);
+      }
+    };
+
+    loadAppliedTheme(); // ✅ 초기 실행
+    window.addEventListener("storage", loadAppliedTheme); // ✅ 스토리지 변경 감지
+
+    return () => {
+      window.removeEventListener("storage", loadAppliedTheme);
+    };
+  }, []);
+
+  const getMoodImage = (mood: string | null) => {
+    if (!moodIcons || Object.keys(moodIcons).length === 0)
+      return themeImages["hurt"];
+    return moodIcons[mood as keyof typeof moodIcons] || themeImages["hurt"];
+  };
+
   // 글자 수
   const [text, setText] = useState(0);
   const maxLength = 1000;
 
-  //   const handleChange = (value: string) => {
-  //     const textContent = stripHtmlTags(value); // HTML 태그 제거 후 순수 텍스트 추출
-  //     if (textContent.length <= maxLength) {
-  //       // 제한된 글자 수 이하만 허용
-  //       setContent(value); // 에디터 내용 설정
-  //       setText(textContent.length); // 글자 수 업데이트
-  //     }
-  //   };
   const handleChange = (value: string) => {
     if (!value) return; // 빈 값 체크 추가
 
@@ -435,7 +464,11 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   };
 
   const onClickCancel = () => {
-    navigate(`/board/${boardId}`);
+    if (isEdit) {
+      navigate(`/board/${boardId}`); // 기존 게시글 수정 시 해당 게시글로 이동
+    } else {
+      navigate("/"); // 새 게시글 작성 중 취소
+    }
   };
 
   // 작성
@@ -587,6 +620,59 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     }
   }, [isEdit]);
 
+  const getUserId = async (): Promise<string | null> => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      return null; // 토큰이 없을 경우 null 반환
+    }
+    const userId = jwtDecode(token).sub;
+    if (!userId) return null;
+    else return userId;
+  };
+
+  const [todayMood, setTodayMood] = useState<string | null>(null); // 오늘의 무드 상태 추가
+
+  const fetchTodayMood = async (): Promise<void> => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    const now = new Date();
+    const todayString = now
+      .toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .replace(/\. /g, "-")
+      .replace(/\./g, "");
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/moods?year=${now.getFullYear()}&month=${now.getMonth() + 1}`
+      );
+
+      const moodEntry = response.data.find(
+        (mood: { date: string; mood: string }) =>
+          new Date(mood.date).toISOString().split("T")[0] === todayString
+      );
+
+      if (moodEntry) {
+        console.log("오늘의 무드 데이터:", moodEntry);
+        setTodayMood(moodEntry.mood);
+      } else {
+        console.log("⚠️ 오늘의 무드 데이터 없음");
+        setTodayMood(null);
+      }
+    } catch (error) {
+      console.error("오늘의 무드 데이터를 불러오는 데 실패했습니다:", error);
+    }
+  };
+
+  // 컴포넌트가 마운트될 때 실행
+  useEffect(() => {
+    fetchTodayMood();
+  }, []);
+
   return (
     <Wrap>
       <h2>{currentDate}</h2>
@@ -630,6 +716,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
       </EditorWrap>
       <WriteEmotion>
         <p>오늘 {userInfo ? userInfo.username : "사용자"} 님의 기분은...</p>
+        <MoodIcon alt={todayMood || ""} src={getMoodImage(todayMood)} />
       </WriteEmotion>
       <ButtonWrap>
         <RecordButton $variant="moodCancel" onClick={onClickCancel}>

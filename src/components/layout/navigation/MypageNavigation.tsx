@@ -478,6 +478,33 @@ export default function MypageNavigation() {
     }
   };
 
+  const [moodCount, setMoodCount] = useState<number>(0); // 무드 개수 상태 추가
+
+  const fetchUserMoods = async () => {
+    const userId = await getUserId();
+    if (!userId) return;
+
+    // 현재 연도와 월 가져오기
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1; // JS의 getMonth()는 0부터 시작
+
+    try {
+      const response = await axios.get(
+        `https://api.meet-da.site/user/${userId}/moods?year=${year}&month=${month}`
+      );
+
+      // 무드 개수 상태 업데이트
+      setMoodCount(response.data.length);
+    } catch (error) {
+      console.error("무드 데이터를 불러오는 데 실패했습니다:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserMoods();
+  }, []);
+
   return (
     <Layout>
       <NavigationWrapper>
@@ -519,7 +546,7 @@ export default function MypageNavigation() {
               {posts.length}개의 다이어리
             </ProfileButton>
             <ProfileButton $variant="mood" onClick={linkCalendar}>
-              97개의 무드
+              {moodCount}개의 무드
             </ProfileButton>
           </ButtonWrapper>
         </UserInfo>

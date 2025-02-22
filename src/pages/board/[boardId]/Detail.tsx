@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AiOutlineEdit } from "react-icons/ai";
 import { AiOutlineDelete } from "react-icons/ai";
@@ -24,6 +24,7 @@ import { FreeMode, Thumbs } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { IoChatbubblesOutline } from "react-icons/io5";
 import { IoChatbubbles } from "react-icons/io5";
+import { themeImages } from "@/assets/common/themeImages";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -72,12 +73,12 @@ const Div = styled.div`
   line-height: 1.5rem;
 `;
 
-// const MoodIcon = styled.img`
-//   width: 1.5rem;
-//   position: relative;
-//   height: 1.5rem;
-//   object-fit: cover;
-// `;
+const MoodIcon = styled.img`
+  width: 1.5rem;
+  position: relative;
+  height: 1.5rem;
+  object-fit: cover;
+`;
 
 const MoodWrap = styled.div`
   align-self: stretch;
@@ -102,7 +103,6 @@ const FrameContainer = styled.div`
 `;
 
 const Div1 = styled.div`
-  width: 4.6875rem;
   position: relative;
   line-height: 1.5rem;
   display: flex;
@@ -291,6 +291,27 @@ const ProfileWrap = styled.div`
   justify-content: space-between;
 `;
 
+const ReplyProfileWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+`;
+
+const ReplyUserProfile = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  > p {
+    color: var(--main-text);
+    font-size: 18px;
+  }
+
+  > span {
+    color: var(--text-03);
+    font-size: 14px;
+  }
+`;
+
 const Profile = styled.div`
   > p {
     margin: 0;
@@ -306,6 +327,17 @@ const Profile = styled.div`
 const ProfileImage = styled.img`
   width: 5rem;
   height: 5rem;
+  border-radius: 6.25rem;
+
+  @media (max-width: 390px) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+`;
+
+const ReplyProfileImage = styled.img`
+  width: 3.375rem;
+  height: 3.375rem;
   border-radius: 6.25rem;
 
   @media (max-width: 390px) {
@@ -689,18 +721,25 @@ interface Author {
   username: string;
   profileImage: string;
   description: string;
+  mood: string;
 }
 
 interface Comment {
   _id: string;
   content: string;
   author: {
+    id: string;
     username: string;
     profileImage: string;
   };
   createdAt: string;
   parentCommentId?: string | null; // 대댓글인지 여부 확인
-  replies?: Comment[]; // 대댓글 리스트 추가
+  replies: Comment[]; // 대댓글 리스트 추가
+}
+
+interface MoodEntry {
+  date: string;
+  mood: string;
 }
 
 export default function BoardDetail() {
@@ -717,9 +756,6 @@ export default function BoardDetail() {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
-  const [loadedImages, setLoadedImages] = useState<{ [key: string]: boolean }>(
-    {}
-  );
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -734,6 +770,69 @@ export default function BoardDetail() {
       sessionStorage.removeItem("showPointModal"); // 한 번만 실행되도록 삭제
     }
   }, [boardId]); // boardId가 변경될 때만 실행
+
+  const [moodIcons, setMoodIcons] = useState(themeImages);
+
+  useEffect(() => {
+    const loadAppliedTheme = () => {
+      const userId = localStorage.getItem("userId");
+      const appliedTheme = userId
+        ? JSON.parse(localStorage.getItem(`appliedTheme_${userId}`) || "{}")
+        : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
+
+      if (appliedTheme.name && appliedTheme.moodImages) {
+        console.log(`🟢 적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
+        setMoodIcons(appliedTheme.moodImages);
+      }
+    };
+
+    loadAppliedTheme(); // ✅ 초기 실행
+    window.addEventListener("storage", loadAppliedTheme); // ✅ 스토리지 변경 감지
+
+    return () => {
+      window.removeEventListener("storage", loadAppliedTheme);
+    };
+  }, []);
+
+  const fetchMoodByDate = async (authorId: string, createdAt: string) => {
+    try {
+      const postDate = new Date(createdAt);
+      const year = postDate.getFullYear();
+      const month = postDate.getMonth() + 1;
+      const day = postDate.getDate(); // 게시글 작성 날짜
+
+      const response = await axios.get<MoodEntry[]>(
+        `https://api.meet-da.site/user/${authorId}/moods?year=${year}&month=${month}`
+      );
+
+      if (response.data.length > 0) {
+        // 해당 날짜에 맞는 무드 찾기
+        const matchedMood = response.data.find((moodEntry: MoodEntry) => {
+          const moodDate = new Date(moodEntry.date); // API에서 제공하는 날짜 값
+          return (
+            moodDate.getFullYear() === year &&
+            moodDate.getMonth() + 1 === month &&
+            moodDate.getDate() === day
+          );
+        });
+
+        return matchedMood ? matchedMood.mood : null; // 해당 날짜 무드가 없으면 null 반환
+      }
+      return null;
+    } catch (error) {
+      console.error(
+        `사용자 ${authorId}의 ${createdAt} 무드 데이터를 불러오는 데 실패했습니다:`,
+        error
+      );
+      return null;
+    }
+  };
+
+  const getMoodImage = (mood: string | null) => {
+    if (!moodIcons || Object.keys(moodIcons).length === 0)
+      return themeImages["hurt"];
+    return moodIcons[mood as keyof typeof moodIcons] || themeImages["hurt"];
+  };
 
   // 친구 추가
   const fetchFollowStatus = async () => {
@@ -897,9 +996,10 @@ export default function BoardDetail() {
   const fetchPost = async () => {
     try {
       setLoading(true);
-      const userId = await getUserId();
+      const userId = await getUserId(); // ✅ 현재 로그인한 사용자 ID 가져오기
       if (!userId) {
         console.error("유저 ID를 가져올 수 없음");
+        navigate("/"); // ✅ 로그인 안 한 사용자는 차단
         return;
       }
 
@@ -908,9 +1008,27 @@ export default function BoardDetail() {
       );
       const postData = response.data;
 
-      setPost(postData);
+      // ✅ 비공개 게시글인데 작성자가 아니면 접근 차단
+      if (postData.visibility === "PRIVATE" && postData.author.id !== userId) {
+        alert("비공개 게시글은 작성자만 볼 수 있습니다.");
+        navigate("/"); // ✅ 홈으로 리디렉트
+        return;
+      }
 
-      // 유저 ID를 기반으로 정확한 북마크 및 좋아요 상태 설정
+      // 작성일 기준으로 무드 가져오기
+      const authorMood = await fetchMoodByDate(
+        postData.author.id,
+        postData.createdAt
+      );
+
+      setPost({
+        ...postData,
+        author: {
+          ...postData.author,
+          mood: authorMood || "hurt", // 무드 정보 추가
+        },
+      });
+
       setIsBookmarked(postData.bookmarks.includes(userId));
       setIsLiked(postData.likes.includes(userId));
       setLikeCount(postData.likes.length);
@@ -1040,16 +1158,20 @@ export default function BoardDetail() {
 
       if (!response.data || response.data.length === 0) {
         console.warn("댓글이 없습니다.");
-        setComments([]); // ✅ 댓글이 없는 경우에도 빈 배열로 설정하여 UI 업데이트
+        setComments([]);
         return;
       }
 
       const commentsWithReplies = await Promise.all(
         response.data.map(async (comment: Comment) => {
+          console.log("서버 응답 댓글 데이터:", comment);
+
           const replies = await fetchReplies(comment._id);
+
           return {
             ...comment,
             author: {
+              id: comment.author?.id ?? null, // ✅ 빈 값("") 대신 null 사용
               username: comment.author?.username || "익명",
               profileImage: comment.author?.profileImage || defaultProfileImage,
             },
@@ -1066,6 +1188,14 @@ export default function BoardDetail() {
   };
 
   const postComment = async () => {
+    if (
+      (!newComment.trim() && !replyingTo) ||
+      (!newReplyComment.trim() && replyingTo)
+    ) {
+      alert("댓글을 입력하세요.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
@@ -1079,32 +1209,44 @@ export default function BoardDetail() {
         return;
       }
 
-      const parentCommentId = replyingTo; // 대댓글이면 부모 댓글의 ID가 들어감
+      const payload = {
+        boardId,
+        author: userId,
+        content: replyingTo ? newReplyComment : newComment, // ✅ 대댓글이면 newReplyComment 사용
+        parentCommentId: replyingTo ? replyingTo : null,
+      };
+
+      console.log("전송할 댓글 데이터:", payload);
 
       const response = await axios.post(
         `https://api.meet-da.site/comment`,
-        {
-          boardId,
-          author: userId,
-          content: newComment,
-          parentCommentId: parentCommentId || null, // 일반 댓글이면 null
-        },
+        payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       console.log("댓글 생성 응답:", response.data);
 
-      setNewComment("");
-      setReplyingTo(null); // 댓글 작성 후 parentCommentId 초기화
-      fetchComments(); // UI 즉시 업데이트
+      if (replyingTo) {
+        setNewReplyComment(""); // ✅ 대댓글 입력 후 초기화
+      } else {
+        setNewComment(""); // ✅ 일반 댓글 입력 후 초기화
+      }
+
+      fetchComments();
     } catch (error) {
       console.error("댓글 작성 실패:", error);
     }
   };
 
+  // 대댓글 작성 버튼 클릭 시 replyingTo 설정
   const toggleReplyBox = (commentId: string) => {
-    setReplyingTo(replyingTo === commentId ? null : commentId); // 부모 댓글의 _id 저장
-    setActiveReplyId((prev) => (prev === commentId ? null : commentId)); // 클릭한 댓글만 Reply 표시
+    if (replyingTo === commentId) {
+      setReplyingTo(null); // 대댓글 입력 취소
+      setActiveReplyId(null);
+    } else {
+      setReplyingTo(commentId); // 클릭한 댓글을 부모로 지정
+      setActiveReplyId(commentId);
+    }
   };
 
   const editComment = async (
@@ -1113,7 +1255,12 @@ export default function BoardDetail() {
     authorId: string
   ) => {
     const userId = await getUserId();
-    if (!userId || userId !== authorId) {
+
+    console.log("현재 로그인한 userId:", userId, "타입:", typeof userId);
+    console.log("댓글 작성자 authorId:", authorId, "타입:", typeof authorId);
+
+    if (!userId || userId.trim() !== authorId.trim()) {
+      // ✅ 문자열 공백 제거 후 비교
       alert("본인이 작성한 댓글만 수정할 수 있습니다.");
       return;
     }
@@ -1148,29 +1295,25 @@ export default function BoardDetail() {
   };
 
   const deleteComment = async (commentId: string, authorId: string) => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return alert("로그인이 필요합니다.");
-
-      const userId = await getUserId();
-      if (!userId || userId !== authorId) {
-        alert("본인이 작성한 댓글만 삭제할 수 있습니다.");
-        return;
-      }
-
-      if (!window.confirm("정말로 이 댓글을 삭제하시겠습니까?")) return;
-
-      await axios.delete(`https://api.meet-da.site/comment/${commentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setComments((prevComments) =>
-        prevComments.filter((comment) => comment._id !== commentId)
-      );
-    } catch (error) {
-      console.error("댓글 삭제 실패:", error);
+    const userId = await getUserId();
+    if (!userId || userId !== authorId) {
+      // ✅ `author.username` → `author.id` 변경
+      alert("본인이 작성한 댓글만 삭제할 수 있습니다.");
+      return;
     }
+
+    if (!window.confirm("정말로 이 댓글을 삭제하시겠습니까?")) return;
+
+    await axios.delete(`https://api.meet-da.site/comment/${commentId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment._id !== commentId)
+    );
   };
+
+  const [newReplyComment, setNewReplyComment] = useState(""); // ✅ 대댓글 입력 상태 추가
 
   const fetchReplies = async (commentId: string) => {
     try {
@@ -1178,14 +1321,20 @@ export default function BoardDetail() {
         `https://api.meet-da.site/comment/replies/${commentId}`
       );
 
-      return response.data.map((reply: Comment) => ({
-        ...reply,
-        author: {
-          username: reply.author?.username || "익명",
-          profileImage: reply.author?.profileImage || defaultProfileImage,
-        },
-        createdAt: reply.createdAt || new Date().toISOString(),
-      }));
+      return response.data
+        .map((reply: Comment) => ({
+          ...reply,
+          author: {
+            id: reply.author?.id || "",
+            username: reply.author?.username || "익명",
+            profileImage: reply.author?.profileImage || defaultProfileImage,
+          },
+          createdAt: reply.createdAt || new Date().toISOString(),
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ); // ✅ 최신순 정렬
     } catch (error) {
       console.error("대댓글 조회 실패:", error);
       return [];
@@ -1199,6 +1348,30 @@ export default function BoardDetail() {
   if (!post) {
     return <p>게시글을 찾을 수 없습니다.</p>;
   }
+
+  const formatTimeAgo = (createdAt: string) => {
+    const now = new Date();
+    const commentDate = new Date(createdAt);
+    const diffMs = now.getTime() - commentDate.getTime(); // 시간 차이 (밀리초)
+    const diffSec = Math.floor(diffMs / 1000); // 초 단위 변환
+    const diffMin = Math.floor(diffSec / 60); // 분 단위 변환
+    const diffHour = Math.floor(diffMin / 60); // 시간 단위 변환
+    const diffDay = Math.floor(diffHour / 12); // 일 단위 변환
+
+    if (diffDay >= 1) {
+      // ✅ 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
+      return `${commentDate.getFullYear()}.${String(commentDate.getMonth() + 1).padStart(2, "0")}.${String(commentDate.getDate()).padStart(2, "0")}`;
+    } else if (diffHour >= 1) {
+      // ✅ 1시간 이상 경과한 경우
+      return `${diffHour}시간 전`;
+    } else if (diffMin >= 1) {
+      // ✅ 1분 이상 경과한 경우
+      return `${diffMin}분 전`;
+    } else {
+      // ✅ 1분 이내
+      return "방금 전";
+    }
+  };
 
   // visibility 값을 한글로 변환하는 객체
   const visibilityMap: { [key: string]: string } = {
@@ -1233,7 +1406,10 @@ export default function BoardDetail() {
                   <UserName>{post.author.username}</UserName>
                   <Span>님의 기분은...</Span>
                 </Div>
-                {/* <MoodIcon alt="피곤" src={EmotionImg} /> */}
+                <MoodIcon
+                  alt={post.author.mood || "기본 무드"}
+                  src={getMoodImage(post.author.mood)}
+                />
               </MoodWrap>
             </FrameContainer>
             <Div>·</Div>
@@ -1366,29 +1542,35 @@ export default function BoardDetail() {
                       e.currentTarget.src = defaultProfileImage;
                     }}
                     style={{
-                      backgroundColor: "transparent", // ✅ 배경색을 하얀색이 아닌 투명하게 설정
-                      display: "block", // ✅ 이미지가 사라지지 않도록 강제 설정
+                      backgroundColor: "transparent", // 배경색을 하얀색이 아닌 투명하게 설정
+                      display: "block", // 이미지가 사라지지 않도록 강제 설정
                     }}
                   />
 
                   <Profile>
                     <p>{comment.author.username}</p>
-                    <span>{new Date(comment.createdAt).toLocaleString()}</span>
+                    <span>{formatTimeAgo(comment.createdAt)}</span>
                   </Profile>
                 </ProfileWrap>
                 <IconButton>
                   <EditIcon
-                    onClick={() =>
+                    onClick={() => {
+                      console.log("댓글 객체:", comment); // ✅ 전체 댓글 객체 확인
+                      console.log(
+                        "댓글 작성자 ID (comment.author.id):",
+                        comment.author?.id
+                      ); // ✅ 값 존재 여부 확인
+
                       editComment(
                         comment._id,
                         comment.content,
-                        comment.author.username
-                      )
-                    }
+                        comment.author?.id || "undefined"
+                      ); // ✅ 값이 없을 경우 기본값 전달
+                    }}
                   />
                   <DeleteIcon
                     onClick={() =>
-                      deleteComment(comment._id, comment.author.username)
+                      deleteComment(comment._id, comment.author.id)
                     }
                   />
                 </IconButton>
@@ -1396,7 +1578,7 @@ export default function BoardDetail() {
               <CommentWrite>
                 {editingCommentId === comment._id ? (
                   <>
-                    {/* ✅ 댓글 작성 UI와 동일한 형태로 수정 */}
+                    {/* 댓글 작성 UI와 동일한 형태로 수정 */}
                     <TextArea
                       placeholder="댓글을 작성하세요."
                       value={editContent}
@@ -1434,43 +1616,78 @@ export default function BoardDetail() {
                   <Reply>
                     <TextAreaWrap>
                       <ArrowIcon />
-                      <TextArea placeholder="답글을 작성하세요." />
+                      <TextArea
+                        placeholder="답글을 작성하세요."
+                        value={newReplyComment}
+                        onChange={(e) => setNewReplyComment(e.target.value)}
+                      />
                     </TextAreaWrap>
                     <Button>
                       <button onClick={() => setActiveReplyId(null)}>
                         취소
                       </button>
-                      <ReplyButton $variant="comment" onClick={postComment}>
+                      <ReplyButton
+                        $variant="comment"
+                        onClick={() => postComment()}
+                      >
                         댓글 작성
                       </ReplyButton>
                     </Button>
                     {/* 대댓글 렌더링 */}
                     {comment.replies &&
-                      comment.replies.map((reply) => (
-                        <ReplyComment key={reply._id}>
-                          <ProfileWrap>
-                            <ProfileImage
-                              src={
-                                reply.author.profileImage || defaultProfileImage
-                              }
-                              alt={`${reply.author.username}의 프로필 이미지`}
-                              onError={(e) => {
-                                e.currentTarget.src = defaultProfileImage;
-                              }}
-                              style={{
-                                opacity: loadedImages[comment._id] ? 1 : 0,
-                              }} // 로딩 완료 후 표시 (깜빡임 방지)
-                            />
-                            <Profile>
-                              <p>{reply.author.username}</p>
-                              <span>
-                                {new Date(reply.createdAt).toLocaleString()}
-                              </span>
-                            </Profile>
-                          </ProfileWrap>
-                          <p>{reply.content}</p>
-                        </ReplyComment>
-                      ))}
+                      comment.replies.map((reply, replyIndex) => {
+                        const isLastReply =
+                          replyIndex === comment.replies.length - 1; // ✅ 마지막 대댓글 여부 확인
+
+                        return (
+                          <React.Fragment key={reply._id}>
+                            <ReplyComment>
+                              <CommentInfoWrap>
+                                <ReplyProfileWrap>
+                                  <ReplyProfileImage
+                                    src={
+                                      reply.author.profileImage ||
+                                      defaultProfileImage
+                                    }
+                                    alt={`${reply.author.username}의 프로필 이미지`}
+                                    onError={(e) => {
+                                      e.currentTarget.src = defaultProfileImage;
+                                    }}
+                                  />
+                                  <ReplyUserProfile>
+                                    <p>{reply.author.username}</p>
+                                    <span>
+                                      {formatTimeAgo(comment.createdAt)}
+                                    </span>
+                                  </ReplyUserProfile>
+                                </ReplyProfileWrap>
+                                <IconButton>
+                                  <EditIcon
+                                    onClick={() =>
+                                      editComment(
+                                        comment._id,
+                                        comment.content,
+                                        comment.author.id
+                                      )
+                                    }
+                                  />
+                                  <DeleteIcon
+                                    onClick={() =>
+                                      deleteComment(
+                                        comment._id,
+                                        comment.author.id
+                                      )
+                                    }
+                                  />
+                                </IconButton>
+                              </CommentInfoWrap>
+                              <p>{reply.content}</p>
+                            </ReplyComment>
+                            {/* ✅ 마지막 대댓글이 아닐 경우만 Line 추가 */}
+                            {!isLastReply && <Line />}
+                          </React.Fragment>
+                        );
+                      })}
                   </Reply>
                   {!isLastComment && <Line />}
                 </>

@@ -9,11 +9,7 @@ import { useEffect, useState } from "react";
 import CalLarge from "@/assets/images/캘린더배경.png";
 import CalMedium from "@/assets/images/캘린더배경_781.png";
 import CalSmall from "@/assets/images/캘린더배경_390.png";
-import happy from "@/assets/mood/happy.svg";
-import normal from "@/assets/mood/normal.svg";
-import tired from "@/assets/mood/tired.svg";
-import angry from "@/assets/mood/angry.svg";
-import sad from "@/assets/mood/sad.svg";
+import { themeImages } from "@/assets/common/themeImages";
 import hurt from "@/assets/mood/hurt.png";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -41,13 +37,16 @@ export default function MainPage() {
   });
 
   // Mood 아이콘 매핑
-  const moodIcons: Record<string, string> = {
-    joy: happy,
-    neutral: normal,
-    sadness: sad,
-    tired: tired,
-    anger: angry,
-  };
+  // const moodIcons: Record<string, string> = {
+  //   joy: themeImages["joy"],
+  //   normal: themeImages["normal"],
+  //   sad: themeImages["sad"],
+  //   tired: themeImages["tired"],
+  //   angry: themeImages["angry"],
+  // };
+
+  const appliedTheme = JSON.parse(localStorage.getItem("appliedTheme") || "{}");
+  const moodIcons = appliedTheme.moodImages || themeImages;
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();

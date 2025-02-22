@@ -26,7 +26,7 @@ export const SearchBarContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: 80%;
   height: 3.75rem;
   padding: 0.75rem 2.5rem;
   border-radius: 0.625rem;
@@ -211,4 +211,23 @@ export const NoTheme = styled.div`
   align-items: center;
   color: var(--main-text);
   font-size: 1.25rem;
+`;
+
+export const ButtonWrapper = styled.div`
+  display: flex;
+  margin-left: auto;
+  width: 7.75rem;
+
+  @media (max-width: 781px) {
+    justify-content: center;
+    margin: unset;
+    width: 100%;
+  }
+`;
+
+export const NavWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1.5rem;
 `;

@@ -85,6 +85,7 @@ export default function ModalTemplate() {
                 <DeleteThemeCompleteModal
                   title={modalData.title}
                   content={modalData.content}
+                  onConfirm={modalData.onConfirm}
                 />
               ) : null;
             case "friendModal":

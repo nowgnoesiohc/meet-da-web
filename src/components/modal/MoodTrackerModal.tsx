@@ -1,15 +1,11 @@
 import styled from "styled-components";
-import happy from "../../assets/mood/happy.svg";
-import sad from "../../assets/mood/sad.svg";
-import normal from "../../assets/mood/normal.svg";
-import tired from "../../assets/mood/tired.svg";
-import angry from "../../assets/mood/angry.svg";
 import { useIsModalStore } from "../../store/ModalStore";
 import { RecordButton } from "../ui/Button";
 import { Textarea } from "@/components/ui/Input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { themeImages } from "@/assets/common/themeImages";
 
 const Wrap = styled.div`
   width: 62.125rem;
@@ -168,12 +164,34 @@ export default function MoodTrackerModal({
   );
   const [memo, setMemo] = useState<string>(content ?? "");
 
+  const [moodIcons, setMoodIcons] = useState(themeImages); // 기본값 설정
+
+  useEffect(() => {
+    const appliedTheme = JSON.parse(
+      localStorage.getItem("appliedTheme") || "{}"
+    );
+
+    console.log("🟠 테마 변경 감지, 적용된 테마:", appliedTheme);
+
+    if (appliedTheme.moodImages) {
+      setMoodIcons(appliedTheme.moodImages); // ✅ 테마 Mood 이미지 업데이트
+    }
+  }, []);
+
+  // const moodIcons = appliedTheme.moodImages || {
+  //   joy: "/defaultMood/happy.svg",
+  //   sadness: "/defaultMood/sad.svg",
+  //   neutral: "/defaultMood/normal.svg",
+  //   tired: "/defaultMood/tired.svg",
+  //   anger: "/defaultMood/angry.svg",
+  // };
+
   const moods = [
-    { id: "joy", label: "기쁨", src: happy },
-    { id: "sadness", label: "슬픔", src: sad },
-    { id: "neutral", label: "평범", src: normal },
-    { id: "tired", label: "피곤", src: tired },
-    { id: "anger", label: "화남", src: angry },
+    { id: "joy", label: "기쁨", src: moodIcons.joy },
+    { id: "sadness", label: "슬픔", src: moodIcons.sadness },
+    { id: "neutral", label: "평범", src: moodIcons.neutral },
+    { id: "tired", label: "피곤", src: moodIcons.tired },
+    { id: "anger", label: "화남", src: moodIcons.anger },
   ];
 
   const getKSTDate = () => {
