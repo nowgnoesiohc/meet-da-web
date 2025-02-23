@@ -920,7 +920,7 @@ export default function BoardDetail() {
 
       // '_id' 속성으로 비교하도록 수정
       const isUserFollowing = followingList.some(
-        (follow) => follow._id === post.author.id
+        (follow: { _id: string }) => follow._id === post.author.id
       );
 
       console.log(`팔로우 상태 확인: ${isUserFollowing}`);
@@ -1419,7 +1419,7 @@ export default function BoardDetail() {
           createdAt: reply.createdAt || new Date().toISOString(),
         }))
         .sort(
-          (a, b) =>
+          (a: { createdAt: string }, b: { createdAt: string }) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ); // 최신순 정렬
     } catch (error) {
