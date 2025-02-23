@@ -12,12 +12,12 @@ import redSet from "../theme/emoji/redSet/redSet.png";
 
 // 개별 감정별 테마 이미지
 // 파스텔
-import pastelJoy from "../theme/emoji/pastelSet/pastelhappy.png";
-import pastelSad from "../theme/emoji/pastelSet/pastelsad.png";
-import pastelAngry from "../theme/emoji/pastelSet/pastelangry.png";
-import pastelNormal from "../theme/emoji/pastelSet/pastelnormal.png";
-import pastelTired from "../theme/emoji/pastelSet/pasteltired.png";
-import pastelHurt from "../theme/emoji/pastelSet/pastelhurt.png";
+import pastelJoy from "../theme/emoji/pastelSet/pastelHappy.png";
+import pastelSad from "../theme/emoji/pastelSet/pastelSad.png";
+import pastelAngry from "../theme/emoji/pastelSet/pastelAngry.png";
+import pastelNormal from "../theme/emoji/pastelSet/pastelNormal.png";
+import pastelTired from "../theme/emoji/pastelSet/pastelTired.png";
+import pastelHurt from "../theme/emoji/pastelSet/pastelHurt.png";
 
 // 빈티지
 import vintageJoy from "../theme/emoji/vintageSet/vintageHappy.png";
