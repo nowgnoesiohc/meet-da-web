@@ -14,7 +14,6 @@ import {
   CommentButton,
   DiaryButton,
   FriendButton,
-  ReplyButton,
 } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
 import PointModal from "@/components/modal/PointModal";
@@ -303,12 +302,12 @@ const ReplyUserProfile = styled.div`
 
   > p {
     color: var(--main-text);
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   > span {
     color: var(--text-03);
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 `;
 
@@ -405,6 +404,18 @@ const CommentButtonWrap = styled.div`
   }
 `;
 
+const EditButtonWrap = styled.div`
+  width: 100%;
+  height: 3.25rem;
+  display: flex;
+  flex-direction: row-reverse;
+  margin: 1.5rem 0rem;
+
+  @media (max-width: 390px) {
+    margin-top: 0.75rem;
+  }
+`;
+
 const CommentList = styled.div`
   margin-top: 5rem;
 
@@ -485,6 +496,17 @@ const CommentWrite = styled.div`
   }
 `;
 
+const EditWrite = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 1rem 0;
+
+  p {
+    margin: 0 !important;
+  }
+`;
+
 const ReplyButtonWrap = styled.div`
   display: flex;
   align-items: center;
@@ -555,6 +577,27 @@ const ReplyComment = styled.div`
 const ReplyIcon = styled(IoChatbubblesOutline)`
   font-size: 1.125rem;
   color: var(--comment-button);
+`;
+
+const CancelButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7.25rem;
+  height: 3.25rem;
+  border-radius: 0.625rem;
+  background-color: none;
+  color: var(--comment-button);
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: var(--font-semibold);
+
+  @media (max-width: 390px) {
+    width: 5.375rem;
+    height: 2.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
 `;
 
 const ClickedReplyIcon = styled(IoChatbubbles)`
@@ -728,13 +771,14 @@ interface Comment {
   _id: string;
   content: string;
   author: {
-    id: string;
+    _id: string;
+    id?: string;
     username: string;
     profileImage: string;
   };
   createdAt: string;
-  parentCommentId?: string | null; // 대댓글인지 여부 확인
-  replies: Comment[]; // 대댓글 리스트 추가
+  parentCommentId?: string | null;
+  replies: Comment[];
 }
 
 interface MoodEntry {
@@ -1144,12 +1188,6 @@ export default function BoardDetail() {
     }
   };
 
-  useEffect(() => {
-    if (boardId) {
-      fetchComments();
-    }
-  }, [boardId]);
-
   const fetchComments = async () => {
     try {
       const response = await axios.get(
@@ -1164,19 +1202,19 @@ export default function BoardDetail() {
 
       const commentsWithReplies = await Promise.all(
         response.data.map(async (comment: Comment) => {
-          console.log("서버 응답 댓글 데이터:", comment);
+          console.log("서버 응답 댓글 데이터:", comment); // API 응답 구조 확인
 
-          const replies = await fetchReplies(comment._id);
+          const replies = await fetchReplies(comment._id); // 대댓글 가져오기
 
           return {
             ...comment,
             author: {
-              id: comment.author?.id ?? null,
+              _id: comment.author?._id || "",
               username: comment.author?.username || "익명",
               profileImage: comment.author?.profileImage || defaultProfileImage,
             },
             createdAt: comment.createdAt || new Date().toISOString(),
-            replies,
+            replies, // 대댓글 추가
           };
         })
       );
@@ -1249,27 +1287,34 @@ export default function BoardDetail() {
     }
   };
 
+  useEffect(() => {
+    fetchComments();
+  }, [boardId]);
+
   const editComment = async (
     commentId: string,
     currentContent: string,
-    authorId: string
+    authorId: string,
+    parentCommentId?: string // TypeScript 및 ESLint 경고 해결
   ) => {
     const userId = await getUserId();
 
-    console.log("현재 로그인한 userId:", userId, "타입:", typeof userId);
-    console.log("댓글 작성자 authorId:", authorId, "타입:", typeof authorId);
-
     if (!userId || userId.trim() !== authorId.trim()) {
-      // 문자열 공백 제거 후 비교
       alert("본인이 작성한 댓글만 수정할 수 있습니다.");
       return;
     }
 
+    console.log("수정할 댓글 정보:", { commentId, parentCommentId });
+
+    // parentCommentId가 있으면 대댓글 수정, 없으면 일반 댓글 수정
     setEditingCommentId(commentId);
     setEditContent(currentContent);
   };
 
-  const saveEditedComment = async (commentId: string) => {
+  const saveEditedComment = async (
+    commentId: string,
+    parentCommentId?: string
+  ) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) return alert("로그인이 필요합니다.");
@@ -1280,13 +1325,30 @@ export default function BoardDetail() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment._id === commentId
-            ? { ...comment, content: editContent }
-            : comment
-        )
-      );
+      setComments((prevComments) => {
+        if (parentCommentId) {
+          // 대댓글 수정
+          return prevComments.map((comment) =>
+            comment._id === parentCommentId
+              ? {
+                  ...comment,
+                  replies: comment.replies.map((reply) =>
+                    reply._id === commentId
+                      ? { ...reply, content: editContent }
+                      : reply
+                  ),
+                }
+              : comment
+          );
+        } else {
+          // 일반 댓글 수정
+          return prevComments.map((comment) =>
+            comment._id === commentId
+              ? { ...comment, content: editContent }
+              : comment
+          );
+        }
+      });
 
       setEditingCommentId(null);
     } catch (error) {
@@ -1294,22 +1356,48 @@ export default function BoardDetail() {
     }
   };
 
-  const deleteComment = async (commentId: string, authorId: string) => {
+  const deleteComment = async (
+    commentId: string,
+    authorId: string,
+    parentCommentId?: string
+  ) => {
     const userId = await getUserId();
-    if (!userId || userId !== authorId) {
+
+    if (!userId || userId.trim() !== authorId.trim()) {
       alert("본인이 작성한 댓글만 삭제할 수 있습니다.");
       return;
     }
 
     if (!window.confirm("정말로 이 댓글을 삭제하시겠습니까?")) return;
 
-    await axios.delete(`https://api.meet-da.site/comment/${commentId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    try {
+      await axios.delete(`https://api.meet-da.site/comment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
 
-    setComments((prevComments) =>
-      prevComments.filter((comment) => comment._id !== commentId)
-    );
+      setComments((prevComments) => {
+        if (parentCommentId) {
+          // 대댓글 삭제: 부모 댓글의 replies에서만 삭제
+          return prevComments.map((comment) =>
+            comment._id === parentCommentId
+              ? {
+                  ...comment,
+                  replies: comment.replies.filter(
+                    (reply) => reply._id !== commentId
+                  ),
+                }
+              : comment
+          );
+        } else {
+          // 일반 댓글 삭제
+          return prevComments.filter((comment) => comment._id !== commentId);
+        }
+      });
+    } catch (error) {
+      console.error("댓글 삭제 실패:", error);
+    }
   };
 
   const [newReplyComment, setNewReplyComment] = useState(""); // 대댓글 입력 상태 추가
@@ -1324,7 +1412,7 @@ export default function BoardDetail() {
         .map((reply: Comment) => ({
           ...reply,
           author: {
-            id: reply.author?.id || "",
+            id: reply.author?._id || "",
             username: reply.author?.username || "익명",
             profileImage: reply.author?.profileImage || defaultProfileImage,
           },
@@ -1557,25 +1645,25 @@ export default function BoardDetail() {
                       console.log("댓글 객체:", comment); // 전체 댓글 객체 확인
                       console.log(
                         "댓글 작성자 ID (comment.author.id):",
-                        comment.author?.id
+                        comment.author?._id
                       ); // 값 존재 여부 확인
 
                       editComment(
                         comment._id,
                         comment.content,
-                        comment.author?.id || "undefined"
+                        comment.author?._id || "undefined"
                       ); // 값이 없을 경우 기본값 전달
                     }}
                   />
                   <DeleteIcon
                     onClick={() =>
-                      deleteComment(comment._id, comment.author.id)
+                      deleteComment(comment._id, comment.author._id)
                     }
                   />
                 </IconButton>
               </CommentInfoWrap>
-              <CommentWrite>
-                {editingCommentId === comment._id ? (
+              {editingCommentId === comment._id ? (
+                <EditWrite>
                   <>
                     {/* 댓글 작성 UI와 동일한 형태로 수정 */}
                     <TextArea
@@ -1583,21 +1671,23 @@ export default function BoardDetail() {
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
                     />
-                    <CommentButtonWrap>
+                    <EditButtonWrap>
                       <CommentButton
                         onClick={() => saveEditedComment(comment._id)}
                       >
                         수정 완료
                       </CommentButton>
-                      <button onClick={() => setEditingCommentId(null)}>
+                      <CancelButton onClick={() => setEditingCommentId(null)}>
                         취소
-                      </button>
-                    </CommentButtonWrap>
+                      </CancelButton>
+                    </EditButtonWrap>
                   </>
-                ) : (
+                </EditWrite>
+              ) : (
+                <CommentWrite>
                   <p>{comment.content}</p>
-                )}
-              </CommentWrite>
+                </CommentWrite>
+              )}
 
               <ReplyButtonWrap>
                 {activeReplyId === comment._id ? (
@@ -1625,68 +1715,131 @@ export default function BoardDetail() {
                       <button onClick={() => setActiveReplyId(null)}>
                         취소
                       </button>
-                      <ReplyButton
-                        $variant="comment"
-                        onClick={() => postComment()}
-                      >
+                      <CommentButton onClick={() => postComment()}>
                         댓글 작성
-                      </ReplyButton>
+                      </CommentButton>
                     </Button>
                     {/* 대댓글 렌더링 */}
                     {comment.replies &&
-                      comment.replies.map((reply, replyIndex) => {
-                        const isLastReply =
-                          replyIndex === comment.replies.length - 1; // 마지막 대댓글 여부 확인
+                      comment.replies.map((reply) => (
+                        <React.Fragment key={reply._id}>
+                          <ReplyComment>
+                            <CommentInfoWrap>
+                              <ReplyProfileWrap>
+                                <ReplyProfileImage
+                                  src={
+                                    reply.author.profileImage ||
+                                    defaultProfileImage
+                                  }
+                                  alt={`${reply.author.username}의 프로필 이미지`}
+                                  onError={(e) => {
+                                    e.currentTarget.src = defaultProfileImage;
+                                  }}
+                                />
+                                <ReplyUserProfile>
+                                  <p>{reply.author.username}</p>
+                                  <span>{formatTimeAgo(reply.createdAt)}</span>
+                                </ReplyUserProfile>
+                              </ReplyProfileWrap>
+                              <IconButton>
+                                <EditIcon
+                                  onClick={() => {
+                                    console.log("대댓글 수정 요청:", {
+                                      replyId: reply._id,
+                                      content: reply.content,
+                                      authorId: reply.author?.id,
+                                      parentCommentId: comment?._id,
+                                    });
 
-                        return (
-                          <React.Fragment key={reply._id}>
-                            <ReplyComment>
-                              <CommentInfoWrap>
-                                <ReplyProfileWrap>
-                                  <ReplyProfileImage
-                                    src={
-                                      reply.author.profileImage ||
-                                      defaultProfileImage
+                                    if (!reply.author?.id) {
+                                      console.error(
+                                        "대댓글의 작성자 ID가 없습니다!",
+                                        reply
+                                      );
+                                      return;
                                     }
-                                    alt={`${reply.author.username}의 프로필 이미지`}
-                                    onError={(e) => {
-                                      e.currentTarget.src = defaultProfileImage;
-                                    }}
-                                  />
-                                  <ReplyUserProfile>
-                                    <p>{reply.author.username}</p>
-                                    <span>
-                                      {formatTimeAgo(comment.createdAt)}
-                                    </span>
-                                  </ReplyUserProfile>
-                                </ReplyProfileWrap>
-                                <IconButton>
-                                  <EditIcon
+                                    if (!comment?._id) {
+                                      console.error(
+                                        "부모 댓글 ID가 없습니다!",
+                                        comment
+                                      );
+                                      return;
+                                    }
+
+                                    editComment(
+                                      reply._id,
+                                      reply.content,
+                                      reply.author.id || "", // undefined 방지
+                                      comment._id // parentCommentId 전달
+                                    );
+                                  }}
+                                />
+                                <DeleteIcon
+                                  onClick={() => {
+                                    console.log("대댓글 삭제 요청:", {
+                                      replyId: reply._id,
+                                      authorId: reply.author?.id,
+                                      parentCommentId: comment?._id,
+                                    });
+
+                                    if (!reply.author?.id) {
+                                      console.error(
+                                        "대댓글의 작성자 ID가 없습니다!",
+                                        reply
+                                      );
+                                      return;
+                                    }
+                                    if (!comment?._id) {
+                                      console.error(
+                                        "부모 댓글 ID가 없습니다!",
+                                        comment
+                                      );
+                                      return;
+                                    }
+
+                                    deleteComment(
+                                      reply._id,
+                                      reply.author.id || "", // undefined 방지
+                                      comment._id || "" // undefined 방지
+                                    );
+                                  }}
+                                />
+                              </IconButton>
+                            </CommentInfoWrap>
+
+                            {/* 대댓글 수정 UI 추가 */}
+                            {editingCommentId === reply._id ? (
+                              <EditWrite>
+                                <TextArea
+                                  placeholder="대댓글을 수정하세요."
+                                  value={editContent}
+                                  onChange={(e) =>
+                                    setEditContent(e.target.value)
+                                  }
+                                />
+                                <EditButtonWrap>
+                                  <CommentButton
                                     onClick={() =>
-                                      editComment(
-                                        comment._id,
-                                        comment.content,
-                                        comment.author.id
-                                      )
+                                      saveEditedComment(reply._id, comment._id)
                                     }
-                                  />
-                                  <DeleteIcon
-                                    onClick={() =>
-                                      deleteComment(
-                                        comment._id,
-                                        comment.author.id
-                                      )
-                                    }
-                                  />
-                                </IconButton>
-                              </CommentInfoWrap>
-                              <p>{reply.content}</p>
-                            </ReplyComment>
-                            {/* 마지막 대댓글이 아닐 경우만 Line 추가 */}
-                            {!isLastReply && <Line />}
-                          </React.Fragment>
-                        );
-                      })}
+                                  >
+                                    수정 완료
+                                  </CommentButton>
+                                  <CancelButton
+                                    onClick={() => setEditingCommentId(null)}
+                                  >
+                                    취소
+                                  </CancelButton>
+                                </EditButtonWrap>
+                              </EditWrite>
+                            ) : (
+                              <CommentWrite>
+                                <p>{reply.content}</p>
+                              </CommentWrite>
+                            )}
+                          </ReplyComment>
+                        </React.Fragment>
+                      ))}
                   </Reply>
                   {!isLastComment && <Line />}
                 </>

@@ -467,7 +467,7 @@ export default function FeedPage() {
       setIsFetching(true);
 
       try {
-        const userId = await getUserId(); // ✅ userId 가져오기
+        const userId = await getUserId(); // userId 가져오기
         console.log(`현재 사용자 ID: ${userId || "로그인 안됨"}`);
 
         const response = await axios.get<Post[]>(
@@ -524,7 +524,7 @@ export default function FeedPage() {
         setHasMore(filteredPosts.length > 0);
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
-        setHasMore(false); // 🚨 실패 시 더 이상 요청 안 하도록 설정
+        setHasMore(false); // 실패 시 더 이상 요청 안 하도록 설정
       } finally {
         setIsFetching(false);
       }
