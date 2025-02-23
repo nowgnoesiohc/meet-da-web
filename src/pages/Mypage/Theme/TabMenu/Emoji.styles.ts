@@ -26,9 +26,8 @@ export const SearchBarContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  height: 3.75rem;
-  padding: 0.75rem 2.5rem;
+  width: 80%;
+  padding: 0.75rem 1.5rem;
   border-radius: 0.625rem;
   border: 1px solid var(--main-text);
 
@@ -230,4 +229,23 @@ export const PriceText = styled.div`
   @media (max-width: 390px) {
     font-size: 1rem;
   }
+`;
+
+export const ButtonWrapper = styled.div`
+  display: flex;
+  margin-left: auto;
+  width: 7.75rem;
+
+  @media (max-width: 781px) {
+    justify-content: center;
+    margin: unset;
+    width: 100%;
+  }
+`;
+
+export const NavWrap = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1.5rem;
 `;

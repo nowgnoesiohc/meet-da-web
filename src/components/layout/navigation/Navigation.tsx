@@ -177,9 +177,15 @@ export default function Navigation() {
   };
 
   const handleLogout = () => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      const userId = jwtDecode(token).sub;
+      sessionStorage.removeItem(`appliedFont_${userId}`);
+      sessionStorage.removeItem(`appliedTheme_${userId}`);
+    }
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("appliedFont");
-    document.documentElement.style.setProperty("--applied-font", "Pretendard"); // 즉시 적용
     setIsLoggedIn(false);
     navigate("/auth/login");
   };

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { OrangeLineButton } from "@/components/ui/Button";
+import { DiarySettingButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
-import { useOutletContext } from "react-router-dom";
-import { moodIconMap } from "@/assets/common/themeImages";
 import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
+import { fontImageMap } from "@/assets/common/themeFonts";
+import { themeSetImageMap, moodIconMap } from "@/assets/common/themeImages";
 import usePagination, {
   AfterIcon,
   BeforeIcon,
@@ -12,11 +12,12 @@ import usePagination, {
   PaginationButton,
 } from "./usePagination";
 import {
-  ButtonBox,
+  ButtonWrapper,
   CheckBox,
   CheckIcon,
   ImageBox,
   Layout,
+  NavWrap,
   NoTheme,
   SearchBarContainer,
   SearchButton,
@@ -29,152 +30,82 @@ import {
   ThemeTitle,
   ThemeWrapper,
 } from "./Own.styles";
-import { fontImageMap } from "@/assets/common/themeFonts";
+
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export default function Own() {
   const [ownThemes, setOwnThemes] = useState<
-    { id: number; name: string; image: string }[]
+    { id: string; name: string; image: string }[]
+  >([]);
+
+  const [ownFonts, setOwnFonts] = useState<{ id: string; name: string }[]>([]);
+
+  const [selectedItems, setSelectedItems] = useState<
+    { id: string; name: string }[]
   >([]);
 
   const [clickedStates, setClickedStates] = useState<{
-    [key: number]: boolean;
+    [key: string]: boolean;
   }>({});
-
-  const { handleSelectedThemes, selectedThemes } = useOutletContext<{
-    handleSelectedThemes: (themes: { name: string }[]) => void;
-    selectedThemes: { name: string }[];
-  }>();
 
   const isModal = useIsModalStore((state) => state.isModal);
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
-  const { handleAppliedTheme } = useOutletContext<{
-    handleAppliedTheme: (theme: {
-      name: string;
-      moodImages: { [key: string]: string };
-    }) => void;
-  }>();
-
-  const defaultFont = "'Pretendard', sans-serif";
-
-  const [appliedFont, setAppliedFont] = useState(
-    () => localStorage.getItem("appliedFont") || defaultFont
-  );
-
   const [modalData, setModalData] = useState<{
-    title: string;
+    name: string;
     content: string;
+    price?: number;
   }>({
-    title: "",
+    name: "",
     content: "",
+    price: 0,
   });
 
-  const [ownFonts, setOwnFonts] = useState<{ name: string; image: string }[]>(
-    []
-  );
+  const selectedItem = selectedItems[0]; // 첫 번째 선택된 항목
+  const isTheme = ownThemes.some((theme) => theme.id === selectedItem?.id);
+  const itemType = isTheme ? "THEME" : "FONT"; // 올바른 타입 구분
 
-  // 로컬스토리지에서 보유 상품 불러오기
   useEffect(() => {
-    const loadOwnedItems = () => {
-      // 테마 로드
-      const storedThemes = localStorage.getItem("ownedThemes");
-      if (!storedThemes) {
-        console.log("로컬스토리지에 저장된 보유 테마 없음");
-        setOwnThemes([]);
-      } else {
-        try {
-          const parsedThemes = JSON.parse(storedThemes);
-          console.log("보유 테마 불러오기 성공:", parsedThemes);
-          setOwnThemes(parsedThemes);
-        } catch (error) {
-          console.error("로컬스토리지 테마 파싱 오류:", error);
-          setOwnThemes([]);
-        }
-      }
+    const fetchOwnedItems = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        if (!token) throw new Error("인증 토큰이 없습니다.");
 
-      // 폰트 로드
-      const storedFonts = localStorage.getItem("ownedFonts");
-      if (!storedFonts) {
-        console.log("로컬스토리지에 저장된 보유 폰트 없음");
-        setOwnFonts([]);
-      } else {
-        try {
-          const parsedFonts = JSON.parse(storedFonts);
+        const response = await axios.get(
+          `https://api.meet-da.site/store/my-items`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-          const updatedFonts = parsedFonts.map((font: { name: string }) => ({
-            ...font,
-            image: fontImageMap[font.name] || "", // 이미지가 없으면 빈 문자열
+        type ThemeType = { _id: string; name: string; type: string };
+        type FontType = { _id: string; name: string; type: string };
+
+        // API에서 받은 데이터를 테마와 폰트로 분류
+        const themes = response.data
+          .filter((item: ThemeType) => item.type === "THEME")
+          .map((theme: ThemeType) => ({
+            id: theme._id,
+            name: theme.name,
           }));
 
-          console.log("보유 폰트 불러오기 성공:", updatedFonts);
-          setOwnFonts(updatedFonts);
-        } catch (error) {
-          console.error("로컬스토리지 폰트 파싱 오류:", error);
-          setOwnFonts([]);
-        }
+        const fonts = response.data
+          .filter((item: FontType) => item.type === "FONT")
+          .map((font: FontType) => ({
+            id: font._id,
+            name: font.name,
+          }));
+
+        setOwnThemes(themes);
+        setOwnFonts(fonts);
+      } catch (error) {
+        console.error("보유한 테마 및 폰트 불러오기 실패:", error);
       }
     };
 
-    // 초기 로딩
-    loadOwnedItems();
-
-    // localStorage 변경 감지 (즉시 반영)
-    window.addEventListener("storage", loadOwnedItems);
-
-    return () => {
-      window.removeEventListener("storage", loadOwnedItems);
-    };
+    fetchOwnedItems();
   }, []);
-
-  const applyItem = (
-    item: { name: string; image?: string },
-    isTheme: boolean
-  ) => {
-    if (isTheme) {
-      // 테마 적용
-      handleAppliedTheme({
-        name: item.name,
-        moodImages: moodIconMap[item.name] || {},
-      });
-
-      localStorage.setItem(
-        "appliedTheme",
-        JSON.stringify({
-          name: item.name,
-          moodImages: moodIconMap[item.name] || {},
-        })
-      );
-
-      // 적용 완료 모달 표시
-      setModalData({
-        title: "테마 적용",
-        content: "선택한 테마가 정상적으로 적용되었습니다.",
-      });
-    } else {
-      // 폰트 적용
-      setAppliedFont(item.name);
-      localStorage.setItem("appliedFont", item.name);
-
-      // 브라우저에 강제 적용 (CSS 변수 업데이트)
-      document.documentElement.style.setProperty("--applied-font", item.name);
-      document.body.style.fontFamily = `${item.name}, sans-serif`;
-
-      // 강제 리렌더링 (일부 브라우저에서 필요할 수 있음)
-      setTimeout(() => {
-        document.body.style.fontFamily = `${item.name}, sans-serif`;
-      }, 50);
-
-      // 적용 완료 모달
-      setModalData({
-        title: "폰트 적용",
-        content: "선택한 폰트가 정상적으로 적용되었습니다.",
-      });
-    }
-
-    setTimeout(() => {
-      setIsModalClick("applyCompleteModal");
-    }, 100);
-  };
 
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
@@ -184,24 +115,153 @@ export default function Own() {
     }
   }, [isModal]);
 
-  useEffect(() => {
-    console.log("현재 적용된 폰트:", appliedFont);
-  }, [appliedFont]);
+  const checkClick = (item: { id: string; name: string }) => {
+    console.log("Clicked Item:", item);
+    if (!item.id) {
+      console.error("Invalid item clicked:", item);
+      return;
+    }
 
-  // 체크박스 클릭 시 상태 업데이트
-  const checkClick = (id: number, theme: { name: string }) => {
-    setClickedStates((prev) => {
-      const newState = { ...prev, [id]: !prev[id] };
-      const isSelected = newState[id];
+    setClickedStates((prevStates) => ({
+      ...prevStates,
+      [item.id]: !prevStates[item.id], // id를 기준으로 체크박스 상태 업데이트
+    }));
 
-      const updatedThemes = isSelected
-        ? [...selectedThemes, theme] // 체크 시 추가
-        : selectedThemes.filter((t) => t.name !== theme.name); // 체크 해제 시 제거
-
-      handleSelectedThemes(updatedThemes);
-      return newState;
+    setSelectedItems((prevItems) => {
+      const isSelected = prevItems.some((t) => t.id === item.id);
+      return isSelected
+        ? prevItems.filter((t) => t.id !== item.id) // 선택 해제
+        : [...prevItems, item]; // 선택 추가
     });
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    const userId = jwtDecode(token).sub;
+    if (!userId) return;
+
+    // 사용자별 적용된 테마 및 폰트 불러오기
+    const storedFont = sessionStorage.getItem(`appliedFont_${userId}`);
+    const storedTheme = sessionStorage.getItem(`appliedTheme_${userId}`);
+
+    if (storedFont) {
+      document.body.style.fontFamily = storedFont;
+    }
+
+    if (storedTheme) {
+      const parsedTheme = JSON.parse(storedTheme);
+      localStorage.setItem(
+        "moodIcons",
+        JSON.stringify(moodIconMap[parsedTheme.name])
+      );
+    }
+  }, []);
+
+  const applyThemeOrFont = async (itemId: string, type: "THEME" | "FONT") => {
+    console.log("applyThemeOrFont 실행됨:", { itemId, type }); // 실행 여부 확인
+    if (!itemId) {
+      console.error("itemId가 존재하지 않음:", itemId);
+      return; // itemId가 없으면 실행 중단
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("인증 토큰이 없습니다.");
+
+      const userId = jwtDecode(token).sub;
+      if (!userId) throw new Error("사용자 ID를 찾을 수 없습니다.");
+
+      const response = await axios.post(
+        `https://api.meet-da.site/store/change/${itemId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.status === 200) {
+        if (type === "FONT") {
+          const appliedFont = ownFonts.find((font) => font.id === itemId);
+          if (appliedFont) {
+            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
+            document.body.style.fontFamily = appliedFont.name;
+            console.log("폰트 적용 완료:", appliedFont.name);
+          }
+        }
+
+        if (type === "THEME") {
+          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
+          if (appliedTheme) {
+            sessionStorage.setItem(
+              `appliedTheme_${userId}`,
+              JSON.stringify(appliedTheme)
+            );
+            if (moodIconMap[appliedTheme.name]) {
+              localStorage.setItem(
+                "moodIcons",
+                JSON.stringify(moodIconMap[appliedTheme.name])
+              );
+            }
+            console.log("테마 적용 완료:", appliedTheme.name);
+          }
+        }
+
+        if (type === "FONT") {
+          const appliedFont = ownFonts.find((font) => font.id === itemId);
+          if (appliedFont) {
+            document.body.style.fontFamily = appliedFont.name;
+            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
+          }
+        }
+
+        if (type === "THEME") {
+          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
+          if (appliedTheme) {
+            sessionStorage.setItem(
+              `appliedTheme_${userId}`,
+              JSON.stringify(appliedTheme)
+            );
+
+            if (moodIconMap[appliedTheme.name]) {
+              // moodIconMap이 존재하는지 확인
+              localStorage.setItem(
+                "moodIcons",
+                JSON.stringify(moodIconMap[appliedTheme.name])
+              );
+            }
+          }
+        }
+
+        // 적용 후 체크박스 상태 초기화
+        setClickedStates((prev) => {
+          console.log("🔵 체크박스 초기화 전 상태:", prev);
+          return {};
+        });
+        setSelectedItems((prev) => {
+          console.log("🔵 선택된 항목 초기화 전 상태:", prev);
+          return [];
+        });
+
+        // 적용 완료 후 applyCompleteModal 모달 표시
+        setModalData({
+          name: "적용 완료",
+          content: "선택한 테마 또는 폰트가 적용되 었습니다.",
+        });
+        setIsModalClick("applyCompleteModal"); // applyCompleteModal로 변경
+      }
+    } catch (error) {
+      console.error("테마/폰트 적용 실패:", error);
+      setModalData({
+        name: "적용 실패",
+        content: "테마 또는 폰트 적용 중 오류가 발생했습니다.",
+      });
+      setIsModalClick("deleteThemeCompleteModal");
+    }
+  };
+
+  useEffect(() => {
+    console.log("🔄 적용 후 UI 업데이트 실행됨");
+  }, [selectedItems, clickedStates]); // ✅ 상태 변경 시 UI 강제 리렌더링
 
   const {
     currentData,
@@ -215,44 +275,64 @@ export default function Own() {
   return (
     <>
       <Layout>
-        <SearchBarContainer>
-          <SearchInput type="text" placeholder="다양한 테마를 검색해 보세요." />
-          <SearchButton>
-            <SearchIcon />
-          </SearchButton>
-        </SearchBarContainer>
+        <NavWrap>
+          <SearchBarContainer>
+            <SearchInput
+              type="text"
+              placeholder="다양한 테마를 검색해 보세요."
+            />
+            <SearchButton>
+              <SearchIcon />
+            </SearchButton>
+          </SearchBarContainer>
+          <ButtonWrapper>
+            <DiarySettingButton
+              $variant="delete"
+              style={{ width: "100%" }}
+              onClick={() => applyThemeOrFont(selectedItem?.id, itemType)}
+              disabled={selectedItems.length === 0}
+            >
+              적용하기
+            </DiarySettingButton>
+          </ButtonWrapper>
+        </NavWrap>
+
         <ThemeContainer>
           {currentData.length > 0 ? (
             <ThemeWrapper>
-              {/* 보유한 테마 목록 렌더링 */}
               {currentData.map((item, index) => {
                 const isTheme = ownThemes.some(
                   (theme) => theme.name === item.name
                 );
+                const imageSrc = isTheme
+                  ? themeSetImageMap[item.name] || ""
+                  : fontImageMap[item.name] || "";
+
+                if (!item.id) {
+                  console.error(`Invalid item found at index ${index}:`, item);
+                }
+
                 return (
                   <ThemeSet key={index}>
                     <ThemeTitle>
                       <CheckBox
-                        $isClicked={!!clickedStates[index]}
-                        onClick={() => checkClick(index, item)}
+                        $isClicked={!!clickedStates[item.id]}
+                        onClick={() =>
+                          checkClick({
+                            id: item.id,
+                            name: item.name,
+                          })
+                        }
                       >
-                        {!!clickedStates[index] && <CheckIcon />}
+                        {!!clickedStates[item.id] && <CheckIcon />}
                       </CheckBox>
                       {item.name}
                     </ThemeTitle>
                     <ThemeBox>
                       <ImageBox>
-                        <ThemeImage src={item.image} />
+                        <ThemeImage src={imageSrc} alt={item.name} />
                       </ImageBox>
                     </ThemeBox>
-                    <ButtonBox>
-                      <OrangeLineButton
-                        $variant="theme"
-                        onClick={() => applyItem(item, isTheme)}
-                      >
-                        적용하기
-                      </OrangeLineButton>
-                    </ButtonBox>
                   </ThemeSet>
                 );
               })}
@@ -291,7 +371,7 @@ export default function Own() {
 
       {isModal === "applyCompleteModal" && (
         <DeleteThemeCompleteModal
-          title={modalData.title}
+          title={modalData.name}
           content={modalData.content}
         />
       )}

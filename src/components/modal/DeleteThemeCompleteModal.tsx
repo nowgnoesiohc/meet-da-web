@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useIsModalStore } from "../../store/ModalStore";
 import { OrangeButton } from "../ui/Button";
 import ReactDOM from "react-dom";
+import { useEffect } from "react";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -78,14 +79,21 @@ export default function DeleteThemeCompleteModal({
 }: {
   title: string;
   content: string;
+  onConfirm?: () => void;
 }) {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
+  useEffect(() => {
+    return () => {
+      setIsModalClick(null); // 모달이 사라질 때 상태 초기화
+    };
+  }, []);
 
   return ReactDOM.createPortal(
     <ModalOverlay onClick={() => setIsModalClick(null)}>
       <DeleteThmeaWrap onClick={(e) => e.stopPropagation()}>
         <Title>
-          <h2>{title} 완료</h2>
+          <h2>{title}</h2>
           <p>{content}</p>
         </Title>
         <Button>
