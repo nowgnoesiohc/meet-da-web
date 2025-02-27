@@ -314,7 +314,6 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
   };
 
   // 이미지 업로드 핸들러
-  // 이미지 업로드 핸들러
   const handleImageUpload = async () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -350,6 +349,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
 
           // 이미지를 `images` 배열에만 추가
           setImages((prevImages) => [...prevImages, imageUrl]);
+          console.log("현재 images 배열:", images);
 
           // `content`에는 이미지를 삽입하지 않음 (이미지 URL을 삽입하지 않음)
           const quill = quillRef.current?.getEditor();
@@ -365,8 +365,6 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
       }
     };
   };
-
-  console.log("현재 images 배열:", images);
 
   // 커스텀 툴바 모듈
   const modules = useMemo(

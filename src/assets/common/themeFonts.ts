@@ -5,7 +5,7 @@ export const themeFonts: Record<string, string> = {
   "학교안심 둥근미소": "'HakgyoansimDunggeunmiso', sans-serif",
   이서윤체: "'LeeSeoyun', sans-serif",
   "온글잎 박다현체": "'pdh', sans-serif",
-  "온글잎 백수빈": "'BaekSubin', sans-serif",
+  "온글잎 백수빈체": "'BaekSubin', sans-serif",
   망고또박: "'MangoDdobak)', sans-serif",
 };
 
@@ -17,7 +17,7 @@ export const fontFiles: Record<string, string> = {
     "../../fonts//HakgyoansimDunggeunmiso/HakgyoansimDunggeunmiso.ttf",
   이서윤체: "../../fonts/LeeSeoyun/LeeSeoyun.ttf",
   "온글잎 박다현체": "../../fonts/PDH/pdh.ttf",
-  "온글잎 백수빈": "../../fonts/BaekSubin/BaekSubin.ttf",
+  "온글잎 백수빈체": "../../fonts/BaekSubin/BaekSubin.ttf",
   망고또박: "../../fonts/Mango/MangoDdobak.ttf",
 };
 
@@ -39,6 +39,6 @@ export const fontImageMap: { [key: string]: string } = {
   "학교안심 둥근미소": Miso,
   이서윤체: LeeSeoyun,
   "온글잎 박다현체": PDH,
-  "온글잎 백수빈": BaekSubin,
+  "온글잎 백수빈체": BaekSubin,
   망고또박: Mango,
 };
