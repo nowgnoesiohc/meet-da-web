@@ -110,7 +110,6 @@ export default function FeedPage() {
         : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
 
       if (appliedTheme.name && appliedTheme.moodImages) {
-        console.log(`적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
         setMoodIcons(appliedTheme.moodImages);
       }
     };
@@ -215,7 +214,7 @@ export default function FeedPage() {
           })
         );
 
-        // 비공개 게시글 필터링: 로그아웃 상태에서도 공개 게시글은 보이도록 수정
+        // 비공개 게시글 필터링 (로그아웃 상태에서도 공개 게시글은 보이도록 수정)
         const filteredPosts = postsWithDetails.filter((post) => {
           return (
             post.visibility !== "PRIVATE" ||
@@ -243,7 +242,7 @@ export default function FeedPage() {
     fetchPosts(1, activeTab.toLowerCase());
   }, [activeTab]);
 
-  // 페이지네이션: currentPage가 변경될 때 실행 (단, 1페이지는 중복 요청 방지)
+  // 페이지네이션 (1페이지 요청 중복 방지)
   useEffect(() => {
     if (currentPage > 1 && !isFetching) {
       fetchPosts(currentPage, activeTab.toLowerCase());
@@ -265,7 +264,7 @@ export default function FeedPage() {
     if (debouncedKeyword) {
       searchPosts(debouncedKeyword, 1); // 검색 시 1페이지부터 실행
     } else {
-      setIsSearching(false); // 검색이 종료되었을 때만 전체 데이터 로드
+      setIsSearching(false);
       fetchPosts(currentPage, activeTab.toLowerCase());
     }
   }, [debouncedKeyword, activeTab]);
@@ -279,7 +278,6 @@ export default function FeedPage() {
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && !isFetching && hasMore) {
           setCurrentPage((prev) => {
-            console.log(`페이지 증가: ${prev + 1}`); // 디버깅용
             return prev + 1;
           });
         }
@@ -290,7 +288,7 @@ export default function FeedPage() {
     [isFetching, hasMore]
   );
 
-  // Observer 설정 useEffect (Sentinel 요소 관찰)
+  // Observer 설정
   useEffect(() => {
     if (!sentinelRef.current || isFetching || !hasMore) return;
 
@@ -329,7 +327,7 @@ export default function FeedPage() {
         !Array.isArray(response.data.boards) ||
         response.data.boards.length === 0
       ) {
-        setPosts([]); // 기존 데이터 삭제
+        setPosts([]);
         setHasMore(false);
         setIsFetching(false);
         return;
@@ -395,23 +393,20 @@ export default function FeedPage() {
   const formatTimeAgo = (createdAt: string) => {
     const now = new Date();
     const commentDate = new Date(createdAt);
-    const diffMs = now.getTime() - commentDate.getTime(); // 시간 차이 (밀리초)
-    const diffSec = Math.floor(diffMs / 1000); // 초 단위 변환
-    const diffMin = Math.floor(diffSec / 60); // 분 단위 변환
-    const diffHour = Math.floor(diffMin / 60); // 시간 단위 변환
-    const diffDay = Math.floor(diffHour / 12); // 일 단위 변환
+    const diffMs = now.getTime() - commentDate.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 12);
 
     if (diffDay >= 1) {
       // 12시간 이상 지난 경우 YYYY.MM.DD 형식 표시
       return `${commentDate.getFullYear()}.${String(commentDate.getMonth() + 1).padStart(2, "0")}.${String(commentDate.getDate()).padStart(2, "0")}`;
     } else if (diffHour >= 1) {
-      // 1시간 이상 경과한 경우
       return `${diffHour}시간 전`;
     } else if (diffMin >= 1) {
-      // 1분 이상 경과한 경우
       return `${diffMin}분 전`;
     } else {
-      // 1분 이내
       return "방금 전";
     }
   };

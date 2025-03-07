@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useIsModalStore } from "@/store/ModalStore";
 import axios from "axios";
-import { themeFonts, fontImageMap } from "@/assets/common/themeFonts";
+import { fontImageMap } from "@/assets/common/themeFonts";
 import usePagination, {
   AfterIcon,
   BeforeIcon,
@@ -48,7 +48,7 @@ export default function Font() {
   const [fonts, setFonts] = useState<
     { _id: number; name: string; price: number }[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
 
   const [modalData, setModalData] = useState<{
     name: string;
@@ -65,7 +65,6 @@ export default function Font() {
   ) => void;
 
   const isModalOpen = (type?: string | null) => {
-    console.log(type);
     setIsModalClick(type || null); // type이 없으면 null을 설정
   };
 
@@ -82,13 +81,9 @@ export default function Font() {
       });
   }, []);
 
-  console.log(loading);
-  console.log(themeFonts);
-
   // Theme에서 selectedFonts가 초기화되면 체크박스도 초기화
   useEffect(() => {
     if (isModal === null) {
-      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
       setClickedStates({});
     }
   }, [isModal]);
@@ -107,6 +102,12 @@ export default function Font() {
       [font.id]: !prevStates[font.id], // 기존 값 반전
     }));
   };
+
+  useEffect(() => {
+    if (!isModal) {
+      setSelectedFonts([]);
+    }
+  }, [isModal]);
 
   // 유저 ID 가져오기
   const getUserId = async (): Promise<string | null> => {

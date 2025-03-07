@@ -110,13 +110,11 @@ export default function Own() {
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
     if (isModal === null) {
-      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
       setClickedStates({});
     }
   }, [isModal]);
 
   const checkClick = (item: { id: string; name: string }) => {
-    console.log("Clicked Item:", item);
     if (!item.id) {
       console.error("Invalid item clicked:", item);
       return;
@@ -160,7 +158,6 @@ export default function Own() {
   }, []);
 
   const applyThemeOrFont = async (itemId: string, type: "THEME" | "FONT") => {
-    console.log("applyThemeOrFont 실행됨:", { itemId, type }); // 실행 여부 확인
     if (!itemId) {
       console.error("itemId가 존재하지 않음:", itemId);
       return; // itemId가 없으면 실행 중단
@@ -185,7 +182,6 @@ export default function Own() {
           if (appliedFont) {
             sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
             document.body.style.fontFamily = appliedFont.name;
-            console.log("폰트 적용 완료:", appliedFont.name);
           }
         }
 
@@ -202,7 +198,6 @@ export default function Own() {
                 JSON.stringify(moodIconMap[appliedTheme.name])
               );
             }
-            console.log("테마 적용 완료:", appliedTheme.name);
           }
         }
 
@@ -233,12 +228,10 @@ export default function Own() {
         }
 
         // 적용 후 체크박스 상태 초기화
-        setClickedStates((prev) => {
-          console.log("🔵 체크박스 초기화 전 상태:", prev);
+        setClickedStates(() => {
           return {};
         });
-        setSelectedItems((prev) => {
-          console.log("🔵 선택된 항목 초기화 전 상태:", prev);
+        setSelectedItems(() => {
           return [];
         });
 
@@ -259,9 +252,7 @@ export default function Own() {
     }
   };
 
-  useEffect(() => {
-    console.log("🔄 적용 후 UI 업데이트 실행됨");
-  }, [selectedItems, clickedStates]); // ✅ 상태 변경 시 UI 강제 리렌더링
+  useEffect(() => {}, [selectedItems, clickedStates]); // 상태 변경 시 UI 강제 리렌더링
 
   const {
     currentData,

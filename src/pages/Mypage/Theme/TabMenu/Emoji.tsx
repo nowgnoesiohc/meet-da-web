@@ -48,7 +48,7 @@ export default function Emoji() {
   const [themes, setThemes] = useState<
     { _id: number; name: string; price: number }[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
 
   const {
     currentData,
@@ -74,7 +74,6 @@ export default function Emoji() {
   ) => void;
 
   const isModalOpen = (type?: string | null) => {
-    console.log(type);
     setIsModalClick(type || null); // type이 없으면 null을 설정
   };
 
@@ -95,12 +94,9 @@ export default function Emoji() {
       });
   }, []);
 
-  console.log(loading);
-
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
     if (isModal === null) {
-      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
       setClickedStates({});
     }
   }, [isModal]);
@@ -244,9 +240,7 @@ export default function Emoji() {
     }
   }, [isModal]);
 
-  useEffect(() => {
-    console.log("selectedThemes 변경됨, totalPrice 업데이트됨:", totalPrice);
-  }, [selectedThemes]); // 상태가 변경될 때마다 로그 출력
+  useEffect(() => {}, [selectedThemes]); // 상태가 변경될 때마다 로그 출력
 
   return (
     <>
