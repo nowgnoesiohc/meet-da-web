@@ -151,7 +151,6 @@ export default function BoardDetail() {
         : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
 
       if (appliedTheme.name && appliedTheme.moodImages) {
-        console.log(`적용된 테마 (사용자 ${userId}):`, appliedTheme.name);
         setMoodIcons(appliedTheme.moodImages);
       }
     };
@@ -214,14 +213,10 @@ export default function BoardDetail() {
 
       setIsAuthor(userId === post.author.id); // 내가 작성한 글인지 확인
 
-      console.log(`팔로잉 조회 요청: /user/${userId}/following`);
-
       // API 응답 전체 확인
       const response = await axios.get(
         `https://api.meet-da.site/user/${userId}/following`
       );
-
-      console.log("API 응답 전체 데이터:", response.data);
 
       if (!response.data) {
         console.error("API 응답이 없습니다.");
@@ -236,19 +231,11 @@ export default function BoardDetail() {
 
       const followingList = response.data.following;
 
-      console.log(
-        "팔로잉 리스트 데이터 타입:",
-        typeof followingList,
-        Array.isArray(followingList)
-      );
-      console.log("팔로잉 리스트 내용:", followingList);
-
       // '_id' 속성으로 비교하도록 수정
       const isUserFollowing = followingList.some(
         (follow: { _id: string }) => follow._id === post.author.id
       );
 
-      console.log(`팔로우 상태 확인: ${isUserFollowing}`);
       setIsFollowing(isUserFollowing);
     } catch (error) {
       console.error("팔로우 상태 가져오기 실패:", error);
@@ -277,31 +264,23 @@ export default function BoardDetail() {
       }
 
       if (isFollowing) {
-        console.log(
-          `팔로우 취소 요청: DELETE /user/follow/${userId}/${targetId}`
-        );
-
         const response = await axios.delete(
           `https://api.meet-da.site/user/follow/${userId}/${targetId}`
         );
 
-        console.log("팔로우 취소 응답:", response.data);
         if (response.status === 200) {
           setIsFollowing(false);
-          setTimeout(fetchFollowStatus, 1000); // 1초 후 최신 상태 확인
+          setTimeout(fetchFollowStatus, 1000);
         }
       } else {
-        console.log(`팔로우 요청: POST /user/follow/${userId}/${targetId}`);
-
         const response = await axios.post(
           `https://api.meet-da.site/user/follow/${userId}/${targetId}`,
           {}
         );
 
-        console.log("팔로우 응답:", response.data);
         if (response.status === 200) {
           setIsFollowing(true);
-          setTimeout(fetchFollowStatus, 1000); // 1초 후 최신 상태 확인
+          setTimeout(fetchFollowStatus, 1000);
         }
       }
     } catch (error) {
@@ -315,7 +294,6 @@ export default function BoardDetail() {
       const userId = await getUserId();
       if (userId && post) {
         setIsAuthor(userId === post.author.id);
-        console.log(`게시글 작성자 여부 확인: ${isAuthor}`);
       }
     };
 
@@ -497,7 +475,6 @@ export default function BoardDetail() {
           `https://api.meet-da.site/board/${boardId}`
         );
         if (response.status === 200) {
-          console.log("게시글 삭제 성공");
           navigate("/"); // 삭제 후 홈 페이지로 이동
         } else {
           console.error("게시글 삭제 실패", response.data);
@@ -523,8 +500,6 @@ export default function BoardDetail() {
 
       const commentsWithReplies = await Promise.all(
         response.data.map(async (comment: Comment) => {
-          console.log("서버 응답 댓글 데이터:", comment); // API 응답 구조 확인
-
           const replies = await fetchReplies(comment._id); // 대댓글 가져오기
 
           return {
@@ -575,8 +550,6 @@ export default function BoardDetail() {
         parentCommentId: replyingTo ? replyingTo : null,
       };
 
-      console.log("전송할 댓글 데이터:", payload);
-
       const response = await axios.post(
         `https://api.meet-da.site/comment`,
         payload,
@@ -616,7 +589,7 @@ export default function BoardDetail() {
     commentId: string,
     currentContent: string,
     authorId: string,
-    parentCommentId?: string // TypeScript 및 ESLint 경고 해결
+    parentCommentId?: string
   ) => {
     const userId = await getUserId();
 
@@ -977,12 +950,6 @@ export default function BoardDetail() {
                 <IconButton>
                   <EditIcon
                     onClick={() => {
-                      console.log("댓글 객체:", comment); // 전체 댓글 객체 확인
-                      console.log(
-                        "댓글 작성자 ID (comment.author.id):",
-                        comment.author?._id
-                      ); // 값 존재 여부 확인
-
                       editComment(
                         comment._id,
                         comment.content,
@@ -1079,13 +1046,6 @@ export default function BoardDetail() {
                               <IconButton>
                                 <EditIcon
                                   onClick={() => {
-                                    console.log("대댓글 수정 요청:", {
-                                      replyId: reply._id,
-                                      content: reply.content,
-                                      authorId: reply.author?.id,
-                                      parentCommentId: comment?._id,
-                                    });
-
                                     if (!reply.author?.id) {
                                       console.error(
                                         "대댓글의 작성자 ID가 없습니다!",
@@ -1111,12 +1071,6 @@ export default function BoardDetail() {
                                 />
                                 <DeleteIcon
                                   onClick={() => {
-                                    console.log("대댓글 삭제 요청:", {
-                                      replyId: reply._id,
-                                      authorId: reply.author?.id,
-                                      parentCommentId: comment?._id,
-                                    });
-
                                     if (!reply.author?.id) {
                                       console.error(
                                         "대댓글의 작성자 ID가 없습니다!",

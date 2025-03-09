@@ -315,6 +315,7 @@ export const ProfileImage = styled.img`
   border-radius: 6.25rem;
   background-color: var(--line-basic);
   cursor: pointer;
+  object-fit: cover;
 
   @media (max-width: 390px) {
     width: 2.5rem;

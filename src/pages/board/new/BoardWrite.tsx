@@ -382,10 +382,6 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
         bindings: {
           enter: {
             key: 13,
-            // handler: (range, context) => {
-            //   // Enter 키 핸들링
-            //   return true;
-            // },
           },
         },
       },
@@ -478,6 +474,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
           const response = await axios.get(
             `https://api.meet-da.site/board/${boardId}`
           );
+          setTitle(response.data.title || "제목을 불러올 수 없습니다.");
           setContent(response.data.content);
           setSelected(response.data.visibility); // 가시성 설정
         } catch (error) {
@@ -669,7 +666,7 @@ const BoardWrite: React.FC<BoarWriteProps> = ({ isEdit }) => {
     <Wrap>
       <h2>{currentDate}</h2>
       <TitleWrap>
-        <p>{title ?? "불러오는 중..."}</p>
+        <p>{title}</p>
         <div ref={menuRef}>
           <DropdownContainer onClick={toggleDropdown}>
             <SelectMenu>{descriptions[selected]}</SelectMenu>

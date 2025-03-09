@@ -160,7 +160,7 @@ export default function Own() {
   const applyThemeOrFont = async (itemId: string, type: "THEME" | "FONT") => {
     if (!itemId) {
       console.error("itemId가 존재하지 않음:", itemId);
-      return; // itemId가 없으면 실행 중단
+      return;
     }
 
     try {
@@ -176,72 +176,49 @@ export default function Own() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.status === 200) {
-        if (type === "FONT") {
-          const appliedFont = ownFonts.find((font) => font.id === itemId);
-          if (appliedFont) {
-            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
-            document.body.style.fontFamily = appliedFont.name;
-          }
-        }
-
-        if (type === "THEME") {
-          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
-          if (appliedTheme) {
-            sessionStorage.setItem(
-              `appliedTheme_${userId}`,
-              JSON.stringify(appliedTheme)
-            );
-            if (moodIconMap[appliedTheme.name]) {
-              localStorage.setItem(
-                "moodIcons",
-                JSON.stringify(moodIconMap[appliedTheme.name])
-              );
-            }
-          }
-        }
-
-        if (type === "FONT") {
-          const appliedFont = ownFonts.find((font) => font.id === itemId);
-          if (appliedFont) {
-            document.body.style.fontFamily = appliedFont.name;
-            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
-          }
-        }
-
-        if (type === "THEME") {
-          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
-          if (appliedTheme) {
-            sessionStorage.setItem(
-              `appliedTheme_${userId}`,
-              JSON.stringify(appliedTheme)
-            );
-
-            if (moodIconMap[appliedTheme.name]) {
-              // moodIconMap이 존재하는지 확인
-              localStorage.setItem(
-                "moodIcons",
-                JSON.stringify(moodIconMap[appliedTheme.name])
-              );
-            }
-          }
-        }
-
-        // 적용 후 체크박스 상태 초기화
-        setClickedStates(() => {
-          return {};
-        });
-        setSelectedItems(() => {
-          return [];
-        });
-
-        // 적용 완료 후 applyCompleteModal 모달 표시
-        setModalData({
-          name: "적용 완료",
-          content: "선택한 테마 또는 폰트가 적용되 었습니다.",
-        });
-        setIsModalClick("applyCompleteModal"); // applyCompleteModal로 변경
+      if (response.status !== 200 && response.status !== 201) {
+        console.error("API 응답 오류:", response);
+        throw new Error("테마/폰트 적용 실패");
       }
+
+      if (type === "FONT") {
+        const appliedFont = ownFonts.find((font) => font.id === itemId);
+        if (appliedFont) {
+          localStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
+          sessionStorage.setItem("appliedFont", appliedFont.name);
+          document.body.style.fontFamily = appliedFont.name;
+        }
+      }
+
+      // 테마 적용
+      if (type === "THEME") {
+        const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
+        if (appliedTheme) {
+          sessionStorage.setItem(
+            `appliedTheme_${userId}`,
+            JSON.stringify(appliedTheme)
+          );
+
+          if (moodIconMap?.[appliedTheme.name]) {
+            localStorage.setItem(
+              "moodIcons",
+              JSON.stringify(moodIconMap[appliedTheme.name])
+            );
+          }
+        }
+      }
+
+      // 적용 후 체크박스 및 선택 항목 초기화
+      setClickedStates({});
+      setSelectedItems([]);
+
+      // 모달 상태 변경
+      console.log("모달 상태 변경:", "applyCompleteModal");
+      setModalData({
+        name: "적용 완료",
+        content: "선택한 테마 또는 폰트가 적용되었습니다.",
+      });
+      setIsModalClick("applyCompleteModal");
     } catch (error) {
       console.error("테마/폰트 적용 실패:", error);
       setModalData({

@@ -157,25 +157,13 @@ export default function Font() {
         return;
       }
 
-      // 포인트 차감 API 요청
-      const pointResponse = await axios.patch(
-        `https://api.meet-da.site/user/${userId}/points`,
-        { delta: -totalPrice, description: truncatedNames },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (pointResponse.status !== 200) {
-        setModalData({ name: "포인트 부족", content: "포인트가 부족합니다." });
-        setIsModalClick("deleteThemeCompleteModal");
-        return;
-      }
-
       // 폰트 구매 요청
       const purchasedItems: string[] = [];
 
       await Promise.all(
         selectedFonts.map(async (item) => {
           try {
+            // 개별 구매 요청을 수행하며, 포인트 차감은 서버에서 처리하도록 변경
             const purchaseResponse = await axios.post(
               `https://api.meet-da.site/store/buy/${item.id}`,
               {},
@@ -191,12 +179,11 @@ export default function Font() {
         })
       );
 
-      // 구매 결과에 따라 모달 변경
       if (purchasedItems.length > 0) {
         setModalData({
           name: purchasedItems.join(", "),
-          content: "구매가 완료되었습니다.",
           price: totalPrice,
+          content: "구매가 완료되었습니다.",
         });
         setIsModalClick("pointModal");
       } else {

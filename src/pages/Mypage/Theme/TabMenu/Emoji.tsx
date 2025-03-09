@@ -164,19 +164,6 @@ export default function Emoji() {
         return;
       }
 
-      // 포인트 차감 API 요청
-      const pointResponse = await axios.patch(
-        `https://api.meet-da.site/user/${userId}/points`,
-        { delta: -totalPrice, description: truncatedNames },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (pointResponse.status !== 200) {
-        setModalData({ name: "포인트 부족", content: "포인트가 부족합니다." });
-        setIsModalClick("deleteThemeCompleteModal");
-        return;
-      }
-
       // 테마 구매 요청
       const purchasedItems: string[] = [];
 

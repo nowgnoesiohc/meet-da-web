@@ -177,15 +177,14 @@ export default function Navigation() {
   };
 
   const handleLogout = () => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      const userId = jwtDecode(token).sub;
-      sessionStorage.removeItem(`appliedFont_${userId}`);
-      sessionStorage.removeItem(`appliedTheme_${userId}`);
-    }
-
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("appliedFont");
+
+    document.body.style.fontFamily = "'Pretendard', sans-serif";
+    sessionStorage.removeItem("appliedFont");
+    sessionStorage.removeItem("appliedTheme");
+
+    window.dispatchEvent(new Event("storage"));
+
     setIsLoggedIn(false);
     navigate("/auth/login");
   };

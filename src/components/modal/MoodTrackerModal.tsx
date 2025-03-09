@@ -171,10 +171,8 @@ export default function MoodTrackerModal({
       localStorage.getItem("appliedTheme") || "{}"
     );
 
-    console.log("🟠 테마 변경 감지, 적용된 테마:", appliedTheme);
-
     if (appliedTheme.moodImages) {
-      setMoodIcons(appliedTheme.moodImages); // ✅ 테마 Mood 이미지 업데이트
+      setMoodIcons(appliedTheme.moodImages);
     }
   }, []);
 
