@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DiarySettingButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
 import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
@@ -249,6 +249,56 @@ export default function Own() {
 
   useEffect(() => {}, [selectedItems, clickedStates]); // 상태 변경 시 UI 강제 리렌더링
 
+  // const {
+  //   currentData,
+  //   currentPage,
+  //   totalPages,
+  //   goToPreviousPage,
+  //   goToNextPage,
+  //   setCurrentPage,
+  // } = usePagination([...ownThemes, ...ownFonts], 6);
+
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filteredItems, setFilteredItems] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  useEffect(() => {
+    setFilteredItems([...ownThemes, ...ownFonts]);
+  }, [ownThemes, ownFonts]);
+
+  // 검색 함수
+  const performSearch = useCallback(() => {
+    const keyword = searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      setFilteredItems([...ownThemes, ...ownFonts]);
+    } else {
+      const filtered = [...ownThemes, ...ownFonts].filter((item) =>
+        item.name.toLowerCase().includes(keyword)
+      );
+      setFilteredItems(filtered);
+    }
+    setCurrentPage(1);
+    setIsSearching(false);
+  }, [searchKeyword, ownThemes, ownFonts]);
+
+  // 검색 디바운싱 적용
+  useEffect(() => {
+    if (isSearching) {
+      const timer = setTimeout(() => {
+        performSearch();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearching, searchKeyword, performSearch]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(event.target.value);
+    setIsSearching(true);
+  };
+
   const {
     currentData,
     currentPage,
@@ -256,7 +306,7 @@ export default function Own() {
     goToPreviousPage,
     goToNextPage,
     setCurrentPage,
-  } = usePagination([...ownThemes, ...ownFonts], 6);
+  } = usePagination(filteredItems, 6);
 
   return (
     <>
@@ -266,6 +316,7 @@ export default function Own() {
             <SearchInput
               type="text"
               placeholder="다양한 테마를 검색해 보세요."
+              onChange={handleSearch}
             />
             <SearchButton>
               <SearchIcon />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIsModalStore } from "@/store/ModalStore";
 import axios from "axios";
 import { fontImageMap } from "@/assets/common/themeFonts";
@@ -214,6 +214,56 @@ export default function Font() {
     return selectedFonts.reduce((sum, theme) => sum + theme.price, 0);
   }, [selectedFonts]);
 
+  // const {
+  //   currentData,
+  //   currentPage,
+  //   totalPages,
+  //   goToPreviousPage,
+  //   goToNextPage,
+  //   setCurrentPage,
+  // } = usePagination(fonts, 6);
+
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filteredFonts, setFilteredFonts] = useState<
+    { _id: number; name: string; price: number }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  useEffect(() => {
+    setFilteredFonts(fonts);
+  }, [fonts]);
+
+  // 검색 함수
+  const performSearch = useCallback(() => {
+    const keyword = searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      setFilteredFonts(fonts);
+    } else {
+      const filtered = fonts.filter((item) =>
+        item.name.toLowerCase().includes(keyword)
+      );
+      setFilteredFonts(filtered);
+    }
+    setCurrentPage(1);
+    setIsSearching(false);
+  }, [searchKeyword, fonts]);
+
+  // 검색 디바운싱 적용
+  useEffect(() => {
+    if (isSearching) {
+      const timer = setTimeout(() => {
+        performSearch();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearching, searchKeyword, performSearch]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(event.target.value);
+    setIsSearching(true);
+  };
+
   const {
     currentData,
     currentPage,
@@ -221,7 +271,7 @@ export default function Font() {
     goToPreviousPage,
     goToNextPage,
     setCurrentPage,
-  } = usePagination(fonts, 6);
+  } = usePagination(filteredFonts, 6);
 
   return (
     <>
@@ -231,6 +281,7 @@ export default function Font() {
             <SearchInput
               type="text"
               placeholder="다양한 테마를 검색해 보세요."
+              onChange={handleSearch}
             />
             <SearchButton>
               <SearchIcon />
