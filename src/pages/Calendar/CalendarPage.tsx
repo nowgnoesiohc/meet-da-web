@@ -40,20 +40,38 @@ export default function MainPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isMyCalendar, setIsMyCalendar] = useState(false); // 내 캘린더 여부 확인
 
-  // Mood 아이콘 매핑
-  // const moodIcons: Record<string, string> = {
-  //   joy: themeImages["joy"],
-  //   normal: themeImages["normal"],
-  //   sad: themeImages["sad"],
-  //   tired: themeImages["tired"],
-  //   angry: themeImages["angry"],
-  // };
-
-  const appliedTheme = JSON.parse(localStorage.getItem("appliedTheme") || "{}");
-  const moodIcons = appliedTheme.moodImages || themeImages;
-
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  const [moodIcons, setMoodIcons] = useState(() => {
+    try {
+      const storedIcons = localStorage.getItem("moodIcons");
+      return storedIcons && storedIcons !== "undefined"
+        ? JSON.parse(storedIcons)
+        : themeImages;
+    } catch (error) {
+      console.error("moodIcons 파싱 중 오류 발생:", error);
+      return themeImages; // 에러 발생 시 기본 테마 반환
+    }
+  });
+
+  useEffect(() => {
+    const updateMoodIcons = () => {
+      const storedIcons = localStorage.getItem("moodIcons");
+      const updatedIcons =
+        storedIcons && storedIcons !== "undefined"
+          ? JSON.parse(storedIcons)
+          : themeImages;
+      setMoodIcons(updatedIcons);
+    };
+
+    updateMoodIcons();
+    window.addEventListener("storage", updateMoodIcons);
+
+    return () => {
+      window.removeEventListener("storage", updateMoodIcons);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchUserId = async () => {

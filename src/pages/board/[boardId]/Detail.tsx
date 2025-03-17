@@ -141,25 +141,33 @@ export default function BoardDetail() {
     }
   }, [boardId]); // boardId가 변경될 때만 실행
 
-  const [moodIcons, setMoodIcons] = useState(themeImages);
+  const [moodIcons, setMoodIcons] = useState(() => {
+    try {
+      const storedIcons = localStorage.getItem("moodIcons");
+      return storedIcons && storedIcons !== "undefined"
+        ? JSON.parse(storedIcons)
+        : themeImages;
+    } catch (error) {
+      console.error("moodIcons 파싱 중 오류 발생:", error);
+      return themeImages; // 에러 발생 시 기본 테마 반환
+    }
+  });
 
   useEffect(() => {
-    const loadAppliedTheme = () => {
-      const userId = localStorage.getItem("userId");
-      const appliedTheme = userId
-        ? JSON.parse(localStorage.getItem(`appliedTheme_${userId}`) || "{}")
-        : JSON.parse(localStorage.getItem("appliedTheme") || "{}");
-
-      if (appliedTheme.name && appliedTheme.moodImages) {
-        setMoodIcons(appliedTheme.moodImages);
-      }
+    const updateMoodIcons = () => {
+      const storedIcons = localStorage.getItem("moodIcons");
+      const updatedIcons =
+        storedIcons && storedIcons !== "undefined"
+          ? JSON.parse(storedIcons)
+          : themeImages;
+      setMoodIcons(updatedIcons);
     };
 
-    loadAppliedTheme(); // 초기 실행
-    window.addEventListener("storage", loadAppliedTheme); // 스토리지 변경 감지
+    updateMoodIcons();
+    window.addEventListener("storage", updateMoodIcons);
 
     return () => {
-      window.removeEventListener("storage", loadAppliedTheme);
+      window.removeEventListener("storage", updateMoodIcons);
     };
   }, []);
 

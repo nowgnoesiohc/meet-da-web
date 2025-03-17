@@ -291,6 +291,11 @@ export default function Login() {
           "'Pretendard', sans-serif";
         sessionStorage.setItem("appliedFont", storedFont);
 
+        const storedTheme = localStorage.getItem(`appliedTheme_${userId}`);
+        if (storedTheme) {
+          sessionStorage.setItem(`appliedTheme_${userId}`, storedTheme);
+        }
+
         window.dispatchEvent(new Event("storage"));
 
         navigate("/");
