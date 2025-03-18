@@ -353,8 +353,6 @@ export default function MypageNavigation() {
   const setIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
   const isModalOpen = (type?: string) => {
-    console.log(type);
-
     if (type) {
       setIsModalClick(type);
     } else {
@@ -397,22 +395,29 @@ export default function MypageNavigation() {
     async function fetchPosts() {
       try {
         const token = localStorage.getItem("accessToken");
-        const response = await axios.get<Post[]>(
+        if (!token) {
+          console.error("토큰이 없습니다.");
+          return;
+        }
+
+        const response = await axios.get(
           `https://api.meet-da.site/board/my-posts`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log(response);
+
+        if (response.status !== 200) {
+          console.error("게시글을 가져오지 못했습니다:", response);
+          return;
+        }
+
         setPosts(response.data);
       } catch (error) {
         console.error("게시글 데이터를 불러오는 데 실패했습니다:", error);
       }
     }
+
     fetchPosts();
   }, []);
-
-  const token = localStorage.getItem("accessToken");
-  console.log("Token:", token);
-  console.log("Posts state:", posts);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -458,8 +463,6 @@ export default function MypageNavigation() {
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-
-      console.log("프로필 업데이트 성공:", response.data);
 
       // 백엔드 응답에서 새로운 이미지 URL을 가져옴
       const updatedImageUrl = response.data.profileImage;

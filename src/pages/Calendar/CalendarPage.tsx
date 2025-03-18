@@ -4,7 +4,7 @@ import ModalPortal from "@/components/modal/ModalPortal";
 import ModalTemplate from "@/components/modal/ModalTemplate";
 import { useIsModalStore } from "@/store/ModalStore";
 import GlobalStyles from "@/styles/GlobalStyle";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import CalLarge from "@/assets/images/캘린더배경.png";
 import CalMedium from "@/assets/images/캘린더배경_781.png";
@@ -12,7 +12,7 @@ import CalSmall from "@/assets/images/캘린더배경_390.png";
 import { themeImages } from "@/assets/common/themeImages";
 import hurt from "@/assets/mood/hurt.png";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 import * as s from "./CalendarPageStyles";
 
 type MoodData = {
@@ -36,49 +36,100 @@ export default function MainPage() {
     profileImage: "",
   });
 
-  // Mood 아이콘 매핑
-  // const moodIcons: Record<string, string> = {
-  //   joy: themeImages["joy"],
-  //   normal: themeImages["normal"],
-  //   sad: themeImages["sad"],
-  //   tired: themeImages["tired"],
-  //   angry: themeImages["angry"],
-  // };
-
-  const appliedTheme = JSON.parse(localStorage.getItem("appliedTheme") || "{}");
-  const moodIcons = appliedTheme.moodImages || themeImages;
+  const location = useLocation();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isMyCalendar, setIsMyCalendar] = useState(false); // 내 캘린더 여부 확인
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const getUserId = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) throw new Error("No accessToken found");
-    const userId = jwtDecode(token).sub; // JWT 해독
-    return userId;
-  };
+  const [moodIcons, setMoodIcons] = useState(() => {
+    try {
+      const storedIcons = localStorage.getItem("moodIcons");
+      return storedIcons && storedIcons !== "undefined"
+        ? JSON.parse(storedIcons)
+        : themeImages;
+    } catch (error) {
+      console.error("moodIcons 파싱 중 오류 발생:", error);
+      return themeImages; // 에러 발생 시 기본 테마 반환
+    }
+  });
+
+  useEffect(() => {
+    const updateMoodIcons = () => {
+      const storedIcons = localStorage.getItem("moodIcons");
+      const updatedIcons =
+        storedIcons && storedIcons !== "undefined"
+          ? JSON.parse(storedIcons)
+          : themeImages;
+      setMoodIcons(updatedIcons);
+    };
+
+    updateMoodIcons();
+    window.addEventListener("storage", updateMoodIcons);
+
+    return () => {
+      window.removeEventListener("storage", updateMoodIcons);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      let fetchedUserId = null;
+
+      if (location.state?.userId) {
+        fetchedUserId = location.state.userId; // 게시글 작성자의 userId 사용
+      } else {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          try {
+            const decodedToken = jwtDecode<JwtPayload>(token);
+            fetchedUserId = decodedToken.sub ?? null;
+          } catch (error) {
+            console.error("토큰 디코딩 실패:", error);
+          }
+        }
+      }
+
+      setUserId(fetchedUserId);
+
+      // 내 캘린더인지 확인
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          const decodedToken = jwtDecode<JwtPayload>(token);
+          const loggedInUserId = decodedToken.sub ?? null;
+          setIsMyCalendar(fetchedUserId === loggedInUserId);
+        } catch (error) {
+          console.error("토큰 디코딩 실패:", error);
+        }
+      }
+    };
+
+    fetchUserId();
+  }, [location.state?.userId]);
 
   const fetchUserData = async () => {
-    const userId = await getUserId();
+    if (!userId) return; // userId가 없으면 실행하지 않음
+
     try {
       const response = await axios.get(
         `https://api.meet-da.site/user/${userId}`
       );
       setUserInfo(response.data);
     } catch (error) {
-      console.error("Failed to fetch user data :", error);
+      console.error("Failed to fetch user data:", error);
     }
   };
 
   const fetchMoodData = async () => {
-    // console.log("fetch mood data 실행");
-    const userId = await getUserId();
+    if (!userId) return; // userId가 없으면 실행하지 않음
+
     try {
       const response = await axios.get(
         `https://api.meet-da.site/user/${userId}/moods?year=${year}&month=${month + 1}`
       );
 
-      // 데이터를 날짜 기반으로 매핑
       const moodArray: MoodData[] = response.data;
       const mappedData = moodArray.reduce(
         (acc, mood) => {
@@ -89,16 +140,17 @@ export default function MainPage() {
         {} as Record<string, MoodData>
       );
       setMoodMap(mappedData);
-      // console.log(mappedData);
     } catch (error) {
-      console.error("Failed to fetch mood data :", error);
+      console.error("Failed to fetch mood data:", error);
     }
   };
 
   useEffect(() => {
-    fetchMoodData();
-    fetchUserData();
-  }, [year, month]);
+    if (userId) {
+      fetchMoodData();
+      fetchUserData();
+    }
+  }, [year, month, userId]); // userId가 변경될 때만 실행
 
   useEffect(() => {
     if (!useIsModal) {
@@ -125,6 +177,7 @@ export default function MainPage() {
     console.log("date", date);
     console.log("changeTo", changeToFormattedDate(date));
     console.log("moodData", moodMap[changeToFormattedDate(date)]);
+    console.log("내 캘린더 여부 확인", isMyCalendar);
 
     if (isToday(date)) {
       // 오늘 날짜 클릭 시 모달만 열림
@@ -133,14 +186,19 @@ export default function MainPage() {
       //   mood: moodMap[changeToFormattedDate(date)].mood,
       //   memo: moodMap[changeToFormattedDate(date)].memo,
       // });
-      console.log("✅ 오늘 날짜 클릭됨:", date);
-      console.log("✅ 상태에 저장할 데이터:", moodData);
+      console.log("오늘 날짜 클릭됨:", date);
+      console.log("상태에 저장할 데이터:", moodData);
+
+      if (!isMyCalendar) {
+        console.warn("다른 사용자의 캘린더에서는 모달을 열 수 없습니다.");
+        return;
+      }
 
       setIsModalClick(type, {
         title: moodData?.mood || "", // 기존 기분이 있다면 전달, 없으면 빈 값
         content: moodData?.memo || "", // 기존 메모가 있다면 전달, 없으면 빈 값
         onConfirm: () => {
-          console.log("✅ onConfirm 실행됨");
+          console.log("onConfirm 실행됨");
           fetchMoodData(); // 기분 데이터 갱신
         },
       });

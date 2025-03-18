@@ -27,8 +27,7 @@ export const SearchBarContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 80%;
-  height: 3.75rem;
-  padding: 0.75rem 2.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 0.625rem;
   border: 1px solid var(--main-text);
 

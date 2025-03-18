@@ -7,6 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { themeImages } from "@/assets/common/themeImages";
 
 const NavigationBar = styled.div`
   display: flex;
@@ -176,19 +177,63 @@ export default function Navigation() {
     navigate("/auth/join");
   };
 
+  // const handleLogout = () => {
+  //   localStorage.removeItem("accessToken");
+
+  //   document.body.style.fontFamily = "'Pretendard', sans-serif";
+  //   sessionStorage.removeItem("appliedFont");
+  //   sessionStorage.removeItem("appliedTheme");
+
+  //   window.dispatchEvent(new Event("storage"));
+
+  //   setIsLoggedIn(false);
+  //   navigate("/auth/login");
+  // };
+
+  const [_, setMoodIcons] = useState(themeImages);
+
   const handleLogout = () => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      const userId = jwtDecode(token).sub;
-      sessionStorage.removeItem(`appliedFont_${userId}`);
-      sessionStorage.removeItem(`appliedTheme_${userId}`);
+    const userId = localStorage.getItem("userId");
+
+    if (userId) {
+      localStorage.removeItem(`appliedTheme_${userId}`);
+      localStorage.removeItem(`appliedFont_${userId}`);
+      localStorage.removeItem(`moodIcons_${userId}`);
     }
 
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("appliedFont");
-    setIsLoggedIn(false);
-    navigate("/auth/login");
+    localStorage.removeItem("userId");
+    sessionStorage.clear();
+
+    document.body.style.fontFamily = "'Pretendard', sans-serif";
+
+    setMoodIcons({ ...themeImages }); // 새로운 객체 할당 (상태 변경 감지)
+
+    localStorage.setItem("logoutEvent", Date.now().toString());
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 50);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      setMoodIcons({ ...themeImages });
+      document.body.style.fontFamily = "'Pretendard', sans-serif";
+      return;
+    }
+
+    const userId = jwtDecode(token).sub;
+    if (!userId) return;
+
+    const storedTheme = localStorage.getItem(`appliedTheme_${userId}`);
+    const storedFont = localStorage.getItem(`appliedFont_${userId}`);
+
+    setMoodIcons(storedTheme ? JSON.parse(storedTheme) : { ...themeImages });
+    document.body.style.fontFamily = storedFont || "'Pretendard', sans-serif";
+  }, [isLoggedIn]);
 
   const handleMypage = () => {
     navigate("/mypage");

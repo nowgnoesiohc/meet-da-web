@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DiarySettingButton } from "@/components/ui/Button";
 import { useIsModalStore } from "@/store/ModalStore";
 import DeleteThemeCompleteModal from "@/components/modal/DeleteThemeCompleteModal";
@@ -110,13 +110,11 @@ export default function Own() {
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
     if (isModal === null) {
-      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
       setClickedStates({});
     }
   }, [isModal]);
 
   const checkClick = (item: { id: string; name: string }) => {
-    console.log("Clicked Item:", item);
     if (!item.id) {
       console.error("Invalid item clicked:", item);
       return;
@@ -144,26 +142,32 @@ export default function Own() {
 
     // 사용자별 적용된 테마 및 폰트 불러오기
     const storedFont = sessionStorage.getItem(`appliedFont_${userId}`);
-    const storedTheme = sessionStorage.getItem(`appliedTheme_${userId}`);
+    localStorage.removeItem("appliedTheme");
 
-    if (storedFont) {
-      document.body.style.fontFamily = storedFont;
-    }
+    const storedTheme = sessionStorage.getItem(`appliedTheme_${userId}`);
 
     if (storedTheme) {
       const parsedTheme = JSON.parse(storedTheme);
+
+      localStorage.setItem(
+        `appliedTheme_${userId}`,
+        JSON.stringify(parsedTheme)
+      );
       localStorage.setItem(
         "moodIcons",
         JSON.stringify(moodIconMap[parsedTheme.name])
       );
     }
+
+    if (storedFont) {
+      document.body.style.fontFamily = storedFont;
+    }
   }, []);
 
   const applyThemeOrFont = async (itemId: string, type: "THEME" | "FONT") => {
-    console.log("applyThemeOrFont 실행됨:", { itemId, type }); // 실행 여부 확인
     if (!itemId) {
       console.error("itemId가 존재하지 않음:", itemId);
-      return; // itemId가 없으면 실행 중단
+      return;
     }
 
     try {
@@ -179,76 +183,60 @@ export default function Own() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.status === 200) {
-        if (type === "FONT") {
-          const appliedFont = ownFonts.find((font) => font.id === itemId);
-          if (appliedFont) {
-            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
-            document.body.style.fontFamily = appliedFont.name;
-            console.log("폰트 적용 완료:", appliedFont.name);
-          }
-        }
-
-        if (type === "THEME") {
-          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
-          if (appliedTheme) {
-            sessionStorage.setItem(
-              `appliedTheme_${userId}`,
-              JSON.stringify(appliedTheme)
-            );
-            if (moodIconMap[appliedTheme.name]) {
-              localStorage.setItem(
-                "moodIcons",
-                JSON.stringify(moodIconMap[appliedTheme.name])
-              );
-            }
-            console.log("테마 적용 완료:", appliedTheme.name);
-          }
-        }
-
-        if (type === "FONT") {
-          const appliedFont = ownFonts.find((font) => font.id === itemId);
-          if (appliedFont) {
-            document.body.style.fontFamily = appliedFont.name;
-            sessionStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
-          }
-        }
-
-        if (type === "THEME") {
-          const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
-          if (appliedTheme) {
-            sessionStorage.setItem(
-              `appliedTheme_${userId}`,
-              JSON.stringify(appliedTheme)
-            );
-
-            if (moodIconMap[appliedTheme.name]) {
-              // moodIconMap이 존재하는지 확인
-              localStorage.setItem(
-                "moodIcons",
-                JSON.stringify(moodIconMap[appliedTheme.name])
-              );
-            }
-          }
-        }
-
-        // 적용 후 체크박스 상태 초기화
-        setClickedStates((prev) => {
-          console.log("🔵 체크박스 초기화 전 상태:", prev);
-          return {};
-        });
-        setSelectedItems((prev) => {
-          console.log("🔵 선택된 항목 초기화 전 상태:", prev);
-          return [];
-        });
-
-        // 적용 완료 후 applyCompleteModal 모달 표시
-        setModalData({
-          name: "적용 완료",
-          content: "선택한 테마 또는 폰트가 적용되 었습니다.",
-        });
-        setIsModalClick("applyCompleteModal"); // applyCompleteModal로 변경
+      if (response.status !== 200 && response.status !== 201) {
+        console.error("API 응답 오류:", response);
+        throw new Error("테마/폰트 적용 실패");
       }
+
+      if (type === "FONT") {
+        const appliedFont = ownFonts.find((font) => font.id === itemId);
+        if (appliedFont) {
+          localStorage.setItem(`appliedFont_${userId}`, appliedFont.name);
+          sessionStorage.setItem("appliedFont", appliedFont.name);
+          document.body.style.fontFamily = appliedFont.name;
+        }
+      }
+
+      // 테마 적용
+      if (type === "THEME") {
+        const appliedTheme = ownThemes.find((theme) => theme.id === itemId);
+
+        if (!appliedTheme) {
+          return;
+        }
+
+        sessionStorage.setItem(
+          `appliedTheme_${userId}`,
+          JSON.stringify(appliedTheme)
+        );
+
+        localStorage.removeItem("appliedTheme");
+        localStorage.setItem(
+          `appliedTheme_${userId}`,
+          JSON.stringify(appliedTheme)
+        );
+
+        const moodIcons = moodIconMap[appliedTheme.name];
+
+        if (!moodIcons) {
+          console.error(
+            "⚠️ moodIconMap에서 해당 테마의 아이콘을 찾을 수 없음:",
+            appliedTheme.name
+          );
+        } else {
+          localStorage.setItem("moodIcons", JSON.stringify(moodIcons));
+        }
+      }
+
+      window.dispatchEvent(new Event("storage"));
+
+      setClickedStates({});
+      setSelectedItems([]);
+      setModalData({
+        name: "적용 완료",
+        content: "선택한 테마 또는 폰트가 적용되었습니다.",
+      });
+      setIsModalClick("applyCompleteModal");
     } catch (error) {
       console.error("테마/폰트 적용 실패:", error);
       setModalData({
@@ -259,9 +247,57 @@ export default function Own() {
     }
   };
 
+  useEffect(() => {}, [selectedItems, clickedStates]); // 상태 변경 시 UI 강제 리렌더링
+
+  // const {
+  //   currentData,
+  //   currentPage,
+  //   totalPages,
+  //   goToPreviousPage,
+  //   goToNextPage,
+  //   setCurrentPage,
+  // } = usePagination([...ownThemes, ...ownFonts], 6);
+
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filteredItems, setFilteredItems] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
   useEffect(() => {
-    console.log("🔄 적용 후 UI 업데이트 실행됨");
-  }, [selectedItems, clickedStates]); // ✅ 상태 변경 시 UI 강제 리렌더링
+    setFilteredItems([...ownThemes, ...ownFonts]);
+  }, [ownThemes, ownFonts]);
+
+  // 검색 함수
+  const performSearch = useCallback(() => {
+    const keyword = searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      setFilteredItems([...ownThemes, ...ownFonts]);
+    } else {
+      const filtered = [...ownThemes, ...ownFonts].filter((item) =>
+        item.name.toLowerCase().includes(keyword)
+      );
+      setFilteredItems(filtered);
+    }
+    setCurrentPage(1);
+    setIsSearching(false);
+  }, [searchKeyword, ownThemes, ownFonts]);
+
+  // 검색 디바운싱 적용
+  useEffect(() => {
+    if (isSearching) {
+      const timer = setTimeout(() => {
+        performSearch();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearching, searchKeyword, performSearch]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(event.target.value);
+    setIsSearching(true);
+  };
 
   const {
     currentData,
@@ -270,7 +306,7 @@ export default function Own() {
     goToPreviousPage,
     goToNextPage,
     setCurrentPage,
-  } = usePagination([...ownThemes, ...ownFonts], 6);
+  } = usePagination(filteredItems, 6);
 
   return (
     <>
@@ -280,6 +316,7 @@ export default function Own() {
             <SearchInput
               type="text"
               placeholder="다양한 테마를 검색해 보세요."
+              onChange={handleSearch}
             />
             <SearchButton>
               <SearchIcon />

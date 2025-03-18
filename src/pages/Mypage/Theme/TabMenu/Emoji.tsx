@@ -1,5 +1,5 @@
 import { themeSetImageMap } from "@/assets/common/themeImages";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIsModalStore } from "@/store/ModalStore";
 import axios from "axios";
 import usePagination, {
@@ -48,16 +48,16 @@ export default function Emoji() {
   const [themes, setThemes] = useState<
     { _id: number; name: string; price: number }[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  const [_, setLoading] = useState(true);
 
-  const {
-    currentData,
-    currentPage,
-    totalPages,
-    goToPreviousPage,
-    goToNextPage,
-    setCurrentPage,
-  } = usePagination(themes, 6);
+  // const {
+  //   currentData,
+  //   currentPage,
+  //   totalPages,
+  //   goToPreviousPage,
+  //   goToNextPage,
+  //   setCurrentPage,
+  // } = usePagination(themes, 6);
 
   const [modalData, setModalData] = useState<{
     name: string;
@@ -74,7 +74,6 @@ export default function Emoji() {
   ) => void;
 
   const isModalOpen = (type?: string | null) => {
-    console.log(type);
     setIsModalClick(type || null); // type이 없으면 null을 설정
   };
 
@@ -95,12 +94,9 @@ export default function Emoji() {
       });
   }, []);
 
-  console.log(loading);
-
   // Theme에서 selectedThemes가 초기화되면 체크박스도 초기화
   useEffect(() => {
     if (isModal === null) {
-      console.log("모달이 닫혔을 때 체크박스 초기화 실행");
       setClickedStates({});
     }
   }, [isModal]);
@@ -168,19 +164,6 @@ export default function Emoji() {
         return;
       }
 
-      // 포인트 차감 API 요청
-      const pointResponse = await axios.patch(
-        `https://api.meet-da.site/user/${userId}/points`,
-        { delta: -totalPrice, description: truncatedNames },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (pointResponse.status !== 200) {
-        setModalData({ name: "포인트 부족", content: "포인트가 부족합니다." });
-        setIsModalClick("deleteThemeCompleteModal");
-        return;
-      }
-
       // 테마 구매 요청
       const purchasedItems: string[] = [];
 
@@ -244,9 +227,57 @@ export default function Emoji() {
     }
   }, [isModal]);
 
+  useEffect(() => {}, [selectedThemes]); // 상태가 변경될 때마다 로그 출력
+
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [filteredThemes, setFilteredThemes] = useState<
+    { _id: number; name: string; price: number }[]
+  >([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
   useEffect(() => {
-    console.log("selectedThemes 변경됨, totalPrice 업데이트됨:", totalPrice);
-  }, [selectedThemes]); // 상태가 변경될 때마다 로그 출력
+    setFilteredThemes(themes);
+  }, [themes]);
+
+  // 검색 함수
+  const performSearch = useCallback(() => {
+    const keyword = searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      setFilteredThemes(themes);
+    } else {
+      const filtered = themes.filter((item) =>
+        item.name.toLowerCase().includes(keyword)
+      );
+      setFilteredThemes(filtered);
+    }
+    setCurrentPage(1);
+    setIsSearching(false);
+  }, [searchKeyword, themes]);
+
+  // 검색 디바운싱 적용
+  useEffect(() => {
+    if (isSearching) {
+      const timer = setTimeout(() => {
+        performSearch();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSearching, searchKeyword, performSearch]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchKeyword(event.target.value);
+    setIsSearching(true);
+  };
+
+  const {
+    currentData,
+    currentPage,
+    totalPages,
+    goToPreviousPage,
+    goToNextPage,
+    setCurrentPage,
+  } = usePagination(filteredThemes, 6);
 
   return (
     <>
@@ -256,6 +287,7 @@ export default function Emoji() {
             <SearchInput
               type="text"
               placeholder="다양한 테마를 검색해 보세요."
+              onChange={handleSearch}
             />
             <SearchButton>
               <SearchIcon />

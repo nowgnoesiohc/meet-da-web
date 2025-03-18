@@ -15,6 +15,7 @@ import { useIsModalStore } from "@/store/ModalStore";
 import { Link, useNavigate } from "react-router-dom";
 import { OrangeButton } from "@/components/ui/Button";
 import { AiOutlineClose } from "react-icons/ai";
+import { jwtDecode } from "jwt-decode";
 // import { useIsModalStore } from "../../store/ModalStore";
 
 interface StyledProps {
@@ -268,27 +269,39 @@ export default function Login() {
   const navigate = useNavigate();
 
   type FormData = z.infer<typeof schema>;
+
   const onClickSubmit = async (data: FormData) => {
-    console.log(data);
     try {
       const response = await axios.post("https://api.meet-da.site/auth/login", {
         email: data.email,
         password: data.password,
       });
+
       if (response.status === 201) {
         console.log("로그인 성공", response.data);
         localStorage.setItem("accessToken", response.data.accessToken);
+
+        const userId = jwtDecode(response.data.accessToken).sub;
+        console.log("새로운 로그인 사용자 ID:", userId);
+
+        sessionStorage.clear();
+
+        const storedFont =
+          localStorage.getItem(`appliedFont_${userId}`) ||
+          "'Pretendard', sans-serif";
+        sessionStorage.setItem("appliedFont", storedFont);
+
+        const storedTheme = localStorage.getItem(`appliedTheme_${userId}`);
+        if (storedTheme) {
+          sessionStorage.setItem(`appliedTheme_${userId}`, storedTheme);
+        }
+
+        window.dispatchEvent(new Event("storage"));
+
         navigate("/");
       }
-    } catch (error: unknown) {
-      if (typeof error === "object" && error !== null && "response" in error) {
-        const apiError = error as {
-          response?: { data?: { message?: string } };
-        };
-        alert(apiError.response?.data?.message || "로그인에 실패했습니다.");
-      } else {
-        alert("로그인 처리 중 오류가 발생했습니다.");
-      }
+    } catch {
+      alert("로그인 처리 중 오류가 발생했습니다.");
     }
   };
 
